@@ -1,0 +1,201 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #17231f;
+  --ink-soft: #4f5f58;
+  --paper: #f4f1e8;
+  --paper-deep: #e9e4d7;
+  --panel: #fffdf8;
+  --line: #d5d0c2;
+  --forest: #173f36;
+  --forest-light: #2f6658;
+  --rust: #a54f32;
+  --gold: #b9883b;
+  --blue: #3c6572;
+  --danger: #8d352c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at 12% -10%, rgb(185 136 59 / 10%), transparent 28rem),
+    linear-gradient(180deg, #f8f5ed 0, var(--paper) 30rem, #efebe1 100%);
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: #d9c39a;
+  color: #10241f;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button,
+a,
+input,
+select,
+summary {
+  outline-offset: 3px;
+}
+
+.font-editorial {
+  font-family: Georgia, "Times New Roman", serif;
+  letter-spacing: -0.025em;
+}
+
+.page-shell {
+  width: min(1440px, 100%);
+  margin-inline: auto;
+  padding: 2rem clamp(1rem, 3vw, 3rem) 5rem;
+}
+
+.page-grid-lines {
+  background-image:
+    linear-gradient(rgb(23 63 54 / 4%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(23 63 54 / 4%) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.paper-panel {
+  border: 1px solid var(--line);
+  background: rgb(255 253 248 / 88%);
+  box-shadow: 0 16px 40px rgb(29 43 37 / 6%);
+  backdrop-filter: blur(8px);
+}
+
+.research-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.research-table th {
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  padding: 0.8rem 1rem;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.research-table td {
+  border-bottom: 1px solid #e5e0d5;
+  padding: 0.9rem 1rem;
+  vertical-align: top;
+}
+
+.research-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.maplibregl-map {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.maplibregl-ctrl-attrib {
+  font-size: 9px !important;
+}
+
+.maplibregl-ctrl-group {
+  border: 1px solid #bcb8ad !important;
+  box-shadow: 0 4px 16px rgb(17 38 31 / 12%) !important;
+}
+
+.research-map-marker {
+  display: flex;
+  cursor: pointer;
+  flex-direction: column;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--forest);
+}
+
+.research-map-marker__label {
+  max-width: 10rem;
+  overflow: hidden;
+  border: 1px solid rgb(23 63 54 / 24%);
+  background: rgb(255 253 248 / 92%);
+  padding: 0.18rem 0.35rem;
+  box-shadow: 0 2px 8px rgb(23 63 54 / 12%);
+  font-size: 0.58rem;
+  font-weight: 700;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.research-map-marker__pin {
+  display: grid;
+  width: 1.4rem;
+  height: 1.4rem;
+  place-items: center;
+  border: 2px solid #fffdf8;
+  border-radius: 999px;
+  box-shadow: 0 1px 0.45rem rgb(23 63 54 / 35%);
+  color: white;
+  font-size: 0.54rem;
+  line-height: 1;
+}
+
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: -4rem;
+  z-index: 100;
+  border-radius: 0.25rem;
+  background: white;
+  color: var(--forest);
+  padding: 0.75rem 1rem;
+  transition: top 150ms ease;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+@media (max-width: 720px) {
+  .page-shell {
+    padding-top: 1.25rem;
+  }
+
+  .research-table th:nth-child(n + 4),
+  .research-table td:nth-child(n + 4) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

@@ -144,6 +144,9 @@ normalized repository is the only application data source.
 The map receives purpose-built, serializable view data. MapLibre rendering is
 separate from route semantics:
 
+- the default base is a deterministic local latitude/longitude research grid;
+  it makes no political, administrative or historical boundary claim and does
+  not depend on a third-party style service;
 - resolved place mentions are points;
 - unresolved place mentions appear in the side panel and unresolved layer
   registry, never at fabricated coordinates;
@@ -153,6 +156,11 @@ separate from route semantics:
 - family/household context is a point overlay, not an automatic shared route;
 - local EHRI records are optional and disabled by default to prevent the
   385-record overlay from overwhelming dossier evidence.
+
+Historical boundaries, WMS/WMTS services and other external cartography remain
+disabled registry placeholders in V1. They can later be added as optional
+layers with their own source, date, license and confidence metadata, without
+changing person, event, mention or route records.
 
 The initial map does not animate. A selected person's timeline can play once,
 pause and reset; playback never loops automatically.

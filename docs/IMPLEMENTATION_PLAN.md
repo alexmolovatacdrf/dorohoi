@@ -27,7 +27,7 @@ Acceptance criteria:
 
 ## Phase 1 — project foundation
 
-Status: pending.
+Status: complete.
 
 - Scaffold Next.js App Router, React, strict TypeScript and Tailwind.
 - Add Zod, MapLibre GL JS and a focused test runner.
@@ -44,7 +44,7 @@ Acceptance criteria:
 
 ## Phase 2 — deterministic normalization
 
-Status: pending.
+Status: complete.
 
 - Define Zod schemas for both dossier versions, the local EHRI list, the supplied
   analytical model and all normalized collections.
@@ -68,7 +68,7 @@ Acceptance criteria:
 
 ## Phase 3 — normalization tests and data selectors
 
-Status: pending.
+Status: complete.
 
 - Test source validation and normalized validation.
 - Test deterministic output.
@@ -88,7 +88,7 @@ Acceptance criteria:
 
 ## Phase 4 — research interface
 
-Status: pending.
+Status: complete.
 
 - Build the Overview with clickable counts linked to filtered indexes.
 - Build searchable Persons and detailed person pages with roles, relationships,
@@ -112,7 +112,7 @@ Acceptance criteria:
 
 ## Phase 5 — MapLibre workspace
 
-Status: pending.
+Status: complete.
 
 - Build the three-column map layout with filter panel, map, contextual details
   and bottom timeline.
@@ -137,7 +137,7 @@ Acceptance criteria:
 
 ## Phase 6 — verification and handoff
 
-Status: pending.
+Status: complete.
 
 Run, in order:
 
