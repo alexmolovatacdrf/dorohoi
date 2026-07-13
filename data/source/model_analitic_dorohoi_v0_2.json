@@ -1,0 +1,79 @@
+{
+  "_model_versiune": "0.2",
+  "_descriere": "Model analitic separat de transcriere. Toate afirmațiile trebuie să păstreze o legătură către document, pagină și rubrică.",
+  "documents": [],
+  "pages": [],
+  "persons": [],
+  "person_name_variants": [],
+  "households": [],
+  "household_memberships": [],
+  "relationships": [],
+  "mentions": [],
+  "events": [],
+  "event_participants": [],
+  "places": [],
+  "place_mentions": [],
+  "event_places": [],
+  "route_segments": [],
+  "amounts": [],
+  "claims": [],
+  "media": [],
+  "entity_matches": [],
+  "review_tasks": [],
+  "_record_templates": {
+    "claim": {
+      "claim_id": null,
+      "subject_type": null,
+      "subject_id": null,
+      "predicate": null,
+      "object_type": null,
+      "object_value": null,
+      "source_ref": {
+        "document_id": null,
+        "page_id": null,
+        "field_code": null,
+        "value_id": null,
+        "fragment_raw": null
+      },
+      "confidence": null,
+      "assertion_status": "explicit",
+      "created_by": null,
+      "created_at": null
+    },
+    "event": {
+      "event_id": null,
+      "event_type": null,
+      "date_raw": null,
+      "date_start": null,
+      "date_end": null,
+      "date_precision": null,
+      "description": null,
+      "participants": [],
+      "places": [],
+      "claims": []
+    },
+    "person": {
+      "person_id": null,
+      "display_name": null,
+      "sex_normalized": null,
+      "birth_date_start": null,
+      "birth_date_end": null,
+      "death_date_start": null,
+      "death_date_end": null,
+      "status": "unresolved",
+      "name_variants": [],
+      "mentions": [],
+      "relationships": []
+    },
+    "entity_match": {
+      "match_id": null,
+      "left_entity": null,
+      "right_entity": null,
+      "score": null,
+      "evidence": [],
+      "decision": "candidate",
+      "reviewed_by": null,
+      "reviewed_at": null
+    }
+  }
+}

@@ -1,0 +1,255 @@
+{
+  "_model_versiune": "0.3-preliminar-2590",
+  "_status": "extragere analitică inițială; nu înlocuiește transcrierea diplomatică",
+  "document": {
+    "document_id": "DOROHOI-2590",
+    "fisier_sursa": "DOROHOI 2590(1).pdf",
+    "tip": "dosar WJC tip A",
+    "pagini_pdf": 8
+  },
+  "persoane": [
+    {
+      "persoana_id": "P-2590-001",
+      "nume_afisat": "Iancu Aizic",
+      "nume_familie": "Aizic",
+      "prenume": "Iancu",
+      "sex": "M",
+      "data_nasterii": {
+        "raw": "1914 Februarie 22",
+        "normalizat": "1914-02-22",
+        "precizie": "zi"
+      },
+      "loc_nastere_raw": "Dorohoi",
+      "stare_civila_raw": "Căsătorit",
+      "roluri_in_document": [
+        "declarant",
+        "cap de familie",
+        "semnatar",
+        "deportat"
+      ],
+      "incredere_identitate": "ridicata"
+    },
+    {
+      "persoana_id": "P-2590-002",
+      "nume_afisat": "Marica Chibac",
+      "nume_familie": "Chibac",
+      "prenume": "Marica",
+      "sex": "F",
+      "an_nastere_raw": "1911",
+      "roluri_in_document": [
+        "membru al familiei",
+        "soție probabilă"
+      ],
+      "incredere_identitate": "medie",
+      "lecturi_alternative": [
+        "Marica Aizic"
+      ]
+    },
+    {
+      "persoana_id": "P-2590-003",
+      "nume_afisat": "Pesi Aizic",
+      "nume_familie": "Aizic",
+      "prenume": "Pesi",
+      "sex": "F",
+      "roluri_in_document": [
+        "mamă a declarantului",
+        "victimă decedată"
+      ],
+      "incredere_identitate": "ridicata"
+    }
+  ],
+  "relatii": [
+    {
+      "relatie_id": "R-2590-001",
+      "tip": "soți",
+      "persoana_1": "P-2590-001",
+      "persoana_2": "P-2590-002",
+      "incredere": "medie",
+      "sursa": {
+        "pagina_pdf": 1,
+        "pagina_tiparita": 1
+      }
+    },
+    {
+      "relatie_id": "R-2590-002",
+      "tip": "mamă-fiu",
+      "parinte": "P-2590-003",
+      "copil": "P-2590-001",
+      "incredere": "ridicata",
+      "sursa": {
+        "pagina_pdf": 8,
+        "pagina_tiparita": 15
+      }
+    }
+  ],
+  "evenimente": [
+    {
+      "eveniment_id": "E-2590-001",
+      "tip": "revizuire_cetatenie",
+      "data_raw": "1938",
+      "participant": "P-2590-001",
+      "descriere_raw": "da; cetățean Român; cheltueli 4-5 mii lei",
+      "sursa": {
+        "pagina_pdf": 2,
+        "pagina_tiparita": 3,
+        "rubrica": "1.b-1.d"
+      }
+    },
+    {
+      "eveniment_id": "E-2590-002",
+      "tip": "evacuare_din_locuinta",
+      "data_raw": null,
+      "participant": "P-2590-001",
+      "origine_raw": "casa proprie",
+      "sursa": {
+        "pagina_pdf": 2,
+        "pagina_tiparita": 3,
+        "rubrica": "3.c"
+      }
+    },
+    {
+      "eveniment_id": "E-2590-003",
+      "tip": "maltratare",
+      "participant": "P-2590-001",
+      "descriere_raw": "da",
+      "sursa": {
+        "pagina_pdf": 3,
+        "pagina_tiparita": 5,
+        "rubrica": "5.b"
+      }
+    },
+    {
+      "eveniment_id": "E-2590-004",
+      "tip": "deportare_internare",
+      "interval_raw": "10 Noembrie 941 - 944",
+      "participant": "P-2590-001",
+      "origine_raw": "Dorohoi",
+      "destinatii_raw": [
+        "Moghilev",
+        "Tropov[...]"
+      ],
+      "motiv_raw": "Rasial fiind Evreu",
+      "sursa": {
+        "pagina_pdf": 7,
+        "pagina_tiparita": 13,
+        "rubrica": "13.a-13.d"
+      }
+    },
+    {
+      "eveniment_id": "E-2590-005",
+      "tip": "munca_obligatorie",
+      "durata_raw": "2 ani și 4 luni",
+      "participant": "P-2590-001",
+      "loc_raw": "Transnistria",
+      "sursa": {
+        "pagina_pdf": 4,
+        "pagina_tiparita": 7,
+        "rubrica": "6.a"
+      }
+    },
+    {
+      "eveniment_id": "E-2590-006",
+      "tip": "violenta",
+      "participant": "P-2590-001",
+      "autoritate_raw": "poliție",
+      "descriere_raw": "greu bătut de poliție",
+      "sursa": {
+        "pagina_pdf": 4,
+        "pagina_tiparita": 7,
+        "rubrica": "6.c"
+      }
+    },
+    {
+      "eveniment_id": "E-2590-007",
+      "tip": "confiscare_la_frontiera",
+      "participant": "P-2590-001",
+      "loc_raw": "Ataki",
+      "descriere_raw": "i s-a luat tot ce avea asupra sa",
+      "sursa": {
+        "pagina_pdf": 8,
+        "pagina_tiparita": 14
+      }
+    },
+    {
+      "eveniment_id": "E-2590-008",
+      "tip": "pierderi_materiale",
+      "participant": "P-2590-001",
+      "valoare_raw": "2.000.000 lei",
+      "descriere_raw": "avere, îmbrăcăminte și lucruri casnice",
+      "sursa": {
+        "pagina_pdf": 7,
+        "pagina_tiparita": 13,
+        "rubrica": "13.e"
+      }
+    },
+    {
+      "eveniment_id": "E-2590-009",
+      "tip": "vanzare_bunuri_pentru_subzistenta",
+      "participant": "P-2590-001",
+      "valoare_raw": "1.200.000 lei",
+      "sursa": {
+        "pagina_pdf": 7,
+        "pagina_tiparita": 13,
+        "rubrica": "12.f"
+      }
+    },
+    {
+      "eveniment_id": "E-2590-010",
+      "tip": "deces",
+      "participant": "P-2590-003",
+      "data_raw": "8 Febr. 942",
+      "loc_raw": "Moghilev",
+      "cauza_raw": "tifos",
+      "sursa": {
+        "pagina_pdf": 8,
+        "pagina_tiparita": 15,
+        "rubrica": "tabel_victime"
+      }
+    }
+  ],
+  "locuri_mentionate": [
+    {
+      "raw": "Dorohoi",
+      "roluri": [
+        "domiciliu",
+        "loc de naștere",
+        "origine deportare",
+        "locul declarației"
+      ]
+    },
+    {
+      "raw": "Ataki",
+      "roluri": [
+        "frontieră",
+        "confiscare și maltratare"
+      ]
+    },
+    {
+      "raw": "Moghilev",
+      "roluri": [
+        "lagăr/deportare",
+        "locul decesului mamei"
+      ]
+    },
+    {
+      "raw": "Tropov[...]",
+      "roluri": [
+        "a doua localitate de deportare, lectură incertă"
+      ]
+    },
+    {
+      "raw": "Transnistria",
+      "roluri": [
+        "internare",
+        "muncă obligatorie"
+      ]
+    }
+  ],
+  "probleme_deschise": [
+    "Confirmarea numelui persoanei din tabelul familiei: Marica Chibac sau Marica Aizic.",
+    "Lectura exactă a ocupației de la 12.a: Cismaci/Cismar/Cismărie.",
+    "Structurarea exactă a ajutorului comunitar la 12.e.",
+    "Identificarea celei de-a doua localități după Moghilev la 13.d.",
+    "Colaționarea ultimelor două fragmente din nota explicativă."
+  ]
+}

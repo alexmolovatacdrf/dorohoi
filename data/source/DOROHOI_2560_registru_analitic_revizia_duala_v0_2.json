@@ -1,0 +1,268 @@
+{
+  "_model_versiune": "0.2-preliminar-2560-revizia-duala",
+  "_status": "extracție analitică inițială; nu înlocuiește transcrierea diplomatică",
+  "document": {
+    "document_id": "DOROHOI-2560",
+    "fisier_sursa": "DOROHOI 2560(1).pdf",
+    "tip": "dosar WJC tip A",
+    "pagini_pdf": 9
+  },
+  "persoane": [
+    {
+      "persoana_id": "P-2560-001",
+      "nume_afisat": "Ițic Herțanu",
+      "nume_familie": "Herțanu",
+      "prenume": "Ițic",
+      "sex": "M",
+      "data_nasterii": {
+        "raw": "1892 Februarie 20",
+        "normalizat": "1892-02-20",
+        "precizie": "zi"
+      },
+      "loc_nastere_raw": "Mihăileni jud. Dorohoi",
+      "stare_civila_raw": "Necăsătorit",
+      "roluri_in_document": [
+        "declarant",
+        "cap de familie",
+        "semnatar"
+      ],
+      "incredere_identitate": "ridicata"
+    }
+  ],
+  "gospodarii": [
+    {
+      "gospodarie_id": "H-2560-001",
+      "cap_persoana_id": "P-2560-001",
+      "total_persoane_raw": "1",
+      "membri": [
+        "P-2560-001"
+      ]
+    }
+  ],
+  "evenimente": [
+    {
+      "eveniment_id": "E-2560-001",
+      "tip": "revizuire_cetatenie",
+      "data_raw": "1938",
+      "participant": "P-2560-001",
+      "descriere_raw": "Da; admis la revizuire; cheltueli 6000 (șase mii)",
+      "sursa": {
+        "pagina_pdf": 2,
+        "pagina_tiparita": 3,
+        "rubrica": "1.b-1.d"
+      }
+    },
+    {
+      "eveniment_id": "E-2560-002",
+      "tip": "evacuare",
+      "data_raw": "19 Iunie 1941",
+      "participant": "P-2560-001",
+      "origine_raw": "Mihăileni",
+      "destinatie_raw": "Bucecea",
+      "mod_transport_raw": "pe jos",
+      "sursa": {
+        "pagina_pdf": 3,
+        "pagina_tiparita": 5,
+        "rubrica": "5.c"
+      }
+    },
+    {
+      "eveniment_id": "E-2560-003",
+      "tip": "deplasare_dupa_evacuare",
+      "data_raw": "4 Iulie 1941",
+      "participant": "P-2560-001",
+      "origine_raw": "Bucecea",
+      "destinatie_raw": "Dorohoi",
+      "sursa": {
+        "pagina_pdf": 9,
+        "pagina_tiparita": "anexă",
+        "fragment": "iar la 4 Iulie 1941 din Burdujeni la Dorohoi"
+      }
+    },
+    {
+      "eveniment_id": "E-2560-004",
+      "tip": "pierdere_gospodarie",
+      "data_raw": "1941",
+      "participant": "P-2560-001",
+      "loc_raw": "Mihăileni",
+      "valoare_raw": "cel puțin 600000 Lei, la valoarea leului din 1941",
+      "sursa": {
+        "pagina_pdf": 9,
+        "pagina_tiparita": "anexă"
+      }
+    },
+    {
+      "eveniment_id": "E-2560-005",
+      "tip": "restrictie_circulatie",
+      "data_raw": "după evacuarea din 1941",
+      "participant": "P-2560-001",
+      "loc_raw": "Dorohoi",
+      "descriere_raw": "o singură oră pe zi pentru ieșire în oraș sau în piață",
+      "sursa": {
+        "pagina_pdf": 9,
+        "pagina_tiparita": "anexă"
+      }
+    },
+    {
+      "eveniment_id": "E-2560-006",
+      "tip": "violenta_si_detentie",
+      "data_raw": "după evacuarea din 1941",
+      "participant": "P-2560-001",
+      "loc_raw": "Dorohoi, beciul poliției",
+      "descriere_raw": "crunt bătut și băgat în beciul poliției pe o zi întreagă",
+      "sursa": {
+        "pagina_pdf": 9,
+        "pagina_tiparita": "anexă"
+      }
+    },
+    {
+      "eveniment_id": "E-2560-007",
+      "tip": "depunere_valori",
+      "data_raw": "înainte de evacuarea evreilor în Transnistria",
+      "participant": "P-2560-001",
+      "institutie_raw": "Banca Națională a României",
+      "descriere_raw": "aur, argint, valută străină, lei românești și titluri",
+      "sursa": {
+        "pagina_pdf": 9,
+        "pagina_tiparita": "anexă"
+      }
+    },
+    {
+      "eveniment_id": "E-2560-008",
+      "tip": "semn_distinctiv",
+      "data_start_raw": "Iulie 1941",
+      "data_end_raw": "Decembrie 1943",
+      "participant": "P-2560-001",
+      "loc_raw": "Dorohoi",
+      "sursa": {
+        "pagina_pdf": 3,
+        "pagina_tiparita": 5,
+        "rubrica": "5.f"
+      }
+    },
+    {
+      "eveniment_id": "E-2560-009",
+      "tip": "munca_obligatorie",
+      "data_raw": "1942",
+      "durata_raw": "30 zile",
+      "participant": "P-2560-001",
+      "sursa": {
+        "pagina_pdf": 4,
+        "pagina_tiparita": 7,
+        "rubrica": "6.a"
+      }
+    },
+    {
+      "eveniment_id": "E-2560-010",
+      "tip": "munca_obligatorie",
+      "data_raw": "1943",
+      "durata_raw": "90 zile",
+      "participant": "P-2560-001",
+      "locuri_raw": [
+        "Dorohoi",
+        "Jijia",
+        "C.F.R."
+      ],
+      "descriere_raw": "repararea unui pod peste Jijia și muncă grea la C.F.R.",
+      "sursa": {
+        "pagina_pdf": 4,
+        "pagina_tiparita": 7,
+        "rubrica": "6.a-6.b"
+      }
+    },
+    {
+      "eveniment_id": "E-2560-011",
+      "tip": "munca_la_zapada",
+      "date_raw": [
+        "10/1942",
+        "10/1943"
+      ],
+      "participant": "P-2560-001",
+      "sursa": {
+        "pagina_pdf": 4,
+        "pagina_tiparita": 7,
+        "rubrica": "6.f"
+      }
+    },
+    {
+      "eveniment_id": "E-2560-012",
+      "tip": "vanzare_obiecte_casnice",
+      "interval_raw": "1942-1943",
+      "participant": "P-2560-001",
+      "valoare_raw": "150000 lei la valoarea leului din 1942-1943",
+      "sursa": {
+        "pagina_pdf": 7,
+        "pagina_tiparita": 13,
+        "rubrica": "12.f"
+      }
+    },
+    {
+      "eveniment_id": "E-2560-013",
+      "tip": "agravare_stare_sanatate",
+      "data_raw": "în timpul prigoanei",
+      "participant": "P-2560-001",
+      "descriere_raw": "declară că munca brută i-a agravat boala",
+      "sursa": {
+        "pagina_pdf": 9,
+        "pagina_tiparita": "anexă"
+      }
+    }
+  ],
+  "locuri_mentionate": [
+    {
+      "raw": "Dorohoi",
+      "roluri": [
+        "domiciliu",
+        "destinație",
+        "loc al restricțiilor",
+        "muncă"
+      ]
+    },
+    {
+      "raw": "Mihăileni jud. Dorohoi",
+      "roluri": [
+        "loc de naștere",
+        "origine evacuare",
+        "proprietate"
+      ]
+    },
+    {
+      "raw": "Bucecea",
+      "roluri": [
+        "destinație intermediară",
+        "origine etapă următoare"
+      ]
+    },
+    {
+      "raw": "Jijia",
+      "roluri": [
+        "pod reparat prin muncă obligatorie"
+      ]
+    },
+    {
+      "raw": "Banca Națională a României",
+      "roluri": [
+        "instituție de depozitare a valorilor"
+      ]
+    }
+  ],
+  "potriviri_de_verificat": [
+    {
+      "tip": "lista_repatriati",
+      "persoana_id": "P-2560-001",
+      "cautare_recomandata": [
+        "Herțanu Ițic",
+        "Hertanu Itic",
+        "Ițic Herțanu"
+      ],
+      "status": "neefectuat"
+    }
+  ],
+  "probleme_deschise": [
+    "Lectura exactă a cuvântului după «mutarea» în Q3.d: probabil «mobilei», alternativ «silită».",
+    "Colationarea diplomatică finală dintre nota înghesuită de la pagina PDF 8 și anexa de la pagina PDF 9.",
+    "Fragmentul exact privind restituirea rublelor de către Banca Națională.",
+    "Fragmentul după «posibilitate de aprovizionare» în anexa manuscrisă.",
+    "Clarificarea sensului notației 10/1942 și 10/1943 la munca de zăpadă."
+  ]
+}
