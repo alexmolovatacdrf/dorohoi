@@ -1,0 +1,679 @@
+[
+  {
+    "id": "RT-2560-BUCECEA-BURDUJENI",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "evenimente[2]",
+        "sourceRecordId": null,
+        "fragmentRaw": "origine_raw: Bucecea; fragment: din Burdujeni la Dorohoi"
+      }
+    ],
+    "raw": {
+      "structuredOrigin": "Bucecea",
+      "fragmentOrigin": "Burdujeni"
+    },
+    "normalized": {
+      "category": "contradiction",
+      "status": "open"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "reviewTaskId": "RT-2560-BUCECEA-BURDUJENI",
+    "category": "contradiction",
+    "title": "Bucecea/Burdujeni route-origin conflict",
+    "description": "The analytical origin field says Bucecea, but its quoted fragment says Burdujeni.",
+    "severity": "high",
+    "status": "open",
+    "entityRefs": [
+      {
+        "entityType": "event",
+        "entityId": "E-2560-003"
+      },
+      {
+        "entityType": "route_segment",
+        "entityId": "RS-2560-002"
+      },
+      {
+        "entityType": "place",
+        "entityId": "PL-UNRESOLVED-BURDUJENI-2560"
+      }
+    ],
+    "suggestedAction": "Inspect PDF page 9 and retain both readings until the transcription is collated."
+  },
+  {
+    "id": "RT-2560-MATCH-01",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "potriviri_de_verificat[0]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "tip": "lista_repatriati",
+      "persoana_id": "P-2560-001",
+      "cautare_recomandata": [
+        "Herțanu Ițic",
+        "Hertanu Itic",
+        "Ițic Herțanu"
+      ],
+      "status": "neefectuat"
+    },
+    "normalized": {
+      "category": "possible_duplicate_person",
+      "status": "open"
+    },
+    "confidence": "unknown",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "reviewTaskId": "RT-2560-MATCH-01",
+    "category": "possible_duplicate_person",
+    "title": "External identity match not yet checked",
+    "description": "Search forms: Herțanu Ițic, Hertanu Itic, Ițic Herțanu.",
+    "severity": "low",
+    "status": "open",
+    "entityRefs": [
+      {
+        "entityType": "person",
+        "entityId": "P-2560-001"
+      }
+    ],
+    "suggestedAction": "Search the named repatriate list and record evidence before linking identities."
+  },
+  {
+    "id": "RT-2560-SOURCE-01",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "probleme_deschise[0]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": "Lectura exactă a cuvântului după «mutarea» în Q3.d: probabil «mobilei», alternativ «silită».",
+    "normalized": {
+      "category": "uncertain_reading",
+      "status": "open"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "reviewTaskId": "RT-2560-SOURCE-01",
+    "category": "uncertain_reading",
+    "title": "Documentary reading requires review",
+    "description": "Lectura exactă a cuvântului după «mutarea» în Q3.d: probabil «mobilei», alternativ «silită».",
+    "severity": "medium",
+    "status": "open",
+    "entityRefs": [
+      {
+        "entityType": "document",
+        "entityId": "DOROHOI-2560"
+      }
+    ],
+    "suggestedAction": "Consult the source scan and record the reviewed reading without replacing the raw extraction."
+  },
+  {
+    "id": "RT-2560-SOURCE-02",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "probleme_deschise[1]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": "Colationarea diplomatică finală dintre nota înghesuită de la pagina PDF 8 și anexa de la pagina PDF 9.",
+    "normalized": {
+      "category": "source_collation",
+      "status": "open"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "reviewTaskId": "RT-2560-SOURCE-02",
+    "category": "source_collation",
+    "title": "Source collation remains open",
+    "description": "Colationarea diplomatică finală dintre nota înghesuită de la pagina PDF 8 și anexa de la pagina PDF 9.",
+    "severity": "medium",
+    "status": "open",
+    "entityRefs": [
+      {
+        "entityType": "document",
+        "entityId": "DOROHOI-2560"
+      }
+    ],
+    "suggestedAction": "Consult the source scan and record the reviewed reading without replacing the raw extraction."
+  },
+  {
+    "id": "RT-2560-SOURCE-03",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "probleme_deschise[2]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": "Fragmentul exact privind restituirea rublelor de către Banca Națională.",
+    "normalized": {
+      "category": "source_collation",
+      "status": "open"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "reviewTaskId": "RT-2560-SOURCE-03",
+    "category": "source_collation",
+    "title": "Source collation remains open",
+    "description": "Fragmentul exact privind restituirea rublelor de către Banca Națională.",
+    "severity": "medium",
+    "status": "open",
+    "entityRefs": [
+      {
+        "entityType": "document",
+        "entityId": "DOROHOI-2560"
+      }
+    ],
+    "suggestedAction": "Consult the source scan and record the reviewed reading without replacing the raw extraction."
+  },
+  {
+    "id": "RT-2560-SOURCE-04",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "probleme_deschise[3]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": "Fragmentul după «posibilitate de aprovizionare» în anexa manuscrisă.",
+    "normalized": {
+      "category": "source_collation",
+      "status": "open"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "reviewTaskId": "RT-2560-SOURCE-04",
+    "category": "source_collation",
+    "title": "Source collation remains open",
+    "description": "Fragmentul după «posibilitate de aprovizionare» în anexa manuscrisă.",
+    "severity": "medium",
+    "status": "open",
+    "entityRefs": [
+      {
+        "entityType": "document",
+        "entityId": "DOROHOI-2560"
+      }
+    ],
+    "suggestedAction": "Consult the source scan and record the reviewed reading without replacing the raw extraction."
+  },
+  {
+    "id": "RT-2560-SOURCE-05",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "probleme_deschise[4]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": "Clarificarea sensului notației 10/1942 și 10/1943 la munca de zăpadă.",
+    "normalized": {
+      "category": "source_collation",
+      "status": "open"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "reviewTaskId": "RT-2560-SOURCE-05",
+    "category": "source_collation",
+    "title": "Source collation remains open",
+    "description": "Clarificarea sensului notației 10/1942 și 10/1943 la munca de zăpadă.",
+    "severity": "medium",
+    "status": "open",
+    "entityRefs": [
+      {
+        "entityType": "document",
+        "entityId": "DOROHOI-2560"
+      }
+    ],
+    "suggestedAction": "Consult the source scan and record the reviewed reading without replacing the raw extraction."
+  },
+  {
+    "id": "RT-2590-INCOMPLETE-ROUTE",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "evenimente[3].destinatii_raw[1]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": "Dorohoi; Ataki; Moghilev; Tropov[...]",
+    "normalized": {
+      "category": "incomplete_route",
+      "status": "open"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "reviewTaskId": "RT-2590-INCOMPLETE-ROUTE",
+    "category": "incomplete_route",
+    "title": "Iancu Aizic deportation route is incomplete",
+    "description": "Two partial legs are shown. The subsequent unresolved place remains a mention with no segment.",
+    "severity": "high",
+    "status": "open",
+    "entityRefs": [
+      {
+        "entityType": "person",
+        "entityId": "P-2590-001"
+      },
+      {
+        "entityType": "route_segment",
+        "entityId": "RS-2590-001"
+      },
+      {
+        "entityType": "route_segment",
+        "entityId": "RS-2590-002"
+      }
+    ],
+    "suggestedAction": "Resolve the reading and seek explicit movement evidence before adding another leg."
+  },
+  {
+    "id": "RT-2590-SOURCE-01",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "probleme_deschise[0]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": "Confirmarea numelui persoanei din tabelul familiei: Marica Chibac sau Marica Aizic.",
+    "normalized": {
+      "category": "uncertain_reading",
+      "status": "open"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "reviewTaskId": "RT-2590-SOURCE-01",
+    "category": "uncertain_reading",
+    "title": "Documentary reading requires review",
+    "description": "Confirmarea numelui persoanei din tabelul familiei: Marica Chibac sau Marica Aizic.",
+    "severity": "medium",
+    "status": "open",
+    "entityRefs": [
+      {
+        "entityType": "document",
+        "entityId": "DOROHOI-2590"
+      }
+    ],
+    "suggestedAction": "Consult the source scan and record the reviewed reading without replacing the raw extraction."
+  },
+  {
+    "id": "RT-2590-SOURCE-02",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "probleme_deschise[1]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": "Lectura exactă a ocupației de la 12.a: Cismaci/Cismar/Cismărie.",
+    "normalized": {
+      "category": "uncertain_reading",
+      "status": "open"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "reviewTaskId": "RT-2590-SOURCE-02",
+    "category": "uncertain_reading",
+    "title": "Documentary reading requires review",
+    "description": "Lectura exactă a ocupației de la 12.a: Cismaci/Cismar/Cismărie.",
+    "severity": "medium",
+    "status": "open",
+    "entityRefs": [
+      {
+        "entityType": "document",
+        "entityId": "DOROHOI-2590"
+      }
+    ],
+    "suggestedAction": "Consult the source scan and record the reviewed reading without replacing the raw extraction."
+  },
+  {
+    "id": "RT-2590-SOURCE-03",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "probleme_deschise[2]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": "Structurarea exactă a ajutorului comunitar la 12.e.",
+    "normalized": {
+      "category": "source_collation",
+      "status": "open"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "reviewTaskId": "RT-2590-SOURCE-03",
+    "category": "source_collation",
+    "title": "Source collation remains open",
+    "description": "Structurarea exactă a ajutorului comunitar la 12.e.",
+    "severity": "medium",
+    "status": "open",
+    "entityRefs": [
+      {
+        "entityType": "document",
+        "entityId": "DOROHOI-2590"
+      }
+    ],
+    "suggestedAction": "Consult the source scan and record the reviewed reading without replacing the raw extraction."
+  },
+  {
+    "id": "RT-2590-SOURCE-04",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "probleme_deschise[3]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": "Identificarea celei de-a doua localități după Moghilev la 13.d.",
+    "normalized": {
+      "category": "unresolved_place",
+      "status": "open"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "reviewTaskId": "RT-2590-SOURCE-04",
+    "category": "unresolved_place",
+    "title": "Place identification requires review",
+    "description": "Identificarea celei de-a doua localități după Moghilev la 13.d.",
+    "severity": "high",
+    "status": "open",
+    "entityRefs": [
+      {
+        "entityType": "document",
+        "entityId": "DOROHOI-2590"
+      }
+    ],
+    "suggestedAction": "Consult the source scan and record the reviewed reading without replacing the raw extraction."
+  },
+  {
+    "id": "RT-2590-SOURCE-05",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "probleme_deschise[4]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": "Colaționarea ultimelor două fragmente din nota explicativă.",
+    "normalized": {
+      "category": "source_collation",
+      "status": "open"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "reviewTaskId": "RT-2590-SOURCE-05",
+    "category": "source_collation",
+    "title": "Source collation remains open",
+    "description": "Colaționarea ultimelor două fragmente din nota explicativă.",
+    "severity": "medium",
+    "status": "open",
+    "entityRefs": [
+      {
+        "entityType": "document",
+        "entityId": "DOROHOI-2590"
+      }
+    ],
+    "suggestedAction": "Consult the source scan and record the reviewed reading without replacing the raw extraction."
+  },
+  {
+    "id": "RT-2590-UNRESOLVED-TROPOV",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "evenimente[3].destinatii_raw[1]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": "Tropov[...]",
+    "normalized": {
+      "category": "unresolved_place",
+      "status": "open"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "reviewTaskId": "RT-2590-UNRESOLVED-TROPOV",
+    "category": "unresolved_place",
+    "title": "Identify the place written after Moghilev",
+    "description": "The current reading is Tropov[…]. No coordinates or route segment have been assigned.",
+    "severity": "high",
+    "status": "open",
+    "entityRefs": [
+      {
+        "entityType": "place",
+        "entityId": "PL-UNRESOLVED-TROPOV-2590"
+      }
+    ],
+    "suggestedAction": "Collate the scan and compare historically plausible names without resolving by similarity alone."
+  },
+  {
+    "id": "RT-EHRI-CATALOG-QUALITY",
+    "dossierId": null,
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/EHRI_lagare_ghetouri_regiune.json",
+        "sourceDataset": "ehri_local",
+        "documentId": null,
+        "dossierId": null,
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "record[0]",
+        "sourceRecordId": "EHRI-0001",
+        "fragmentRaw": null
+      },
+      {
+        "sourceFile": "data/source/EHRI_lagare_ghetouri_regiune.json",
+        "sourceDataset": "ehri_local",
+        "documentId": null,
+        "dossierId": null,
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "record[384]",
+        "sourceRecordId": "EHRI-0385",
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "typeConflicts": 86,
+      "leadingWhitespaceVariants": 60,
+      "sharedCoordinateGroups": 38
+    },
+    "normalized": {
+      "category": "external_catalog_quality",
+      "status": "open"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "reviewTaskId": "RT-EHRI-CATALOG-QUALITY",
+    "category": "external_catalog_quality",
+    "title": "Local EHRI overlay needs catalog-level quality review",
+    "description": "86 records have a ghetto-like label but are coded as camp; 60 alternatives contain outer whitespace; 38 coordinate pairs are shared by multiple records. Supplied values remain preserved.",
+    "severity": "medium",
+    "status": "open",
+    "entityRefs": [
+      {
+        "entityType": "dataset",
+        "entityId": "EHRI-LOCAL"
+      }
+    ],
+    "suggestedAction": "Compare the local extract with upstream identifiers and provenance before merging or correcting records."
+  },
+  {
+    "id": "RT-R-2590-001-CONFIDENCE",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 1,
+        "pagePrinted": 1,
+        "field": "relatii[0]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "relatie_id": "R-2590-001",
+      "tip": "soți",
+      "persoana_1": "P-2590-001",
+      "persoana_2": "P-2590-002",
+      "incredere": "medie",
+      "sursa": {
+        "pagina_pdf": 1,
+        "pagina_tiparita": 1
+      }
+    },
+    "normalized": {
+      "category": "questionable_relationship",
+      "status": "open"
+    },
+    "confidence": "medium",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "reviewTaskId": "RT-R-2590-001-CONFIDENCE",
+    "category": "questionable_relationship",
+    "title": "Relationship requires confirmation",
+    "description": "The spouse relationship is present in the analytical source at medium confidence.",
+    "severity": "medium",
+    "status": "open",
+    "entityRefs": [
+      {
+        "entityType": "relationship",
+        "entityId": "R-2590-001"
+      }
+    ],
+    "suggestedAction": "Verify the family table and preserve any competing name or relationship reading."
+  }
+]

@@ -1,0 +1,245 @@
+[
+  {
+    "id": "PNV-P-2560-001-PRIMARY",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "persoane[0].nume_afisat",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": "Ițic Herțanu",
+    "normalized": {
+      "value": "Ițic Herțanu",
+      "variantType": "documentary"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "variantId": "PNV-P-2560-001-PRIMARY",
+    "personId": "P-2560-001",
+    "value": "Ițic Herțanu",
+    "variantType": "documentary",
+    "language": "ro",
+    "script": "Latn"
+  },
+  {
+    "id": "PNV-P-2560-001-SEARCH-01",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "potriviri_de_verificat[0].cautare_recomandata",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": "Herțanu Ițic",
+    "normalized": {
+      "value": "Herțanu Ițic",
+      "variantType": "search_form"
+    },
+    "confidence": "medium",
+    "assertionStatus": "partial",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "variantId": "PNV-P-2560-001-SEARCH-01",
+    "personId": "P-2560-001",
+    "value": "Herțanu Ițic",
+    "variantType": "search_form",
+    "language": "ro",
+    "script": "Latn"
+  },
+  {
+    "id": "PNV-P-2560-001-SEARCH-02",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "potriviri_de_verificat[0].cautare_recomandata",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": "Hertanu Itic",
+    "normalized": {
+      "value": "Hertanu Itic",
+      "variantType": "search_form"
+    },
+    "confidence": "medium",
+    "assertionStatus": "partial",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "variantId": "PNV-P-2560-001-SEARCH-02",
+    "personId": "P-2560-001",
+    "value": "Hertanu Itic",
+    "variantType": "search_form",
+    "language": "ro",
+    "script": "Latn"
+  },
+  {
+    "id": "PNV-P-2590-001-PRIMARY",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "persoane[0].nume_afisat",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": "Iancu Aizic",
+    "normalized": {
+      "value": "Iancu Aizic",
+      "variantType": "documentary"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "variantId": "PNV-P-2590-001-PRIMARY",
+    "personId": "P-2590-001",
+    "value": "Iancu Aizic",
+    "variantType": "documentary",
+    "language": "ro",
+    "script": "Latn"
+  },
+  {
+    "id": "PNV-P-2590-002-ALT-01",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "persoane[1].nume_afisat",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": "Marica Aizic",
+    "normalized": {
+      "value": "Marica Aizic",
+      "variantType": "alternative_reading"
+    },
+    "confidence": "medium",
+    "assertionStatus": "unresolved",
+    "reviewState": "needs_review",
+    "alternativeReadings": [
+      {
+        "value": "Marica Chibac",
+        "note": "Primary documentary reading",
+        "confidence": "medium",
+        "sourceRefs": [
+          {
+            "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+            "sourceDataset": "dossier",
+            "documentId": "DOROHOI-2590",
+            "dossierId": "DOROHOI-2590",
+            "pagePdf": null,
+            "pagePrinted": null,
+            "field": "persoane[1].nume_afisat",
+            "sourceRecordId": null,
+            "fragmentRaw": null
+          }
+        ]
+      }
+    ],
+    "variantId": "PNV-P-2590-002-ALT-01",
+    "personId": "P-2590-002",
+    "value": "Marica Aizic",
+    "variantType": "alternative_reading",
+    "language": "ro",
+    "script": "Latn"
+  },
+  {
+    "id": "PNV-P-2590-002-PRIMARY",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "persoane[1].nume_afisat",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": "Marica Chibac",
+    "normalized": {
+      "value": "Marica Chibac",
+      "variantType": "documentary"
+    },
+    "confidence": "medium",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "variantId": "PNV-P-2590-002-PRIMARY",
+    "personId": "P-2590-002",
+    "value": "Marica Chibac",
+    "variantType": "documentary",
+    "language": "ro",
+    "script": "Latn"
+  },
+  {
+    "id": "PNV-P-2590-003-PRIMARY",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "persoane[2].nume_afisat",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": "Pesi Aizic",
+    "normalized": {
+      "value": "Pesi Aizic",
+      "variantType": "documentary"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "variantId": "PNV-P-2590-003-PRIMARY",
+    "personId": "P-2590-003",
+    "value": "Pesi Aizic",
+    "variantType": "documentary",
+    "language": "ro",
+    "script": "Latn"
+  }
+]

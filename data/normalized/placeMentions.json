@@ -1,0 +1,1409 @@
+[
+  {
+    "id": "PM-DOROHOI-2560-SUMMARY-01",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "locuri_mentionate[0]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Dorohoi",
+      "role": "domiciliu; destinație; loc al restricțiilor; muncă"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-DOROHOI",
+      "resolutionStatus": "resolved",
+      "role": "domiciliu; destinație; loc al restricțiilor; muncă"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-DOROHOI-2560-SUMMARY-01",
+    "ownerType": "document",
+    "ownerId": "DOROHOI-2560",
+    "personIds": [],
+    "role": "domiciliu; destinație; loc al restricțiilor; muncă",
+    "valueRaw": "Dorohoi",
+    "placeId": "PL-CORE-DOROHOI",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "PM-DOROHOI-2560-SUMMARY-02",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "locuri_mentionate[1]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Mihăileni jud. Dorohoi",
+      "role": "loc de naștere; origine evacuare; proprietate"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-MIHAILENI",
+      "resolutionStatus": "resolved",
+      "role": "loc de naștere; origine evacuare; proprietate"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-DOROHOI-2560-SUMMARY-02",
+    "ownerType": "document",
+    "ownerId": "DOROHOI-2560",
+    "personIds": [],
+    "role": "loc de naștere; origine evacuare; proprietate",
+    "valueRaw": "Mihăileni jud. Dorohoi",
+    "placeId": "PL-CORE-MIHAILENI",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "PM-DOROHOI-2560-SUMMARY-03",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "locuri_mentionate[2]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Bucecea",
+      "role": "destinație intermediară; origine etapă următoare"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-BUCECEA",
+      "resolutionStatus": "resolved",
+      "role": "destinație intermediară; origine etapă următoare"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-DOROHOI-2560-SUMMARY-03",
+    "ownerType": "document",
+    "ownerId": "DOROHOI-2560",
+    "personIds": [],
+    "role": "destinație intermediară; origine etapă următoare",
+    "valueRaw": "Bucecea",
+    "placeId": "PL-CORE-BUCECEA",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "PM-DOROHOI-2560-SUMMARY-04",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "locuri_mentionate[3]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Jijia",
+      "role": "pod reparat prin muncă obligatorie"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-JIJIA",
+      "resolutionStatus": "partially_resolved",
+      "role": "pod reparat prin muncă obligatorie"
+    },
+    "confidence": "medium",
+    "assertionStatus": "partial",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-DOROHOI-2560-SUMMARY-04",
+    "ownerType": "document",
+    "ownerId": "DOROHOI-2560",
+    "personIds": [],
+    "role": "pod reparat prin muncă obligatorie",
+    "valueRaw": "Jijia",
+    "placeId": "PL-CORE-JIJIA",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "partially_resolved",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "PM-DOROHOI-2560-SUMMARY-05",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "locuri_mentionate[4]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Banca Națională a României",
+      "role": "instituție de depozitare a valorilor"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-BNR",
+      "resolutionStatus": "resolved",
+      "role": "instituție de depozitare a valorilor"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-DOROHOI-2560-SUMMARY-05",
+    "ownerType": "document",
+    "ownerId": "DOROHOI-2560",
+    "personIds": [],
+    "role": "instituție de depozitare a valorilor",
+    "valueRaw": "Banca Națională a României",
+    "placeId": "PL-CORE-BNR",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "PM-DOROHOI-2590-SUMMARY-01",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "locuri_mentionate[0]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Dorohoi",
+      "role": "domiciliu; loc de naștere; origine deportare; locul declarației"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-DOROHOI",
+      "resolutionStatus": "resolved",
+      "role": "domiciliu; loc de naștere; origine deportare; locul declarației"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-DOROHOI-2590-SUMMARY-01",
+    "ownerType": "document",
+    "ownerId": "DOROHOI-2590",
+    "personIds": [],
+    "role": "domiciliu; loc de naștere; origine deportare; locul declarației",
+    "valueRaw": "Dorohoi",
+    "placeId": "PL-CORE-DOROHOI",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "PM-DOROHOI-2590-SUMMARY-02",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "locuri_mentionate[1]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Ataki",
+      "role": "frontieră; confiscare și maltratare"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-OTACI",
+      "resolutionStatus": "resolved",
+      "role": "frontieră; confiscare și maltratare"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-DOROHOI-2590-SUMMARY-02",
+    "ownerType": "document",
+    "ownerId": "DOROHOI-2590",
+    "personIds": [],
+    "role": "frontieră; confiscare și maltratare",
+    "valueRaw": "Ataki",
+    "placeId": "PL-CORE-OTACI",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "PM-DOROHOI-2590-SUMMARY-03",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "locuri_mentionate[2]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Moghilev",
+      "role": "lagăr/deportare; locul decesului mamei"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-MOHYLIV-PODILSKYI",
+      "resolutionStatus": "resolved",
+      "role": "lagăr/deportare; locul decesului mamei"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-DOROHOI-2590-SUMMARY-03",
+    "ownerType": "document",
+    "ownerId": "DOROHOI-2590",
+    "personIds": [],
+    "role": "lagăr/deportare; locul decesului mamei",
+    "valueRaw": "Moghilev",
+    "placeId": "PL-CORE-MOHYLIV-PODILSKYI",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "PM-DOROHOI-2590-SUMMARY-04",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "locuri_mentionate[3]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Tropov[...]",
+      "role": "a doua localitate de deportare, lectură incertă"
+    },
+    "normalized": {
+      "placeId": "PL-UNRESOLVED-TROPOV-2590",
+      "resolutionStatus": "unresolved",
+      "role": "a doua localitate de deportare, lectură incertă"
+    },
+    "confidence": "unknown",
+    "assertionStatus": "unresolved",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-DOROHOI-2590-SUMMARY-04",
+    "ownerType": "document",
+    "ownerId": "DOROHOI-2590",
+    "personIds": [],
+    "role": "a doua localitate de deportare, lectură incertă",
+    "valueRaw": "Tropov[...]",
+    "placeId": "PL-UNRESOLVED-TROPOV-2590",
+    "resolutionMethod": "unresolved_placeholder",
+    "resolutionStatus": "unresolved",
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "PM-DOROHOI-2590-SUMMARY-05",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "locuri_mentionate[4]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Transnistria",
+      "role": "internare; muncă obligatorie"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-TRANSNISTRIA",
+      "resolutionStatus": "partially_resolved",
+      "role": "internare; muncă obligatorie"
+    },
+    "confidence": "medium",
+    "assertionStatus": "partial",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-DOROHOI-2590-SUMMARY-05",
+    "ownerType": "document",
+    "ownerId": "DOROHOI-2590",
+    "personIds": [],
+    "role": "internare; muncă obligatorie",
+    "valueRaw": "Transnistria",
+    "placeId": "PL-CORE-TRANSNISTRIA",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "partially_resolved",
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "PM-E-2560-002-DESTINATION",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 3,
+        "pagePrinted": 5,
+        "field": "5.c · evenimente[1].destinatie_raw",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Bucecea",
+      "role": "destination"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-BUCECEA",
+      "resolutionStatus": "resolved",
+      "role": "destination"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-E-2560-002-DESTINATION",
+    "ownerType": "event",
+    "ownerId": "E-2560-002",
+    "personIds": [
+      "P-2560-001"
+    ],
+    "role": "destination",
+    "valueRaw": "Bucecea",
+    "placeId": "PL-CORE-BUCECEA",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "PM-E-2560-002-ORIGIN",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 3,
+        "pagePrinted": 5,
+        "field": "5.c · evenimente[1].origine_raw",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Mihăileni",
+      "role": "origin"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-MIHAILENI",
+      "resolutionStatus": "resolved",
+      "role": "origin"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-E-2560-002-ORIGIN",
+    "ownerType": "event",
+    "ownerId": "E-2560-002",
+    "personIds": [
+      "P-2560-001"
+    ],
+    "role": "origin",
+    "valueRaw": "Mihăileni",
+    "placeId": "PL-CORE-MIHAILENI",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "PM-E-2560-003-DESTINATION",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 9,
+        "pagePrinted": "anexă",
+        "field": "evenimente[2].destinatie_raw",
+        "sourceRecordId": null,
+        "fragmentRaw": "iar la 4 Iulie 1941 din Burdujeni la Dorohoi"
+      }
+    ],
+    "raw": {
+      "value": "Dorohoi",
+      "role": "destination"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-DOROHOI",
+      "resolutionStatus": "resolved",
+      "role": "destination"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-E-2560-003-DESTINATION",
+    "ownerType": "event",
+    "ownerId": "E-2560-003",
+    "personIds": [
+      "P-2560-001"
+    ],
+    "role": "destination",
+    "valueRaw": "Dorohoi",
+    "placeId": "PL-CORE-DOROHOI",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "PM-E-2560-003-ORIGIN",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 9,
+        "pagePrinted": "anexă",
+        "field": "evenimente[2].origine_raw",
+        "sourceRecordId": null,
+        "fragmentRaw": "iar la 4 Iulie 1941 din Burdujeni la Dorohoi"
+      }
+    ],
+    "raw": {
+      "value": "Bucecea",
+      "role": "origin"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-BUCECEA",
+      "resolutionStatus": "resolved",
+      "role": "origin"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-E-2560-003-ORIGIN",
+    "ownerType": "event",
+    "ownerId": "E-2560-003",
+    "personIds": [
+      "P-2560-001"
+    ],
+    "role": "origin",
+    "valueRaw": "Bucecea",
+    "placeId": "PL-CORE-BUCECEA",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "PM-E-2560-003-ORIGIN-FRAGMENT",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 9,
+        "pagePrinted": "anexă",
+        "field": "evenimente[2].sursa.fragment",
+        "sourceRecordId": null,
+        "fragmentRaw": "iar la 4 Iulie 1941 din Burdujeni la Dorohoi"
+      }
+    ],
+    "raw": {
+      "value": "Burdujeni",
+      "role": "alternative_origin_reading"
+    },
+    "normalized": {
+      "placeId": "PL-UNRESOLVED-BURDUJENI-2560",
+      "resolutionStatus": "unresolved",
+      "role": "alternative_origin_reading"
+    },
+    "confidence": "unknown",
+    "assertionStatus": "unresolved",
+    "reviewState": "needs_review",
+    "alternativeReadings": [
+      {
+        "value": "Bucecea",
+        "note": "The structured origine_raw field names Bucecea.",
+        "confidence": "medium",
+        "sourceRefs": [
+          {
+            "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+            "sourceDataset": "dossier",
+            "documentId": "DOROHOI-2560",
+            "dossierId": "DOROHOI-2560",
+            "pagePdf": 9,
+            "pagePrinted": "anexă",
+            "field": "evenimente[2].sursa.fragment",
+            "sourceRecordId": null,
+            "fragmentRaw": "iar la 4 Iulie 1941 din Burdujeni la Dorohoi"
+          }
+        ]
+      }
+    ],
+    "placeMentionId": "PM-E-2560-003-ORIGIN-FRAGMENT",
+    "ownerType": "event",
+    "ownerId": "E-2560-003",
+    "personIds": [
+      "P-2560-001"
+    ],
+    "role": "alternative_origin_reading",
+    "valueRaw": "Burdujeni",
+    "placeId": "PL-UNRESOLVED-BURDUJENI-2560",
+    "resolutionMethod": "unresolved_placeholder",
+    "resolutionStatus": "unresolved",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "PM-E-2560-004-LOCATION",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 9,
+        "pagePrinted": "anexă",
+        "field": "evenimente[3].loc_raw",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Mihăileni",
+      "role": "event_place"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-MIHAILENI",
+      "resolutionStatus": "resolved",
+      "role": "event_place"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-E-2560-004-LOCATION",
+    "ownerType": "event",
+    "ownerId": "E-2560-004",
+    "personIds": [
+      "P-2560-001"
+    ],
+    "role": "event_place",
+    "valueRaw": "Mihăileni",
+    "placeId": "PL-CORE-MIHAILENI",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "PM-E-2560-005-LOCATION",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 9,
+        "pagePrinted": "anexă",
+        "field": "evenimente[4].loc_raw",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Dorohoi",
+      "role": "event_place"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-DOROHOI",
+      "resolutionStatus": "resolved",
+      "role": "event_place"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-E-2560-005-LOCATION",
+    "ownerType": "event",
+    "ownerId": "E-2560-005",
+    "personIds": [
+      "P-2560-001"
+    ],
+    "role": "event_place",
+    "valueRaw": "Dorohoi",
+    "placeId": "PL-CORE-DOROHOI",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "PM-E-2560-006-LOCATION",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 9,
+        "pagePrinted": "anexă",
+        "field": "evenimente[5].loc_raw",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Dorohoi, beciul poliției",
+      "role": "event_place"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-DOROHOI",
+      "resolutionStatus": "partially_resolved",
+      "role": "event_place"
+    },
+    "confidence": "medium",
+    "assertionStatus": "partial",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-E-2560-006-LOCATION",
+    "ownerType": "event",
+    "ownerId": "E-2560-006",
+    "personIds": [
+      "P-2560-001"
+    ],
+    "role": "event_place",
+    "valueRaw": "Dorohoi, beciul poliției",
+    "placeId": "PL-CORE-DOROHOI",
+    "resolutionMethod": "compound_registry",
+    "resolutionStatus": "partially_resolved",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "PM-E-2560-007-INSTITUTION",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 9,
+        "pagePrinted": "anexă",
+        "field": "evenimente[6].institutie_raw",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Banca Națională a României",
+      "role": "institution"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-BNR",
+      "resolutionStatus": "resolved",
+      "role": "institution"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-E-2560-007-INSTITUTION",
+    "ownerType": "event",
+    "ownerId": "E-2560-007",
+    "personIds": [
+      "P-2560-001"
+    ],
+    "role": "institution",
+    "valueRaw": "Banca Națională a României",
+    "placeId": "PL-CORE-BNR",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "PM-E-2560-008-LOCATION",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 3,
+        "pagePrinted": 5,
+        "field": "5.f · evenimente[7].loc_raw",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Dorohoi",
+      "role": "event_place"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-DOROHOI",
+      "resolutionStatus": "resolved",
+      "role": "event_place"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-E-2560-008-LOCATION",
+    "ownerType": "event",
+    "ownerId": "E-2560-008",
+    "personIds": [
+      "P-2560-001"
+    ],
+    "role": "event_place",
+    "valueRaw": "Dorohoi",
+    "placeId": "PL-CORE-DOROHOI",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "PM-E-2560-010-LOCATION-01",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 4,
+        "pagePrinted": 7,
+        "field": "6.a-6.b · evenimente[9].locuri_raw[0]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Dorohoi",
+      "role": "event_place"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-DOROHOI",
+      "resolutionStatus": "resolved",
+      "role": "event_place"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-E-2560-010-LOCATION-01",
+    "ownerType": "event",
+    "ownerId": "E-2560-010",
+    "personIds": [
+      "P-2560-001"
+    ],
+    "role": "event_place",
+    "valueRaw": "Dorohoi",
+    "placeId": "PL-CORE-DOROHOI",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "PM-E-2560-010-LOCATION-02",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 4,
+        "pagePrinted": 7,
+        "field": "6.a-6.b · evenimente[9].locuri_raw[1]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Jijia",
+      "role": "event_place"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-JIJIA",
+      "resolutionStatus": "partially_resolved",
+      "role": "event_place"
+    },
+    "confidence": "medium",
+    "assertionStatus": "partial",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-E-2560-010-LOCATION-02",
+    "ownerType": "event",
+    "ownerId": "E-2560-010",
+    "personIds": [
+      "P-2560-001"
+    ],
+    "role": "event_place",
+    "valueRaw": "Jijia",
+    "placeId": "PL-CORE-JIJIA",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "partially_resolved",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "PM-E-2560-010-LOCATION-03",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 4,
+        "pagePrinted": 7,
+        "field": "6.a-6.b · evenimente[9].locuri_raw[2]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "C.F.R.",
+      "role": "event_place"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-CFR",
+      "resolutionStatus": "resolved",
+      "role": "event_place"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-E-2560-010-LOCATION-03",
+    "ownerType": "event",
+    "ownerId": "E-2560-010",
+    "personIds": [
+      "P-2560-001"
+    ],
+    "role": "event_place",
+    "valueRaw": "C.F.R.",
+    "placeId": "PL-CORE-CFR",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "PM-E-2590-002-ORIGIN",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 2,
+        "pagePrinted": 3,
+        "field": "3.c · evenimente[1].origine_raw",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "casa proprie",
+      "role": "origin"
+    },
+    "normalized": {
+      "placeId": null,
+      "resolutionStatus": "unresolved",
+      "role": "origin"
+    },
+    "confidence": "unknown",
+    "assertionStatus": "unresolved",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-E-2590-002-ORIGIN",
+    "ownerType": "event",
+    "ownerId": "E-2590-002",
+    "personIds": [
+      "P-2590-001"
+    ],
+    "role": "origin",
+    "valueRaw": "casa proprie",
+    "placeId": null,
+    "resolutionMethod": "unresolved",
+    "resolutionStatus": "unresolved",
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "PM-E-2590-004-DESTINATION-01",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 7,
+        "pagePrinted": 13,
+        "field": "13.a-13.d · evenimente[3].destinatii_raw[0]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Moghilev",
+      "role": "destination"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-MOHYLIV-PODILSKYI",
+      "resolutionStatus": "resolved",
+      "role": "destination"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-E-2590-004-DESTINATION-01",
+    "ownerType": "event",
+    "ownerId": "E-2590-004",
+    "personIds": [
+      "P-2590-001"
+    ],
+    "role": "destination",
+    "valueRaw": "Moghilev",
+    "placeId": "PL-CORE-MOHYLIV-PODILSKYI",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "PM-E-2590-004-DESTINATION-02",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 7,
+        "pagePrinted": 13,
+        "field": "13.a-13.d · evenimente[3].destinatii_raw[1]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Tropov[...]",
+      "role": "destination"
+    },
+    "normalized": {
+      "placeId": "PL-UNRESOLVED-TROPOV-2590",
+      "resolutionStatus": "unresolved",
+      "role": "destination"
+    },
+    "confidence": "unknown",
+    "assertionStatus": "unresolved",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-E-2590-004-DESTINATION-02",
+    "ownerType": "event",
+    "ownerId": "E-2590-004",
+    "personIds": [
+      "P-2590-001"
+    ],
+    "role": "destination",
+    "valueRaw": "Tropov[...]",
+    "placeId": "PL-UNRESOLVED-TROPOV-2590",
+    "resolutionMethod": "unresolved_placeholder",
+    "resolutionStatus": "unresolved",
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "PM-E-2590-004-ORIGIN",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 7,
+        "pagePrinted": 13,
+        "field": "13.a-13.d · evenimente[3].origine_raw",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Dorohoi",
+      "role": "origin"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-DOROHOI",
+      "resolutionStatus": "resolved",
+      "role": "origin"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-E-2590-004-ORIGIN",
+    "ownerType": "event",
+    "ownerId": "E-2590-004",
+    "personIds": [
+      "P-2590-001"
+    ],
+    "role": "origin",
+    "valueRaw": "Dorohoi",
+    "placeId": "PL-CORE-DOROHOI",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "PM-E-2590-005-LOCATION",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 4,
+        "pagePrinted": 7,
+        "field": "6.a · evenimente[4].loc_raw",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Transnistria",
+      "role": "event_place"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-TRANSNISTRIA",
+      "resolutionStatus": "partially_resolved",
+      "role": "event_place"
+    },
+    "confidence": "medium",
+    "assertionStatus": "partial",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-E-2590-005-LOCATION",
+    "ownerType": "event",
+    "ownerId": "E-2590-005",
+    "personIds": [
+      "P-2590-001"
+    ],
+    "role": "event_place",
+    "valueRaw": "Transnistria",
+    "placeId": "PL-CORE-TRANSNISTRIA",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "partially_resolved",
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "PM-E-2590-007-LOCATION",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 8,
+        "pagePrinted": 14,
+        "field": "evenimente[6].loc_raw",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Ataki",
+      "role": "event_place"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-OTACI",
+      "resolutionStatus": "resolved",
+      "role": "event_place"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-E-2590-007-LOCATION",
+    "ownerType": "event",
+    "ownerId": "E-2590-007",
+    "personIds": [
+      "P-2590-001"
+    ],
+    "role": "event_place",
+    "valueRaw": "Ataki",
+    "placeId": "PL-CORE-OTACI",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "PM-E-2590-010-LOCATION",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 8,
+        "pagePrinted": 15,
+        "field": "tabel_victime · evenimente[9].loc_raw",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Moghilev",
+      "role": "event_place"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-MOHYLIV-PODILSKYI",
+      "resolutionStatus": "resolved",
+      "role": "event_place"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-E-2590-010-LOCATION",
+    "ownerType": "event",
+    "ownerId": "E-2590-010",
+    "personIds": [
+      "P-2590-003"
+    ],
+    "role": "event_place",
+    "valueRaw": "Moghilev",
+    "placeId": "PL-CORE-MOHYLIV-PODILSKYI",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "PM-P-2560-001-BIRTH",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "persoane[0].loc_nastere_raw",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Mihăileni jud. Dorohoi",
+      "role": "birth_place"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-MIHAILENI",
+      "resolutionStatus": "resolved",
+      "role": "birth_place"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-P-2560-001-BIRTH",
+    "ownerType": "person",
+    "ownerId": "P-2560-001",
+    "personIds": [
+      "P-2560-001"
+    ],
+    "role": "birth_place",
+    "valueRaw": "Mihăileni jud. Dorohoi",
+    "placeId": "PL-CORE-MIHAILENI",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "PM-P-2590-001-BIRTH",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "persoane[0].loc_nastere_raw",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "value": "Dorohoi",
+      "role": "birth_place"
+    },
+    "normalized": {
+      "placeId": "PL-CORE-DOROHOI",
+      "resolutionStatus": "resolved",
+      "role": "birth_place"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "placeMentionId": "PM-P-2590-001-BIRTH",
+    "ownerType": "person",
+    "ownerId": "P-2590-001",
+    "personIds": [
+      "P-2590-001"
+    ],
+    "role": "birth_place",
+    "valueRaw": "Dorohoi",
+    "placeId": "PL-CORE-DOROHOI",
+    "resolutionMethod": "explicit_registry",
+    "resolutionStatus": "resolved",
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  }
+]

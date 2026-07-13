@@ -1,0 +1,125 @@
+[
+  {
+    "id": "DOROHOI-2560",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "document",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "document": {
+        "document_id": "DOROHOI-2560",
+        "fisier_sursa": "DOROHOI 2560(1).pdf",
+        "tip": "dosar WJC tip A",
+        "pagini_pdf": 9
+      },
+      "modelVersion": "0.2-preliminar-2560-revizia-duala",
+      "status": "extracție analitică inițială; nu înlocuiește transcrierea diplomatică"
+    },
+    "normalized": {
+      "title": "Dossier 2560",
+      "documentType": "dosar WJC tip A",
+      "mediaStatus": "referenced_only"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "documentId": "DOROHOI-2560",
+    "title": "Dossier 2560",
+    "fileName": "DOROHOI 2560(1).pdf",
+    "documentType": "dosar WJC tip A",
+    "pageCount": 9,
+    "modelVersion": "0.2-preliminar-2560-revizia-duala",
+    "extractionStatus": "extracție analitică inițială; nu înlocuiește transcrierea diplomatică",
+    "mediaStatus": "referenced_only",
+    "personIds": [
+      "P-2560-001"
+    ],
+    "eventIds": [
+      "E-2560-001",
+      "E-2560-002",
+      "E-2560-003",
+      "E-2560-004",
+      "E-2560-005",
+      "E-2560-006",
+      "E-2560-007",
+      "E-2560-008",
+      "E-2560-009",
+      "E-2560-010",
+      "E-2560-011",
+      "E-2560-012",
+      "E-2560-013"
+    ]
+  },
+  {
+    "id": "DOROHOI-2590",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "document",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "document": {
+        "document_id": "DOROHOI-2590",
+        "fisier_sursa": "DOROHOI 2590(1).pdf",
+        "tip": "dosar WJC tip A",
+        "pagini_pdf": 8
+      },
+      "modelVersion": "0.3-preliminar-2590",
+      "status": "extragere analitică inițială; nu înlocuiește transcrierea diplomatică"
+    },
+    "normalized": {
+      "title": "Dossier 2590",
+      "documentType": "dosar WJC tip A",
+      "mediaStatus": "referenced_only"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "documentId": "DOROHOI-2590",
+    "title": "Dossier 2590",
+    "fileName": "DOROHOI 2590(1).pdf",
+    "documentType": "dosar WJC tip A",
+    "pageCount": 8,
+    "modelVersion": "0.3-preliminar-2590",
+    "extractionStatus": "extragere analitică inițială; nu înlocuiește transcrierea diplomatică",
+    "mediaStatus": "referenced_only",
+    "personIds": [
+      "P-2590-001",
+      "P-2590-002",
+      "P-2590-003"
+    ],
+    "eventIds": [
+      "E-2590-001",
+      "E-2590-002",
+      "E-2590-003",
+      "E-2590-004",
+      "E-2590-005",
+      "E-2590-006",
+      "E-2590-007",
+      "E-2590-008",
+      "E-2590-009",
+      "E-2590-010"
+    ]
+  }
+]

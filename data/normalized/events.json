@@ -1,0 +1,1554 @@
+[
+  {
+    "id": "E-2560-001",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 2,
+        "pagePrinted": 3,
+        "field": "1.b-1.d · evenimente[0]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2560-001",
+      "tip": "revizuire_cetatenie",
+      "participant": "P-2560-001",
+      "sursa": {
+        "pagina_pdf": 2,
+        "pagina_tiparita": 3,
+        "rubrica": "1.b-1.d"
+      },
+      "data_raw": "1938",
+      "descriere_raw": "Da; admis la revizuire; cheltueli 6000 (șase mii)"
+    },
+    "normalized": {
+      "eventType": "revizuire_cetatenie",
+      "date": {
+        "raw": "1938",
+        "start": "1938-01-01",
+        "end": "1938-12-31",
+        "precision": "year"
+      },
+      "participantIds": [
+        "P-2560-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2560-001",
+    "eventType": "revizuire_cetatenie",
+    "date": {
+      "raw": "1938",
+      "start": "1938-01-01",
+      "end": "1938-12-31",
+      "precision": "year"
+    },
+    "participantIds": [
+      "P-2560-001"
+    ],
+    "placeMentionIds": [],
+    "descriptionRaw": "Da; admis la revizuire; cheltueli 6000 (șase mii)",
+    "attributes": {},
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "E-2560-002",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 3,
+        "pagePrinted": 5,
+        "field": "5.c · evenimente[1]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2560-002",
+      "tip": "evacuare",
+      "participant": "P-2560-001",
+      "sursa": {
+        "pagina_pdf": 3,
+        "pagina_tiparita": 5,
+        "rubrica": "5.c"
+      },
+      "data_raw": "19 Iunie 1941",
+      "origine_raw": "Mihăileni",
+      "destinatie_raw": "Bucecea",
+      "mod_transport_raw": "pe jos"
+    },
+    "normalized": {
+      "eventType": "evacuare",
+      "date": {
+        "raw": "19 Iunie 1941",
+        "start": "1941-06-19",
+        "end": "1941-06-19",
+        "precision": "day"
+      },
+      "participantIds": [
+        "P-2560-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2560-002",
+    "eventType": "evacuare",
+    "date": {
+      "raw": "19 Iunie 1941",
+      "start": "1941-06-19",
+      "end": "1941-06-19",
+      "precision": "day"
+    },
+    "participantIds": [
+      "P-2560-001"
+    ],
+    "placeMentionIds": [
+      "PM-E-2560-002-DESTINATION",
+      "PM-E-2560-002-ORIGIN"
+    ],
+    "descriptionRaw": null,
+    "attributes": {
+      "origine_raw": "Mihăileni",
+      "destinatie_raw": "Bucecea",
+      "mod_transport_raw": "pe jos"
+    },
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "E-2560-003",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 9,
+        "pagePrinted": "anexă",
+        "field": "evenimente[2]",
+        "sourceRecordId": null,
+        "fragmentRaw": "iar la 4 Iulie 1941 din Burdujeni la Dorohoi"
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2560-003",
+      "tip": "deplasare_dupa_evacuare",
+      "participant": "P-2560-001",
+      "sursa": {
+        "pagina_pdf": 9,
+        "pagina_tiparita": "anexă",
+        "fragment": "iar la 4 Iulie 1941 din Burdujeni la Dorohoi"
+      },
+      "data_raw": "4 Iulie 1941",
+      "origine_raw": "Bucecea",
+      "destinatie_raw": "Dorohoi"
+    },
+    "normalized": {
+      "eventType": "deplasare_dupa_evacuare",
+      "date": {
+        "raw": "4 Iulie 1941",
+        "start": "1941-07-04",
+        "end": "1941-07-04",
+        "precision": "day"
+      },
+      "participantIds": [
+        "P-2560-001"
+      ]
+    },
+    "confidence": "medium",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [
+      {
+        "value": {
+          "origin": "Burdujeni"
+        },
+        "note": "The quoted fragment conflicts with the normalized origine_raw value Bucecea.",
+        "confidence": "medium",
+        "sourceRefs": [
+          {
+            "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+            "sourceDataset": "dossier",
+            "documentId": "DOROHOI-2560",
+            "dossierId": "DOROHOI-2560",
+            "pagePdf": 9,
+            "pagePrinted": "anexă",
+            "field": "evenimente[2]",
+            "sourceRecordId": null,
+            "fragmentRaw": "iar la 4 Iulie 1941 din Burdujeni la Dorohoi"
+          }
+        ]
+      }
+    ],
+    "eventId": "E-2560-003",
+    "eventType": "deplasare_dupa_evacuare",
+    "date": {
+      "raw": "4 Iulie 1941",
+      "start": "1941-07-04",
+      "end": "1941-07-04",
+      "precision": "day"
+    },
+    "participantIds": [
+      "P-2560-001"
+    ],
+    "placeMentionIds": [
+      "PM-E-2560-003-DESTINATION",
+      "PM-E-2560-003-ORIGIN",
+      "PM-E-2560-003-ORIGIN-FRAGMENT"
+    ],
+    "descriptionRaw": null,
+    "attributes": {
+      "origine_raw": "Bucecea",
+      "destinatie_raw": "Dorohoi"
+    },
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "E-2560-004",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 9,
+        "pagePrinted": "anexă",
+        "field": "evenimente[3]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2560-004",
+      "tip": "pierdere_gospodarie",
+      "participant": "P-2560-001",
+      "sursa": {
+        "pagina_pdf": 9,
+        "pagina_tiparita": "anexă"
+      },
+      "data_raw": "1941",
+      "loc_raw": "Mihăileni",
+      "valoare_raw": "cel puțin 600000 Lei, la valoarea leului din 1941"
+    },
+    "normalized": {
+      "eventType": "pierdere_gospodarie",
+      "date": {
+        "raw": "1941",
+        "start": "1941-01-01",
+        "end": "1941-12-31",
+        "precision": "year"
+      },
+      "participantIds": [
+        "P-2560-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2560-004",
+    "eventType": "pierdere_gospodarie",
+    "date": {
+      "raw": "1941",
+      "start": "1941-01-01",
+      "end": "1941-12-31",
+      "precision": "year"
+    },
+    "participantIds": [
+      "P-2560-001"
+    ],
+    "placeMentionIds": [
+      "PM-E-2560-004-LOCATION"
+    ],
+    "descriptionRaw": null,
+    "attributes": {
+      "loc_raw": "Mihăileni",
+      "valoare_raw": "cel puțin 600000 Lei, la valoarea leului din 1941"
+    },
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "E-2560-005",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 9,
+        "pagePrinted": "anexă",
+        "field": "evenimente[4]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2560-005",
+      "tip": "restrictie_circulatie",
+      "participant": "P-2560-001",
+      "sursa": {
+        "pagina_pdf": 9,
+        "pagina_tiparita": "anexă"
+      },
+      "data_raw": "după evacuarea din 1941",
+      "loc_raw": "Dorohoi",
+      "descriere_raw": "o singură oră pe zi pentru ieșire în oraș sau în piață"
+    },
+    "normalized": {
+      "eventType": "restrictie_circulatie",
+      "date": {
+        "raw": "după evacuarea din 1941",
+        "start": null,
+        "end": null,
+        "precision": "relative"
+      },
+      "participantIds": [
+        "P-2560-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2560-005",
+    "eventType": "restrictie_circulatie",
+    "date": {
+      "raw": "după evacuarea din 1941",
+      "start": null,
+      "end": null,
+      "precision": "relative"
+    },
+    "participantIds": [
+      "P-2560-001"
+    ],
+    "placeMentionIds": [
+      "PM-E-2560-005-LOCATION"
+    ],
+    "descriptionRaw": "o singură oră pe zi pentru ieșire în oraș sau în piață",
+    "attributes": {
+      "loc_raw": "Dorohoi"
+    },
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "E-2560-006",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 9,
+        "pagePrinted": "anexă",
+        "field": "evenimente[5]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2560-006",
+      "tip": "violenta_si_detentie",
+      "participant": "P-2560-001",
+      "sursa": {
+        "pagina_pdf": 9,
+        "pagina_tiparita": "anexă"
+      },
+      "data_raw": "după evacuarea din 1941",
+      "loc_raw": "Dorohoi, beciul poliției",
+      "descriere_raw": "crunt bătut și băgat în beciul poliției pe o zi întreagă"
+    },
+    "normalized": {
+      "eventType": "violenta_si_detentie",
+      "date": {
+        "raw": "după evacuarea din 1941",
+        "start": null,
+        "end": null,
+        "precision": "relative"
+      },
+      "participantIds": [
+        "P-2560-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2560-006",
+    "eventType": "violenta_si_detentie",
+    "date": {
+      "raw": "după evacuarea din 1941",
+      "start": null,
+      "end": null,
+      "precision": "relative"
+    },
+    "participantIds": [
+      "P-2560-001"
+    ],
+    "placeMentionIds": [
+      "PM-E-2560-006-LOCATION"
+    ],
+    "descriptionRaw": "crunt bătut și băgat în beciul poliției pe o zi întreagă",
+    "attributes": {
+      "loc_raw": "Dorohoi, beciul poliției"
+    },
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "E-2560-007",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 9,
+        "pagePrinted": "anexă",
+        "field": "evenimente[6]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2560-007",
+      "tip": "depunere_valori",
+      "participant": "P-2560-001",
+      "sursa": {
+        "pagina_pdf": 9,
+        "pagina_tiparita": "anexă"
+      },
+      "data_raw": "înainte de evacuarea evreilor în Transnistria",
+      "institutie_raw": "Banca Națională a României",
+      "descriere_raw": "aur, argint, valută străină, lei românești și titluri"
+    },
+    "normalized": {
+      "eventType": "depunere_valori",
+      "date": {
+        "raw": "înainte de evacuarea evreilor în Transnistria",
+        "start": null,
+        "end": null,
+        "precision": "relative"
+      },
+      "participantIds": [
+        "P-2560-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2560-007",
+    "eventType": "depunere_valori",
+    "date": {
+      "raw": "înainte de evacuarea evreilor în Transnistria",
+      "start": null,
+      "end": null,
+      "precision": "relative"
+    },
+    "participantIds": [
+      "P-2560-001"
+    ],
+    "placeMentionIds": [
+      "PM-E-2560-007-INSTITUTION"
+    ],
+    "descriptionRaw": "aur, argint, valută străină, lei românești și titluri",
+    "attributes": {
+      "institutie_raw": "Banca Națională a României"
+    },
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "E-2560-008",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 3,
+        "pagePrinted": 5,
+        "field": "5.f · evenimente[7]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2560-008",
+      "tip": "semn_distinctiv",
+      "participant": "P-2560-001",
+      "sursa": {
+        "pagina_pdf": 3,
+        "pagina_tiparita": 5,
+        "rubrica": "5.f"
+      },
+      "data_start_raw": "Iulie 1941",
+      "data_end_raw": "Decembrie 1943",
+      "loc_raw": "Dorohoi"
+    },
+    "normalized": {
+      "eventType": "semn_distinctiv",
+      "date": {
+        "raw": {
+          "start": "Iulie 1941",
+          "end": "Decembrie 1943"
+        },
+        "start": "1941-07-01",
+        "end": "1943-12-31",
+        "precision": "interval"
+      },
+      "participantIds": [
+        "P-2560-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2560-008",
+    "eventType": "semn_distinctiv",
+    "date": {
+      "raw": {
+        "start": "Iulie 1941",
+        "end": "Decembrie 1943"
+      },
+      "start": "1941-07-01",
+      "end": "1943-12-31",
+      "precision": "interval"
+    },
+    "participantIds": [
+      "P-2560-001"
+    ],
+    "placeMentionIds": [
+      "PM-E-2560-008-LOCATION"
+    ],
+    "descriptionRaw": null,
+    "attributes": {
+      "loc_raw": "Dorohoi"
+    },
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "E-2560-009",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 4,
+        "pagePrinted": 7,
+        "field": "6.a · evenimente[8]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2560-009",
+      "tip": "munca_obligatorie",
+      "participant": "P-2560-001",
+      "sursa": {
+        "pagina_pdf": 4,
+        "pagina_tiparita": 7,
+        "rubrica": "6.a"
+      },
+      "data_raw": "1942",
+      "durata_raw": "30 zile"
+    },
+    "normalized": {
+      "eventType": "munca_obligatorie",
+      "date": {
+        "raw": "1942",
+        "start": "1942-01-01",
+        "end": "1942-12-31",
+        "precision": "year"
+      },
+      "participantIds": [
+        "P-2560-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2560-009",
+    "eventType": "munca_obligatorie",
+    "date": {
+      "raw": "1942",
+      "start": "1942-01-01",
+      "end": "1942-12-31",
+      "precision": "year"
+    },
+    "participantIds": [
+      "P-2560-001"
+    ],
+    "placeMentionIds": [],
+    "descriptionRaw": null,
+    "attributes": {
+      "durata_raw": "30 zile"
+    },
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "E-2560-010",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 4,
+        "pagePrinted": 7,
+        "field": "6.a-6.b · evenimente[9]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2560-010",
+      "tip": "munca_obligatorie",
+      "participant": "P-2560-001",
+      "sursa": {
+        "pagina_pdf": 4,
+        "pagina_tiparita": 7,
+        "rubrica": "6.a-6.b"
+      },
+      "data_raw": "1943",
+      "durata_raw": "90 zile",
+      "locuri_raw": [
+        "Dorohoi",
+        "Jijia",
+        "C.F.R."
+      ],
+      "descriere_raw": "repararea unui pod peste Jijia și muncă grea la C.F.R."
+    },
+    "normalized": {
+      "eventType": "munca_obligatorie",
+      "date": {
+        "raw": "1943",
+        "start": "1943-01-01",
+        "end": "1943-12-31",
+        "precision": "year"
+      },
+      "participantIds": [
+        "P-2560-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2560-010",
+    "eventType": "munca_obligatorie",
+    "date": {
+      "raw": "1943",
+      "start": "1943-01-01",
+      "end": "1943-12-31",
+      "precision": "year"
+    },
+    "participantIds": [
+      "P-2560-001"
+    ],
+    "placeMentionIds": [
+      "PM-E-2560-010-LOCATION-01",
+      "PM-E-2560-010-LOCATION-02",
+      "PM-E-2560-010-LOCATION-03"
+    ],
+    "descriptionRaw": "repararea unui pod peste Jijia și muncă grea la C.F.R.",
+    "attributes": {
+      "durata_raw": "90 zile",
+      "locuri_raw": [
+        "Dorohoi",
+        "Jijia",
+        "C.F.R."
+      ]
+    },
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "E-2560-011",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 4,
+        "pagePrinted": 7,
+        "field": "6.f · evenimente[10]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2560-011",
+      "tip": "munca_la_zapada",
+      "participant": "P-2560-001",
+      "sursa": {
+        "pagina_pdf": 4,
+        "pagina_tiparita": 7,
+        "rubrica": "6.f"
+      },
+      "date_raw": [
+        "10/1942",
+        "10/1943"
+      ]
+    },
+    "normalized": {
+      "eventType": "munca_la_zapada",
+      "date": {
+        "raw": null,
+        "start": null,
+        "end": null,
+        "precision": "unknown"
+      },
+      "participantIds": [
+        "P-2560-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2560-011",
+    "eventType": "munca_la_zapada",
+    "date": {
+      "raw": null,
+      "start": null,
+      "end": null,
+      "precision": "unknown"
+    },
+    "participantIds": [
+      "P-2560-001"
+    ],
+    "placeMentionIds": [],
+    "descriptionRaw": null,
+    "attributes": {},
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "E-2560-012",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 7,
+        "pagePrinted": 13,
+        "field": "12.f · evenimente[11]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2560-012",
+      "tip": "vanzare_obiecte_casnice",
+      "participant": "P-2560-001",
+      "sursa": {
+        "pagina_pdf": 7,
+        "pagina_tiparita": 13,
+        "rubrica": "12.f"
+      },
+      "interval_raw": "1942-1943",
+      "valoare_raw": "150000 lei la valoarea leului din 1942-1943"
+    },
+    "normalized": {
+      "eventType": "vanzare_obiecte_casnice",
+      "date": {
+        "raw": "1942-1943",
+        "start": "1942-01-01",
+        "end": "1943-12-31",
+        "precision": "interval"
+      },
+      "participantIds": [
+        "P-2560-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2560-012",
+    "eventType": "vanzare_obiecte_casnice",
+    "date": {
+      "raw": "1942-1943",
+      "start": "1942-01-01",
+      "end": "1943-12-31",
+      "precision": "interval"
+    },
+    "participantIds": [
+      "P-2560-001"
+    ],
+    "placeMentionIds": [],
+    "descriptionRaw": null,
+    "attributes": {
+      "valoare_raw": "150000 lei la valoarea leului din 1942-1943"
+    },
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "E-2560-013",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 9,
+        "pagePrinted": "anexă",
+        "field": "evenimente[12]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2560-013",
+      "tip": "agravare_stare_sanatate",
+      "participant": "P-2560-001",
+      "sursa": {
+        "pagina_pdf": 9,
+        "pagina_tiparita": "anexă"
+      },
+      "data_raw": "în timpul prigoanei",
+      "descriere_raw": "declară că munca brută i-a agravat boala"
+    },
+    "normalized": {
+      "eventType": "agravare_stare_sanatate",
+      "date": {
+        "raw": "în timpul prigoanei",
+        "start": null,
+        "end": null,
+        "precision": "relative"
+      },
+      "participantIds": [
+        "P-2560-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2560-013",
+    "eventType": "agravare_stare_sanatate",
+    "date": {
+      "raw": "în timpul prigoanei",
+      "start": null,
+      "end": null,
+      "precision": "relative"
+    },
+    "participantIds": [
+      "P-2560-001"
+    ],
+    "placeMentionIds": [],
+    "descriptionRaw": "declară că munca brută i-a agravat boala",
+    "attributes": {},
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  },
+  {
+    "id": "E-2590-001",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 2,
+        "pagePrinted": 3,
+        "field": "1.b-1.d · evenimente[0]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2590-001",
+      "tip": "revizuire_cetatenie",
+      "participant": "P-2590-001",
+      "sursa": {
+        "pagina_pdf": 2,
+        "pagina_tiparita": 3,
+        "rubrica": "1.b-1.d"
+      },
+      "data_raw": "1938",
+      "descriere_raw": "da; cetățean Român; cheltueli 4-5 mii lei"
+    },
+    "normalized": {
+      "eventType": "revizuire_cetatenie",
+      "date": {
+        "raw": "1938",
+        "start": "1938-01-01",
+        "end": "1938-12-31",
+        "precision": "year"
+      },
+      "participantIds": [
+        "P-2590-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2590-001",
+    "eventType": "revizuire_cetatenie",
+    "date": {
+      "raw": "1938",
+      "start": "1938-01-01",
+      "end": "1938-12-31",
+      "precision": "year"
+    },
+    "participantIds": [
+      "P-2590-001"
+    ],
+    "placeMentionIds": [],
+    "descriptionRaw": "da; cetățean Român; cheltueli 4-5 mii lei",
+    "attributes": {},
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "E-2590-002",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 2,
+        "pagePrinted": 3,
+        "field": "3.c · evenimente[1]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2590-002",
+      "tip": "evacuare_din_locuinta",
+      "participant": "P-2590-001",
+      "sursa": {
+        "pagina_pdf": 2,
+        "pagina_tiparita": 3,
+        "rubrica": "3.c"
+      },
+      "data_raw": null,
+      "origine_raw": "casa proprie"
+    },
+    "normalized": {
+      "eventType": "evacuare_din_locuinta",
+      "date": {
+        "raw": null,
+        "start": null,
+        "end": null,
+        "precision": "unknown"
+      },
+      "participantIds": [
+        "P-2590-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2590-002",
+    "eventType": "evacuare_din_locuinta",
+    "date": {
+      "raw": null,
+      "start": null,
+      "end": null,
+      "precision": "unknown"
+    },
+    "participantIds": [
+      "P-2590-001"
+    ],
+    "placeMentionIds": [
+      "PM-E-2590-002-ORIGIN"
+    ],
+    "descriptionRaw": null,
+    "attributes": {
+      "origine_raw": "casa proprie"
+    },
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "E-2590-003",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 3,
+        "pagePrinted": 5,
+        "field": "5.b · evenimente[2]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2590-003",
+      "tip": "maltratare",
+      "participant": "P-2590-001",
+      "sursa": {
+        "pagina_pdf": 3,
+        "pagina_tiparita": 5,
+        "rubrica": "5.b"
+      },
+      "descriere_raw": "da"
+    },
+    "normalized": {
+      "eventType": "maltratare",
+      "date": {
+        "raw": null,
+        "start": null,
+        "end": null,
+        "precision": "unknown"
+      },
+      "participantIds": [
+        "P-2590-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2590-003",
+    "eventType": "maltratare",
+    "date": {
+      "raw": null,
+      "start": null,
+      "end": null,
+      "precision": "unknown"
+    },
+    "participantIds": [
+      "P-2590-001"
+    ],
+    "placeMentionIds": [],
+    "descriptionRaw": "da",
+    "attributes": {},
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "E-2590-004",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 7,
+        "pagePrinted": 13,
+        "field": "13.a-13.d · evenimente[3]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2590-004",
+      "tip": "deportare_internare",
+      "participant": "P-2590-001",
+      "sursa": {
+        "pagina_pdf": 7,
+        "pagina_tiparita": 13,
+        "rubrica": "13.a-13.d"
+      },
+      "interval_raw": "10 Noembrie 941 - 944",
+      "origine_raw": "Dorohoi",
+      "destinatii_raw": [
+        "Moghilev",
+        "Tropov[...]"
+      ],
+      "motiv_raw": "Rasial fiind Evreu"
+    },
+    "normalized": {
+      "eventType": "deportare_internare",
+      "date": {
+        "raw": "10 Noembrie 941 - 944",
+        "start": "1941-11-10",
+        "end": "1944-12-31",
+        "precision": "interval"
+      },
+      "participantIds": [
+        "P-2590-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "eventId": "E-2590-004",
+    "eventType": "deportare_internare",
+    "date": {
+      "raw": "10 Noembrie 941 - 944",
+      "start": "1941-11-10",
+      "end": "1944-12-31",
+      "precision": "interval"
+    },
+    "participantIds": [
+      "P-2590-001"
+    ],
+    "placeMentionIds": [
+      "PM-E-2590-004-DESTINATION-01",
+      "PM-E-2590-004-DESTINATION-02",
+      "PM-E-2590-004-ORIGIN"
+    ],
+    "descriptionRaw": null,
+    "attributes": {
+      "origine_raw": "Dorohoi",
+      "destinatii_raw": [
+        "Moghilev",
+        "Tropov[...]"
+      ],
+      "motiv_raw": "Rasial fiind Evreu"
+    },
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "E-2590-005",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 4,
+        "pagePrinted": 7,
+        "field": "6.a · evenimente[4]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2590-005",
+      "tip": "munca_obligatorie",
+      "participant": "P-2590-001",
+      "sursa": {
+        "pagina_pdf": 4,
+        "pagina_tiparita": 7,
+        "rubrica": "6.a"
+      },
+      "durata_raw": "2 ani și 4 luni",
+      "loc_raw": "Transnistria"
+    },
+    "normalized": {
+      "eventType": "munca_obligatorie",
+      "date": {
+        "raw": null,
+        "start": null,
+        "end": null,
+        "precision": "unknown"
+      },
+      "participantIds": [
+        "P-2590-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2590-005",
+    "eventType": "munca_obligatorie",
+    "date": {
+      "raw": null,
+      "start": null,
+      "end": null,
+      "precision": "unknown"
+    },
+    "participantIds": [
+      "P-2590-001"
+    ],
+    "placeMentionIds": [
+      "PM-E-2590-005-LOCATION"
+    ],
+    "descriptionRaw": null,
+    "attributes": {
+      "durata_raw": "2 ani și 4 luni",
+      "loc_raw": "Transnistria"
+    },
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "E-2590-006",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 4,
+        "pagePrinted": 7,
+        "field": "6.c · evenimente[5]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2590-006",
+      "tip": "violenta",
+      "participant": "P-2590-001",
+      "sursa": {
+        "pagina_pdf": 4,
+        "pagina_tiparita": 7,
+        "rubrica": "6.c"
+      },
+      "autoritate_raw": "poliție",
+      "descriere_raw": "greu bătut de poliție"
+    },
+    "normalized": {
+      "eventType": "violenta",
+      "date": {
+        "raw": null,
+        "start": null,
+        "end": null,
+        "precision": "unknown"
+      },
+      "participantIds": [
+        "P-2590-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2590-006",
+    "eventType": "violenta",
+    "date": {
+      "raw": null,
+      "start": null,
+      "end": null,
+      "precision": "unknown"
+    },
+    "participantIds": [
+      "P-2590-001"
+    ],
+    "placeMentionIds": [],
+    "descriptionRaw": "greu bătut de poliție",
+    "attributes": {
+      "autoritate_raw": "poliție"
+    },
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "E-2590-007",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 8,
+        "pagePrinted": 14,
+        "field": "evenimente[6]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2590-007",
+      "tip": "confiscare_la_frontiera",
+      "participant": "P-2590-001",
+      "sursa": {
+        "pagina_pdf": 8,
+        "pagina_tiparita": 14
+      },
+      "loc_raw": "Ataki",
+      "descriere_raw": "i s-a luat tot ce avea asupra sa"
+    },
+    "normalized": {
+      "eventType": "confiscare_la_frontiera",
+      "date": {
+        "raw": null,
+        "start": null,
+        "end": null,
+        "precision": "unknown"
+      },
+      "participantIds": [
+        "P-2590-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2590-007",
+    "eventType": "confiscare_la_frontiera",
+    "date": {
+      "raw": null,
+      "start": null,
+      "end": null,
+      "precision": "unknown"
+    },
+    "participantIds": [
+      "P-2590-001"
+    ],
+    "placeMentionIds": [
+      "PM-E-2590-007-LOCATION"
+    ],
+    "descriptionRaw": "i s-a luat tot ce avea asupra sa",
+    "attributes": {
+      "loc_raw": "Ataki"
+    },
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "E-2590-008",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 7,
+        "pagePrinted": 13,
+        "field": "13.e · evenimente[7]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2590-008",
+      "tip": "pierderi_materiale",
+      "participant": "P-2590-001",
+      "sursa": {
+        "pagina_pdf": 7,
+        "pagina_tiparita": 13,
+        "rubrica": "13.e"
+      },
+      "valoare_raw": "2.000.000 lei",
+      "descriere_raw": "avere, îmbrăcăminte și lucruri casnice"
+    },
+    "normalized": {
+      "eventType": "pierderi_materiale",
+      "date": {
+        "raw": null,
+        "start": null,
+        "end": null,
+        "precision": "unknown"
+      },
+      "participantIds": [
+        "P-2590-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2590-008",
+    "eventType": "pierderi_materiale",
+    "date": {
+      "raw": null,
+      "start": null,
+      "end": null,
+      "precision": "unknown"
+    },
+    "participantIds": [
+      "P-2590-001"
+    ],
+    "placeMentionIds": [],
+    "descriptionRaw": "avere, îmbrăcăminte și lucruri casnice",
+    "attributes": {
+      "valoare_raw": "2.000.000 lei"
+    },
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "E-2590-009",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 7,
+        "pagePrinted": 13,
+        "field": "12.f · evenimente[8]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2590-009",
+      "tip": "vanzare_bunuri_pentru_subzistenta",
+      "participant": "P-2590-001",
+      "sursa": {
+        "pagina_pdf": 7,
+        "pagina_tiparita": 13,
+        "rubrica": "12.f"
+      },
+      "valoare_raw": "1.200.000 lei"
+    },
+    "normalized": {
+      "eventType": "vanzare_bunuri_pentru_subzistenta",
+      "date": {
+        "raw": null,
+        "start": null,
+        "end": null,
+        "precision": "unknown"
+      },
+      "participantIds": [
+        "P-2590-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2590-009",
+    "eventType": "vanzare_bunuri_pentru_subzistenta",
+    "date": {
+      "raw": null,
+      "start": null,
+      "end": null,
+      "precision": "unknown"
+    },
+    "participantIds": [
+      "P-2590-001"
+    ],
+    "placeMentionIds": [],
+    "descriptionRaw": null,
+    "attributes": {
+      "valoare_raw": "1.200.000 lei"
+    },
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "E-2590-010",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 8,
+        "pagePrinted": 15,
+        "field": "tabel_victime · evenimente[9]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2590-010",
+      "tip": "deces",
+      "participant": "P-2590-003",
+      "sursa": {
+        "pagina_pdf": 8,
+        "pagina_tiparita": 15,
+        "rubrica": "tabel_victime"
+      },
+      "data_raw": "8 Febr. 942",
+      "loc_raw": "Moghilev",
+      "cauza_raw": "tifos"
+    },
+    "normalized": {
+      "eventType": "deces",
+      "date": {
+        "raw": "8 Febr. 942",
+        "start": "1942-02-08",
+        "end": "1942-02-08",
+        "precision": "day"
+      },
+      "participantIds": [
+        "P-2590-003"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "eventId": "E-2590-010",
+    "eventType": "deces",
+    "date": {
+      "raw": "8 Febr. 942",
+      "start": "1942-02-08",
+      "end": "1942-02-08",
+      "precision": "day"
+    },
+    "participantIds": [
+      "P-2590-003"
+    ],
+    "placeMentionIds": [
+      "PM-E-2590-010-LOCATION"
+    ],
+    "descriptionRaw": null,
+    "attributes": {
+      "loc_raw": "Moghilev",
+      "cauza_raw": "tifos"
+    },
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  }
+]

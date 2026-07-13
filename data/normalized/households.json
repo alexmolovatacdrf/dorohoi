@@ -1,0 +1,47 @@
+[
+  {
+    "id": "H-2560-001",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "gospodarii[0]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "gospodarie_id": "H-2560-001",
+      "cap_persoana_id": "P-2560-001",
+      "total_persoane_raw": "1",
+      "membri": [
+        "P-2560-001"
+      ]
+    },
+    "normalized": {
+      "headPersonId": "P-2560-001",
+      "memberPersonIds": [
+        "P-2560-001"
+      ]
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "householdId": "H-2560-001",
+    "householdType": "documented_household",
+    "headPersonId": "P-2560-001",
+    "memberPersonIds": [
+      "P-2560-001"
+    ],
+    "totalPersonsRaw": "1",
+    "documentIds": [
+      "DOROHOI-2560"
+    ]
+  }
+]

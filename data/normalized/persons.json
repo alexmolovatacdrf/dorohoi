@@ -1,0 +1,367 @@
+[
+  {
+    "id": "P-2560-001",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "persoane[0]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "persoana_id": "P-2560-001",
+      "nume_afisat": "Ițic Herțanu",
+      "nume_familie": "Herțanu",
+      "prenume": "Ițic",
+      "sex": "M",
+      "data_nasterii": {
+        "raw": "1892 Februarie 20",
+        "normalizat": "1892-02-20",
+        "precizie": "zi"
+      },
+      "loc_nastere_raw": "Mihăileni jud. Dorohoi",
+      "stare_civila_raw": "Necăsătorit",
+      "roluri_in_document": [
+        "declarant",
+        "cap de familie",
+        "semnatar"
+      ],
+      "incredere_identitate": "ridicata"
+    },
+    "normalized": {
+      "displayName": "Ițic Herțanu",
+      "givenName": "Ițic",
+      "familyName": "Herțanu",
+      "sex": "male",
+      "birthDate": {
+        "raw": "1892 Februarie 20",
+        "start": "1892-02-20",
+        "end": "1892-02-20",
+        "precision": "day"
+      }
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "personId": "P-2560-001",
+    "displayName": "Ițic Herțanu",
+    "givenName": "Ițic",
+    "familyName": "Herțanu",
+    "sex": "male",
+    "birthDate": {
+      "raw": "1892 Februarie 20",
+      "start": "1892-02-20",
+      "end": "1892-02-20",
+      "precision": "day"
+    },
+    "birthPlaceMentionId": "PM-P-2560-001-BIRTH",
+    "civilStatusRaw": "Necăsătorit",
+    "roles": [
+      "declarant",
+      "cap de familie",
+      "semnatar"
+    ],
+    "documentIds": [
+      "DOROHOI-2560"
+    ],
+    "householdIds": [
+      "H-2560-001"
+    ],
+    "nameVariantIds": [
+      "PNV-P-2560-001-PRIMARY",
+      "PNV-P-2560-001-SEARCH-01",
+      "PNV-P-2560-001-SEARCH-02"
+    ],
+    "relationshipIds": [],
+    "eventIds": [
+      "E-2560-001",
+      "E-2560-002",
+      "E-2560-003",
+      "E-2560-004",
+      "E-2560-005",
+      "E-2560-006",
+      "E-2560-007",
+      "E-2560-008",
+      "E-2560-009",
+      "E-2560-010",
+      "E-2560-011",
+      "E-2560-012",
+      "E-2560-013"
+    ],
+    "routeSegmentIds": [
+      "RS-2560-001",
+      "RS-2560-002"
+    ]
+  },
+  {
+    "id": "P-2590-001",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "persoane[0]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "persoana_id": "P-2590-001",
+      "nume_afisat": "Iancu Aizic",
+      "nume_familie": "Aizic",
+      "prenume": "Iancu",
+      "sex": "M",
+      "data_nasterii": {
+        "raw": "1914 Februarie 22",
+        "normalizat": "1914-02-22",
+        "precizie": "zi"
+      },
+      "loc_nastere_raw": "Dorohoi",
+      "stare_civila_raw": "Căsătorit",
+      "roluri_in_document": [
+        "declarant",
+        "cap de familie",
+        "semnatar",
+        "deportat"
+      ],
+      "incredere_identitate": "ridicata"
+    },
+    "normalized": {
+      "displayName": "Iancu Aizic",
+      "givenName": "Iancu",
+      "familyName": "Aizic",
+      "sex": "male",
+      "birthDate": {
+        "raw": "1914 Februarie 22",
+        "start": "1914-02-22",
+        "end": "1914-02-22",
+        "precision": "day"
+      }
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "personId": "P-2590-001",
+    "displayName": "Iancu Aizic",
+    "givenName": "Iancu",
+    "familyName": "Aizic",
+    "sex": "male",
+    "birthDate": {
+      "raw": "1914 Februarie 22",
+      "start": "1914-02-22",
+      "end": "1914-02-22",
+      "precision": "day"
+    },
+    "birthPlaceMentionId": "PM-P-2590-001-BIRTH",
+    "civilStatusRaw": "Căsătorit",
+    "roles": [
+      "declarant",
+      "cap de familie",
+      "semnatar",
+      "deportat"
+    ],
+    "documentIds": [
+      "DOROHOI-2590"
+    ],
+    "householdIds": [],
+    "nameVariantIds": [
+      "PNV-P-2590-001-PRIMARY"
+    ],
+    "relationshipIds": [
+      "R-2590-001",
+      "R-2590-002"
+    ],
+    "eventIds": [
+      "E-2590-001",
+      "E-2590-002",
+      "E-2590-003",
+      "E-2590-004",
+      "E-2590-005",
+      "E-2590-006",
+      "E-2590-007",
+      "E-2590-008",
+      "E-2590-009"
+    ],
+    "routeSegmentIds": [
+      "RS-2590-001",
+      "RS-2590-002"
+    ]
+  },
+  {
+    "id": "P-2590-002",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "persoane[1]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "persoana_id": "P-2590-002",
+      "nume_afisat": "Marica Chibac",
+      "nume_familie": "Chibac",
+      "prenume": "Marica",
+      "sex": "F",
+      "an_nastere_raw": "1911",
+      "roluri_in_document": [
+        "membru al familiei",
+        "soție probabilă"
+      ],
+      "incredere_identitate": "medie",
+      "lecturi_alternative": [
+        "Marica Aizic"
+      ]
+    },
+    "normalized": {
+      "displayName": "Marica Chibac",
+      "givenName": "Marica",
+      "familyName": "Chibac",
+      "sex": "female",
+      "birthDate": {
+        "raw": "1911",
+        "start": "1911-01-01",
+        "end": "1911-12-31",
+        "precision": "year"
+      }
+    },
+    "confidence": "medium",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [
+      {
+        "value": "Marica Aizic",
+        "note": "Alternative source reading",
+        "confidence": "medium",
+        "sourceRefs": [
+          {
+            "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+            "sourceDataset": "dossier",
+            "documentId": "DOROHOI-2590",
+            "dossierId": "DOROHOI-2590",
+            "pagePdf": null,
+            "pagePrinted": null,
+            "field": "persoane[1]",
+            "sourceRecordId": null,
+            "fragmentRaw": null
+          }
+        ]
+      }
+    ],
+    "personId": "P-2590-002",
+    "displayName": "Marica Chibac",
+    "givenName": "Marica",
+    "familyName": "Chibac",
+    "sex": "female",
+    "birthDate": {
+      "raw": "1911",
+      "start": "1911-01-01",
+      "end": "1911-12-31",
+      "precision": "year"
+    },
+    "birthPlaceMentionId": null,
+    "civilStatusRaw": null,
+    "roles": [
+      "membru al familiei",
+      "soție probabilă"
+    ],
+    "documentIds": [
+      "DOROHOI-2590"
+    ],
+    "householdIds": [],
+    "nameVariantIds": [
+      "PNV-P-2590-002-ALT-01",
+      "PNV-P-2590-002-PRIMARY"
+    ],
+    "relationshipIds": [
+      "R-2590-001"
+    ],
+    "eventIds": [],
+    "routeSegmentIds": []
+  },
+  {
+    "id": "P-2590-003",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": null,
+        "pagePrinted": null,
+        "field": "persoane[2]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "persoana_id": "P-2590-003",
+      "nume_afisat": "Pesi Aizic",
+      "nume_familie": "Aizic",
+      "prenume": "Pesi",
+      "sex": "F",
+      "roluri_in_document": [
+        "mamă a declarantului",
+        "victimă decedată"
+      ],
+      "incredere_identitate": "ridicata"
+    },
+    "normalized": {
+      "displayName": "Pesi Aizic",
+      "givenName": "Pesi",
+      "familyName": "Aizic",
+      "sex": "female",
+      "birthDate": null
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "personId": "P-2590-003",
+    "displayName": "Pesi Aizic",
+    "givenName": "Pesi",
+    "familyName": "Aizic",
+    "sex": "female",
+    "birthDate": null,
+    "birthPlaceMentionId": null,
+    "civilStatusRaw": null,
+    "roles": [
+      "mamă a declarantului",
+      "victimă decedată"
+    ],
+    "documentIds": [
+      "DOROHOI-2590"
+    ],
+    "householdIds": [],
+    "nameVariantIds": [
+      "PNV-P-2590-003-PRIMARY"
+    ],
+    "relationshipIds": [
+      "R-2590-002"
+    ],
+    "eventIds": [
+      "E-2590-010"
+    ],
+    "routeSegmentIds": []
+  }
+]

@@ -1,0 +1,315 @@
+[
+  {
+    "id": "RS-2560-001",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 3,
+        "pagePrinted": 5,
+        "field": "5.c · evenimente[1]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2560-002",
+      "tip": "evacuare",
+      "participant": "P-2560-001",
+      "sursa": {
+        "pagina_pdf": 3,
+        "pagina_tiparita": 5,
+        "rubrica": "5.c"
+      },
+      "data_raw": "19 Iunie 1941",
+      "origine_raw": "Mihăileni",
+      "destinatie_raw": "Bucecea",
+      "mod_transport_raw": "pe jos"
+    },
+    "normalized": {
+      "originPlaceId": "PL-CORE-MIHAILENI",
+      "destinationPlaceId": "PL-CORE-BUCECEA",
+      "routeStatus": "explicit"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "routeSegmentId": "RS-2560-001",
+    "personId": "P-2560-001",
+    "originPlaceId": "PL-CORE-MIHAILENI",
+    "destinationPlaceId": "PL-CORE-BUCECEA",
+    "sequence": 1,
+    "date": {
+      "raw": "19 Iunie 1941",
+      "start": "1941-06-19",
+      "end": "1941-06-19",
+      "precision": "day"
+    },
+    "transportRaw": "pe jos",
+    "routeStatus": "explicit",
+    "lineStyle": "solid",
+    "directionKnown": true,
+    "evidenceEventIds": [
+      "E-2560-002"
+    ],
+    "notes": null
+  },
+  {
+    "id": "RS-2560-002",
+    "dossierId": "DOROHOI-2560",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2560",
+        "dossierId": "DOROHOI-2560",
+        "pagePdf": 9,
+        "pagePrinted": "anexă",
+        "field": "evenimente[2]",
+        "sourceRecordId": null,
+        "fragmentRaw": "iar la 4 Iulie 1941 din Burdujeni la Dorohoi"
+      }
+    ],
+    "raw": {
+      "eveniment_id": "E-2560-003",
+      "tip": "deplasare_dupa_evacuare",
+      "participant": "P-2560-001",
+      "sursa": {
+        "pagina_pdf": 9,
+        "pagina_tiparita": "anexă",
+        "fragment": "iar la 4 Iulie 1941 din Burdujeni la Dorohoi"
+      },
+      "data_raw": "4 Iulie 1941",
+      "origine_raw": "Bucecea",
+      "destinatie_raw": "Dorohoi"
+    },
+    "normalized": {
+      "originPlaceId": "PL-CORE-BUCECEA",
+      "destinationPlaceId": "PL-CORE-DOROHOI",
+      "routeStatus": "explicit"
+    },
+    "confidence": "medium",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [
+      {
+        "value": {
+          "originPlaceId": "PL-UNRESOLVED-BURDUJENI-2560",
+          "originRaw": "Burdujeni"
+        },
+        "note": "The quoted fragment says Burdujeni while the structured origin says Bucecea.",
+        "confidence": "medium",
+        "sourceRefs": [
+          {
+            "sourceFile": "data/source/DOROHOI_2560_registru_analitic_revizia_duala_v0_2.json",
+            "sourceDataset": "dossier",
+            "documentId": "DOROHOI-2560",
+            "dossierId": "DOROHOI-2560",
+            "pagePdf": 9,
+            "pagePrinted": "anexă",
+            "field": "evenimente[2]",
+            "sourceRecordId": null,
+            "fragmentRaw": "iar la 4 Iulie 1941 din Burdujeni la Dorohoi"
+          }
+        ]
+      }
+    ],
+    "routeSegmentId": "RS-2560-002",
+    "personId": "P-2560-001",
+    "originPlaceId": "PL-CORE-BUCECEA",
+    "destinationPlaceId": "PL-CORE-DOROHOI",
+    "sequence": 2,
+    "date": {
+      "raw": "4 Iulie 1941",
+      "start": "1941-07-04",
+      "end": "1941-07-04",
+      "precision": "day"
+    },
+    "transportRaw": null,
+    "routeStatus": "explicit",
+    "lineStyle": "solid",
+    "directionKnown": true,
+    "evidenceEventIds": [
+      "E-2560-003"
+    ],
+    "notes": "Origin is under review because the source fragment names Burdujeni."
+  },
+  {
+    "id": "RS-2590-001",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 7,
+        "pagePrinted": 13,
+        "field": "13.a-13.d · evenimente[3]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      },
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 8,
+        "pagePrinted": 14,
+        "field": "evenimente[6]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "deportation": {
+        "eveniment_id": "E-2590-004",
+        "tip": "deportare_internare",
+        "participant": "P-2590-001",
+        "sursa": {
+          "pagina_pdf": 7,
+          "pagina_tiparita": 13,
+          "rubrica": "13.a-13.d"
+        },
+        "interval_raw": "10 Noembrie 941 - 944",
+        "origine_raw": "Dorohoi",
+        "destinatii_raw": [
+          "Moghilev",
+          "Tropov[...]"
+        ],
+        "motiv_raw": "Rasial fiind Evreu"
+      },
+      "frontier": {
+        "eveniment_id": "E-2590-007",
+        "tip": "confiscare_la_frontiera",
+        "participant": "P-2590-001",
+        "sursa": {
+          "pagina_pdf": 8,
+          "pagina_tiparita": 14
+        },
+        "loc_raw": "Ataki",
+        "descriere_raw": "i s-a luat tot ce avea asupra sa"
+      }
+    },
+    "normalized": {
+      "originPlaceId": "PL-CORE-DOROHOI",
+      "destinationPlaceId": "PL-CORE-OTACI",
+      "routeStatus": "partial"
+    },
+    "confidence": "medium",
+    "assertionStatus": "partial",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "routeSegmentId": "RS-2590-001",
+    "personId": "P-2590-001",
+    "originPlaceId": "PL-CORE-DOROHOI",
+    "destinationPlaceId": "PL-CORE-OTACI",
+    "sequence": 1,
+    "date": {
+      "raw": "10 Noembrie 941",
+      "start": "1941-11-10",
+      "end": "1941-11-10",
+      "precision": "day"
+    },
+    "transportRaw": null,
+    "routeStatus": "partial",
+    "lineStyle": "dashed",
+    "directionKnown": true,
+    "evidenceEventIds": [
+      "E-2590-004",
+      "E-2590-007"
+    ],
+    "notes": "Dorohoi origin and Ataki frontier presence are explicit; the exact intervening path is not."
+  },
+  {
+    "id": "RS-2590-002",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 8,
+        "pagePrinted": 14,
+        "field": "evenimente[6]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      },
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 7,
+        "pagePrinted": 13,
+        "field": "13.a-13.d · evenimente[3]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "frontier": {
+        "eveniment_id": "E-2590-007",
+        "tip": "confiscare_la_frontiera",
+        "participant": "P-2590-001",
+        "sursa": {
+          "pagina_pdf": 8,
+          "pagina_tiparita": 14
+        },
+        "loc_raw": "Ataki",
+        "descriere_raw": "i s-a luat tot ce avea asupra sa"
+      },
+      "deportation": {
+        "eveniment_id": "E-2590-004",
+        "tip": "deportare_internare",
+        "participant": "P-2590-001",
+        "sursa": {
+          "pagina_pdf": 7,
+          "pagina_tiparita": 13,
+          "rubrica": "13.a-13.d"
+        },
+        "interval_raw": "10 Noembrie 941 - 944",
+        "origine_raw": "Dorohoi",
+        "destinatii_raw": [
+          "Moghilev",
+          "Tropov[...]"
+        ],
+        "motiv_raw": "Rasial fiind Evreu"
+      }
+    },
+    "normalized": {
+      "originPlaceId": "PL-CORE-OTACI",
+      "destinationPlaceId": "PL-CORE-MOHYLIV-PODILSKYI",
+      "routeStatus": "partial"
+    },
+    "confidence": "medium",
+    "assertionStatus": "partial",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "routeSegmentId": "RS-2590-002",
+    "personId": "P-2590-001",
+    "originPlaceId": "PL-CORE-OTACI",
+    "destinationPlaceId": "PL-CORE-MOHYLIV-PODILSKYI",
+    "sequence": 2,
+    "date": {
+      "raw": null,
+      "start": null,
+      "end": null,
+      "precision": "unknown"
+    },
+    "transportRaw": null,
+    "routeStatus": "partial",
+    "lineStyle": "dashed",
+    "directionKnown": true,
+    "evidenceEventIds": [
+      "E-2590-007",
+      "E-2590-004"
+    ],
+    "notes": "Ataki presence and Moghilev destination are explicit; travel date and exact path are not."
+  }
+]

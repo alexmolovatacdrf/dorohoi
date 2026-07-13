@@ -1,0 +1,96 @@
+[
+  {
+    "id": "R-2590-001",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 1,
+        "pagePrinted": 1,
+        "field": "relatii[0]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "relatie_id": "R-2590-001",
+      "tip": "soți",
+      "persoana_1": "P-2590-001",
+      "persoana_2": "P-2590-002",
+      "incredere": "medie",
+      "sursa": {
+        "pagina_pdf": 1,
+        "pagina_tiparita": 1
+      }
+    },
+    "normalized": {
+      "relationshipType": "spouse",
+      "person1Id": "P-2590-001",
+      "person2Id": "P-2590-002"
+    },
+    "confidence": "medium",
+    "assertionStatus": "explicit",
+    "reviewState": "needs_review",
+    "alternativeReadings": [],
+    "relationshipId": "R-2590-001",
+    "relationshipType": "spouse",
+    "person1Id": "P-2590-001",
+    "person2Id": "P-2590-002",
+    "person1Role": "spouse",
+    "person2Role": "spouse",
+    "symmetric": true,
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  },
+  {
+    "id": "R-2590-002",
+    "dossierId": "DOROHOI-2590",
+    "sourceRefs": [
+      {
+        "sourceFile": "data/source/DOROHOI_2590_registru_analitic_initial_v0_1.json",
+        "sourceDataset": "dossier",
+        "documentId": "DOROHOI-2590",
+        "dossierId": "DOROHOI-2590",
+        "pagePdf": 8,
+        "pagePrinted": 15,
+        "field": "relatii[1]",
+        "sourceRecordId": null,
+        "fragmentRaw": null
+      }
+    ],
+    "raw": {
+      "relatie_id": "R-2590-002",
+      "tip": "mamă-fiu",
+      "parinte": "P-2590-003",
+      "copil": "P-2590-001",
+      "incredere": "ridicata",
+      "sursa": {
+        "pagina_pdf": 8,
+        "pagina_tiparita": 15
+      }
+    },
+    "normalized": {
+      "relationshipType": "parent_child",
+      "person1Id": "P-2590-003",
+      "person2Id": "P-2590-001"
+    },
+    "confidence": "high",
+    "assertionStatus": "explicit",
+    "reviewState": "not_required",
+    "alternativeReadings": [],
+    "relationshipId": "R-2590-002",
+    "relationshipType": "parent_child",
+    "person1Id": "P-2590-003",
+    "person2Id": "P-2590-001",
+    "person1Role": "parent",
+    "person2Role": "child",
+    "symmetric": false,
+    "documentIds": [
+      "DOROHOI-2590"
+    ]
+  }
+]
