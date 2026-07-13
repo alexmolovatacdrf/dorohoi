@@ -7,12 +7,17 @@ import maplibregl, {
   type GeoJSONSource,
   type Map as MapLibreMap,
   type Marker,
-  type StyleSpecification,
 } from "maplibre-gl";
 import { useLanguage } from "@/components/shell/language-provider";
 import { StatusBadge, confidenceTone } from "@/components/ui/status-badge";
 import { humanizeSlug, rawValueLabel } from "@/lib/data/format";
 import type { MapPlaceDatum, MapRouteDatum, MapViewModel } from "@/lib/data/selectors";
+import {
+  BASEMAP_LAYER_ID,
+  BASEMAP_SOURCE_ID,
+  BASEMAP_TILE_HOST,
+  createResearchMapStyle,
+} from "@/lib/map/style";
 
 interface Filters {
   person: string;
@@ -26,6 +31,7 @@ interface Filters {
 }
 
 interface Layers {
+  basemap: boolean;
   locations: boolean;
   individualRoutes: boolean;
   familyContext: boolean;
@@ -41,6 +47,8 @@ interface Layers {
 }
 
 type Selection = { kind: "place" | "route"; id: string } | null;
+type MapLifecycle = "initializing" | "ready" | "failed";
+type BasemapStatus = "loading" | "available" | "unavailable";
 
 const emptyPointCollection: FeatureCollection<Point, GeoJsonProperties> = {
   type: "FeatureCollection",
@@ -51,59 +59,10 @@ const emptyLineCollection: FeatureCollection<LineString, GeoJsonProperties> = {
   features: [],
 };
 
-const researchGrid: FeatureCollection<LineString, GeoJsonProperties> = {
-  type: "FeatureCollection",
-  features: [
-    ...[24, 25, 26, 27, 28, 29, 30].map((longitude) => ({
-      type: "Feature" as const,
-      geometry: {
-        type: "LineString" as const,
-        coordinates: [[longitude, 45], [longitude, 51]],
-      },
-      properties: {},
-    })),
-    ...[45, 46, 47, 48, 49, 50, 51].map((latitude) => ({
-      type: "Feature" as const,
-      geometry: {
-        type: "LineString" as const,
-        coordinates: [[23, latitude], [31, latitude]],
-      },
-      properties: {},
-    })),
-  ],
-};
-
-const localBaseStyle: StyleSpecification = {
-  version: 8,
-  name: "Dosare Dorohoi local research grid",
-  sources: {
-    "research-grid": {
-      type: "geojson",
-      data: researchGrid,
-    },
-  },
-  layers: [
-    {
-      id: "research-paper",
-      type: "background",
-      paint: { "background-color": "#dfe3dc" },
-    },
-    {
-      id: "research-grid",
-      type: "line",
-      source: "research-grid",
-      paint: {
-        "line-color": "#8c9991",
-        "line-width": 1,
-        "line-opacity": 0.34,
-        "line-dasharray": [2, 3],
-      },
-    },
-  ],
-};
-
 const controlClass =
   "w-full border border-[#c8c3b8] bg-white px-2.5 py-2 text-[11px] text-[#34473f] outline-none focus:border-[#2f6658]";
+const basemapFallbackMessage =
+  "OpenStreetMap tiles are unavailable. The local research grid, project places, routes, filters and layer controls remain active.";
 
 function LayerToggle({
   label,
@@ -131,6 +90,27 @@ function LayerToggle({
 
 function yearFromDate(value: string | null): number | null {
   return value ? Number.parseInt(value.slice(0, 4), 10) : null;
+}
+
+function errorDetails(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  if (typeof error === "object" && error !== null && "url" in error) {
+    const url = String(error.url);
+    return message.includes(url) ? message : `${message} (${url})`;
+  }
+  return message;
+}
+
+function hasWebGl2(): boolean {
+  try {
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("webgl2", { failIfMajorPerformanceCaveat: false });
+    if (!context) return false;
+    context.getExtension("WEBGL_lose_context")?.loseContext();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function placeSymbol(place: MapPlaceDatum): string {
@@ -242,6 +222,9 @@ export function MapWorkspace({
   const mapRef = useRef<MapLibreMap | null>(null);
   const coreMarkersRef = useRef<Marker[]>([]);
   const [mapReady, setMapReady] = useState(false);
+  const [mapLifecycle, setMapLifecycle] = useState<MapLifecycle>("initializing");
+  const [mapDiagnostic, setMapDiagnostic] = useState<string | null>(null);
+  const [basemapStatus, setBasemapStatus] = useState<BasemapStatus>("loading");
   const [selection, setSelection] = useState<Selection>(
     initialPlace ? { kind: "place", id: initialPlace } : null,
   );
@@ -256,6 +239,7 @@ export function MapWorkspace({
     toYear: "",
   });
   const [layers, setLayers] = useState<Layers>({
+    basemap: true,
     locations: true,
     individualRoutes: true,
     familyContext: true,
@@ -382,143 +366,231 @@ export function MapWorkspace({
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
-    const map = new maplibregl.Map({
-      container: containerRef.current,
-      style: localBaseStyle,
-      center: [27.25, 48.08],
-      zoom: 6.1,
-      attributionControl: false,
-      fadeDuration: 0,
-    });
-    mapRef.current = map;
-    map.addControl(new maplibregl.NavigationControl({ showCompass: true, visualizePitch: true }), "top-right");
-    map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
+    let activeMap: MapLibreMap | null = null;
+    let basemapFailed = false;
+    let disposed = false;
+    let projectLayersRegistered = false;
+    let basemapTimer: number | undefined;
+    let styleTimer: number | undefined;
 
-    map.on("load", () => {
-      map.addSource("research-places", { type: "geojson", data: emptyPointCollection });
-      map.addSource("ehri-places", { type: "geojson", data: emptyPointCollection });
-      map.addSource("family-places", { type: "geojson", data: emptyPointCollection });
-      map.addSource("research-routes", { type: "geojson", data: emptyLineCollection });
-
-      map.addLayer({
-        id: "routes-explicit",
-        type: "line",
-        source: "research-routes",
-        filter: ["==", ["get", "routeStatus"], "explicit"],
-        layout: { "line-cap": "round", "line-join": "round" },
-        paint: { "line-color": "#236353", "line-width": 4, "line-opacity": 0.9 },
-      });
-      map.addLayer({
-        id: "routes-partial",
-        type: "line",
-        source: "research-routes",
-        filter: ["==", ["get", "routeStatus"], "partial"],
-        layout: { "line-cap": "butt", "line-join": "round" },
-        paint: { "line-color": "#a54f32", "line-width": 4, "line-dasharray": [2, 2], "line-opacity": 0.9 },
-      });
-      map.addLayer({
-        id: "routes-inferred",
-        type: "line",
-        source: "research-routes",
-        filter: ["==", ["get", "routeStatus"], "inferred"],
-        paint: { "line-color": "#7e6b8d", "line-width": 3, "line-dasharray": [0.5, 2.5], "line-opacity": 0.75 },
-      });
-      map.addImage("route-arrow-explicit", routeArrow("#236353"));
-      map.addImage("route-arrow-partial", routeArrow("#a54f32"));
-      map.addImage("route-arrow-inferred", routeArrow("#7e6b8d"));
-
-      map.addLayer({
-        id: "route-direction",
-        type: "symbol",
-        source: "research-routes",
-        layout: {
-          "symbol-placement": "line",
-          "symbol-spacing": 110,
-          "icon-image": [
-            "match",
-            ["get", "routeStatus"],
-            "partial",
-            "route-arrow-partial",
-            "inferred",
-            "route-arrow-inferred",
-            "route-arrow-explicit",
-          ],
-          "icon-size": 0.66,
-          "icon-rotation-alignment": "map",
-          "icon-keep-upright": false,
-          "icon-allow-overlap": true,
-        },
-      });
-
-      map.addLayer({
-        id: "family-context-rings",
-        type: "circle",
-        source: "family-places",
-        paint: {
-          "circle-radius": 18,
-          "circle-color": "rgba(0,0,0,0)",
-          "circle-stroke-width": 2,
-          "circle-stroke-color": "#b9883b",
-          "circle-stroke-opacity": 0.8,
-        },
-      });
-      map.addLayer({
-        id: "research-place-halos",
-        type: "circle",
-        source: "research-places",
-        paint: {
-          "circle-radius": 11,
-          "circle-color": "rgba(255,253,248,0.88)",
-          "circle-stroke-width": 1,
-          "circle-stroke-color": "#173f36",
-        },
-      });
-      map.addLayer({
-        id: "research-place-cores",
-        type: "circle",
-        source: "research-places",
-        paint: {
-          "circle-radius": 6,
-          "circle-color": ["get", "color"],
-        },
-      });
-      map.addLayer({
-        id: "ehri-place-halos",
-        type: "circle",
-        source: "ehri-places",
-        paint: {
-          "circle-radius": 7,
-          "circle-color": "rgba(53,91,103,0.28)",
-          "circle-stroke-width": 1,
-          "circle-stroke-color": "#355b67",
-        },
-      });
-
-      const placeLayers = ["research-place-halos", "research-place-cores", "ehri-place-halos"];
-      for (const layerId of placeLayers) {
-        map.on("mouseenter", layerId, () => { map.getCanvas().style.cursor = "pointer"; });
-        map.on("mouseleave", layerId, () => { map.getCanvas().style.cursor = ""; });
-        map.on("click", layerId, (event) => {
-          const id = event.features?.[0]?.properties?.id;
-          if (typeof id === "string") setSelection({ kind: "place", id });
-        });
+    try {
+      if (!hasWebGl2()) {
+        throw new Error("WebGL 2 is unavailable or disabled in this browser.");
       }
-      for (const layerId of ["routes-explicit", "routes-partial", "routes-inferred", "route-direction"]) {
-        map.on("mouseenter", layerId, () => { map.getCanvas().style.cursor = "pointer"; });
-        map.on("mouseleave", layerId, () => { map.getCanvas().style.cursor = ""; });
-        map.on("click", layerId, (event) => {
-          const id = event.features?.[0]?.properties?.id;
-          if (typeof id === "string") setSelection({ kind: "route", id });
-        });
+
+      const map = new maplibregl.Map({
+        container: containerRef.current,
+        style: createResearchMapStyle(),
+        center: [27.25, 48.08],
+        zoom: 6.1,
+        attributionControl: false,
+        fadeDuration: 0,
+      });
+      activeMap = map;
+      mapRef.current = map;
+      map.addControl(new maplibregl.NavigationControl({ showCompass: true, visualizePitch: true }), "top-right");
+      map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
+
+      map.on("error", (event) => {
+        if (disposed) return;
+        const details = errorDetails(event.error);
+        if (
+          details.includes(BASEMAP_TILE_HOST) ||
+          details.toLowerCase().includes("failed to fetch")
+        ) {
+          basemapFailed = true;
+          if (basemapTimer !== undefined) window.clearTimeout(basemapTimer);
+          setBasemapStatus("unavailable");
+          setMapDiagnostic(basemapFallbackMessage);
+          return;
+        }
+        setMapDiagnostic(`MapLibre reported an error: ${details}`);
+      });
+
+      map.on("sourcedata", (event) => {
+        if (
+          disposed ||
+          basemapFailed ||
+          event.sourceId !== BASEMAP_SOURCE_ID ||
+          !event.isSourceLoaded
+        ) return;
+        if (basemapTimer !== undefined) window.clearTimeout(basemapTimer);
+        setBasemapStatus("available");
+        setMapDiagnostic((current) => current === basemapFallbackMessage ? null : current);
+      });
+
+      const initializeProjectLayers = () => {
+        if (disposed || projectLayersRegistered) return;
+        projectLayersRegistered = true;
+        try {
+          map.addSource("research-places", { type: "geojson", data: emptyPointCollection });
+          map.addSource("ehri-places", { type: "geojson", data: emptyPointCollection });
+          map.addSource("family-places", { type: "geojson", data: emptyPointCollection });
+          map.addSource("research-routes", { type: "geojson", data: emptyLineCollection });
+
+          map.addLayer({
+            id: "routes-explicit",
+            type: "line",
+            source: "research-routes",
+            filter: ["==", ["get", "routeStatus"], "explicit"],
+            layout: { "line-cap": "round", "line-join": "round" },
+            paint: { "line-color": "#236353", "line-width": 4, "line-opacity": 0.9 },
+          });
+          map.addLayer({
+            id: "routes-partial",
+            type: "line",
+            source: "research-routes",
+            filter: ["==", ["get", "routeStatus"], "partial"],
+            layout: { "line-cap": "butt", "line-join": "round" },
+            paint: { "line-color": "#a54f32", "line-width": 4, "line-dasharray": [2, 2], "line-opacity": 0.9 },
+          });
+          map.addLayer({
+            id: "routes-inferred",
+            type: "line",
+            source: "research-routes",
+            filter: ["==", ["get", "routeStatus"], "inferred"],
+            paint: { "line-color": "#7e6b8d", "line-width": 3, "line-dasharray": [0.5, 2.5], "line-opacity": 0.75 },
+          });
+          map.addImage("route-arrow-explicit", routeArrow("#236353"));
+          map.addImage("route-arrow-partial", routeArrow("#a54f32"));
+          map.addImage("route-arrow-inferred", routeArrow("#7e6b8d"));
+
+          map.addLayer({
+            id: "route-direction",
+            type: "symbol",
+            source: "research-routes",
+            layout: {
+              "symbol-placement": "line",
+              "symbol-spacing": 110,
+              "icon-image": [
+                "match",
+                ["get", "routeStatus"],
+                "partial",
+                "route-arrow-partial",
+                "inferred",
+                "route-arrow-inferred",
+                "route-arrow-explicit",
+              ],
+              "icon-size": 0.66,
+              "icon-rotation-alignment": "map",
+              "icon-keep-upright": false,
+              "icon-allow-overlap": true,
+            },
+          });
+
+          map.addLayer({
+            id: "family-context-rings",
+            type: "circle",
+            source: "family-places",
+            paint: {
+              "circle-radius": 18,
+              "circle-color": "rgba(0,0,0,0)",
+              "circle-stroke-width": 2,
+              "circle-stroke-color": "#b9883b",
+              "circle-stroke-opacity": 0.8,
+            },
+          });
+          map.addLayer({
+            id: "research-place-halos",
+            type: "circle",
+            source: "research-places",
+            paint: {
+              "circle-radius": 11,
+              "circle-color": "rgba(255,253,248,0.88)",
+              "circle-stroke-width": 1,
+              "circle-stroke-color": "#173f36",
+            },
+          });
+          map.addLayer({
+            id: "research-place-cores",
+            type: "circle",
+            source: "research-places",
+            paint: {
+              "circle-radius": 6,
+              "circle-color": ["get", "color"],
+            },
+          });
+          map.addLayer({
+            id: "ehri-place-halos",
+            type: "circle",
+            source: "ehri-places",
+            paint: {
+              "circle-radius": 7,
+              "circle-color": "rgba(53,91,103,0.28)",
+              "circle-stroke-width": 1,
+              "circle-stroke-color": "#355b67",
+            },
+          });
+
+          const placeLayers = ["research-place-halos", "research-place-cores", "ehri-place-halos"];
+          for (const layerId of placeLayers) {
+            map.on("mouseenter", layerId, () => { map.getCanvas().style.cursor = "pointer"; });
+            map.on("mouseleave", layerId, () => { map.getCanvas().style.cursor = ""; });
+            map.on("click", layerId, (event) => {
+              const id = event.features?.[0]?.properties?.id;
+              if (typeof id === "string") setSelection({ kind: "place", id });
+            });
+          }
+          for (const layerId of ["routes-explicit", "routes-partial", "routes-inferred", "route-direction"]) {
+            map.on("mouseenter", layerId, () => { map.getCanvas().style.cursor = "pointer"; });
+            map.on("mouseleave", layerId, () => { map.getCanvas().style.cursor = ""; });
+            map.on("click", layerId, (event) => {
+              const id = event.features?.[0]?.properties?.id;
+              if (typeof id === "string") setSelection({ kind: "route", id });
+            });
+          }
+          if (styleTimer !== undefined) window.clearTimeout(styleTimer);
+          setMapReady(true);
+          setMapLifecycle("ready");
+        } catch (error) {
+          setMapReady(false);
+          setMapLifecycle("failed");
+          setMapDiagnostic(`Project map layers could not be registered: ${errorDetails(error)}`);
+        }
+      };
+
+      styleTimer = window.setTimeout(() => {
+        if (disposed || projectLayersRegistered) return;
+        setMapReady(false);
+        setMapLifecycle("failed");
+        setMapDiagnostic(
+          "The inline map style did not initialize in time. Check browser WebGL support and console diagnostics.",
+        );
+      }, 8_000);
+      basemapTimer = window.setTimeout(() => {
+        if (disposed || basemapFailed) return;
+        basemapFailed = true;
+        setBasemapStatus("unavailable");
+        setMapDiagnostic(basemapFallbackMessage);
+      }, 10_000);
+
+      map.on("style.load", initializeProjectLayers);
+      if (map.isStyleLoaded()) initializeProjectLayers();
+    } catch (error) {
+      const diagnostic = `Map initialization failed: ${errorDetails(error)}`;
+      window.queueMicrotask(() => {
+        if (disposed) return;
+        setMapReady(false);
+        setMapLifecycle("failed");
+        setMapDiagnostic(diagnostic);
+      });
+      try {
+        activeMap?.remove();
+      } catch {
+        // A partially initialized MapLibre instance may not be removable.
       }
-      setMapReady(true);
-    });
+      activeMap = null;
+      mapRef.current = null;
+    }
 
     return () => {
+      disposed = true;
+      if (styleTimer !== undefined) window.clearTimeout(styleTimer);
+      if (basemapTimer !== undefined) window.clearTimeout(basemapTimer);
       coreMarkersRef.current.forEach((marker) => marker.remove());
       coreMarkersRef.current = [];
-      map.remove();
-      mapRef.current = null;
+      activeMap?.remove();
+      if (mapRef.current === activeMap) mapRef.current = null;
     };
   }, []);
 
@@ -530,6 +602,12 @@ export function MapWorkspace({
     (map.getSource("family-places") as GeoJSONSource).setData(pointCollection(familyContextPlaces, language));
     (map.getSource("research-routes") as GeoJSONSource).setData(routeCollection(visibleRoutes));
   }, [familyContextPlaces, language, mapReady, visibleCorePlaces, visibleEhriPlaces, visibleRoutes]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!mapReady || !map || !map.getLayer(BASEMAP_LAYER_ID)) return;
+    map.setLayoutProperty(BASEMAP_LAYER_ID, "visibility", layers.basemap ? "visible" : "none");
+  }, [layers.basemap, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -669,6 +747,21 @@ export function MapWorkspace({
 
         <div className="mt-5 border-t border-[#d2ccbf] pt-4">
           <h2 className="font-editorial mb-2 text-lg font-bold text-[#173f36]">{t("map.layers")}</h2>
+          <LayerToggle
+            label="OpenStreetMap basemap"
+            marker="▦"
+            checked={layers.basemap}
+            onChange={(value) => updateLayer("basemap", value)}
+            note={
+              !layers.basemap
+                ? "Hidden; local grid remains"
+                : basemapStatus === "available"
+                  ? "Public raster tiles · connected"
+                  : basemapStatus === "unavailable"
+                    ? "Unavailable; local fallback active"
+                    : "Loading public raster tiles"
+            }
+          />
           <LayerToggle label="Locations" marker="●" checked={layers.locations} onChange={(value) => updateLayer("locations", value)} />
           <LayerToggle label="Individual routes" marker="→" checked={layers.individualRoutes} onChange={(value) => updateLayer("individualRoutes", value)} />
           <LayerToggle label="Family / household context" marker="○" checked={layers.familyContext} onChange={(value) => updateLayer("familyContext", value)} note="Gold rings; requires a group filter" />
@@ -688,17 +781,55 @@ export function MapWorkspace({
         </div>
       </aside>
 
-      <div className="relative min-h-[540px] bg-[#d7d3ca] lg:min-h-0">
+      <div
+        className="relative min-h-[540px] min-w-0 overflow-hidden bg-[#d7d3ca] lg:min-h-0"
+        data-map-state={mapLifecycle}
+      >
+        <div aria-hidden="true" className="map-local-fallback-grid absolute inset-0" />
         <div
           ref={containerRef}
           className="absolute inset-0"
           style={{ position: "absolute", inset: 0 }}
           aria-label="Interactive historical research map"
+          data-testid="maplibre-container"
         />
+        {mapLifecycle === "initializing" ? (
+          <div role="status" className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border border-[#a9a397] bg-[#fffdf8]/95 px-4 py-3 text-center shadow-lg">
+            <p className="text-[9px] font-black tracking-[0.12em] text-[#173f36] uppercase">Initializing map</p>
+            <p className="mt-1 text-[9px] text-[#68746e]">Loading the inline fallback style and project layers…</p>
+          </div>
+        ) : null}
+        {mapLifecycle === "failed" ? (
+          <div role="alert" className="absolute top-1/2 right-4 left-4 z-10 mx-auto max-w-lg -translate-y-1/2 border-2 border-[#8d352c] bg-[#fff8f3]/97 p-5 shadow-xl">
+            <p className="text-[9px] font-black tracking-[0.13em] text-[#8d352c] uppercase">Map rendering unavailable</p>
+            <p className="font-editorial mt-2 text-xl font-bold text-[#173f36]">The map could not initialize.</p>
+            <p className="mt-2 text-xs leading-5 text-[#5f6864]">{mapDiagnostic}</p>
+            <p className="mt-3 text-[9px] leading-4 text-[#777f7b]">Research filters and layer controls remain available. Enable WebGL 2, then refresh this page.</p>
+          </div>
+        ) : null}
+        {mapLifecycle === "ready" && mapDiagnostic && (mapDiagnostic !== basemapFallbackMessage || layers.basemap) ? (
+          <div role="alert" className="pointer-events-none absolute right-3 bottom-8 left-3 z-10 border border-[#b9883b] bg-[#fff8e8]/96 px-3 py-2 shadow-lg sm:right-auto sm:max-w-md">
+            <p className="text-[9px] font-black tracking-[0.11em] text-[#806024] uppercase">Local fallback active</p>
+            <p className="mt-1 text-[9px] leading-4 text-[#5e665f]">{mapDiagnostic}</p>
+          </div>
+        ) : null}
         <div className="pointer-events-none absolute top-3 left-3 border border-[#a9a397] bg-[#fffdf8]/92 px-3 py-2 shadow-md backdrop-blur-sm">
           <p className="text-[8px] font-black tracking-[0.13em] text-[#6f7974] uppercase">Visible evidence</p>
           <p className="mt-1 text-xs font-bold text-[#173f36]">{visibleCorePlaces.length} core · {visibleRoutes.length} routes · {visibleEhriPlaces.length} EHRI</p>
-          <p className="mt-1 text-[8px] text-[#707b76]">Local research grid · no boundary claims</p>
+          <p className="mt-1 text-[8px] text-[#707b76]" data-testid="map-service-status">
+            {mapLifecycle === "ready"
+              ? layers.basemap
+                ? basemapStatus === "available"
+                  ? "Basemap connected · local fallback ready"
+                  : basemapStatus === "unavailable"
+                    ? "Basemap unavailable · local fallback active"
+                    : "Basemap loading · local fallback ready"
+                : "Basemap hidden · local fallback active"
+              : mapLifecycle === "failed"
+                ? "Map initialization failed"
+                : "Map initializing"}
+          </p>
+          <p className="mt-0.5 text-[8px] text-[#707b76]">Research grid · no boundary claims</p>
         </div>
       </div>
 

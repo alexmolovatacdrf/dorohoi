@@ -12,6 +12,19 @@ The immutable boundary has been preserved: `data/source/` was inspected but not
 modified. All generated research collections are written to
 `data/normalized/`.
 
+## Map acceptance correction
+
+The original V1 checkpoint initialized MapLibre with an inline background and
+research grid but no geographic source. Consequently, no style, tile, glyph or
+sprite request could ever produce a basemap. Project sources were also attached
+to the later `load` event and initialization errors had no visible UI state.
+
+The corrected implementation adds an attributed public raster source, keeps
+the local background/grid in the same inline style, attaches project evidence
+on `style.load`, and reports both tile fallback and MapLibre/WebGL failure
+states visibly. The original `v0.1.0-map-prototype` tag remains on the
+pre-correction V1 checkpoint.
+
 ## Completed scope
 
 - strict Next.js App Router, React, TypeScript and Tailwind foundation;
@@ -38,8 +51,11 @@ modified. All generated research collections are written to
   state;
 - responsive desktop and mobile layouts with keyboard-accessible controls and
   no horizontal page overflow at a 390-pixel viewport;
-- a deterministic local map grid that remains usable without an external
-  basemap and makes no boundary claims;
+- a visible no-key OpenStreetMap raster basemap with contributor attribution;
+- an inline local background/grid fallback that keeps project places, routes,
+  filters and layer controls usable when raster tiles fail, with a visible
+  fallback notice;
+- an explicit MapLibre/WebGL initialization diagnostic instead of a blank map;
 - dependency audit remediation by overriding Next's nested PostCSS 8.4.31 with
   the compatible patched 8.5.19 already used elsewhere in the project.
 
@@ -92,19 +108,27 @@ npm audit --json
 npm run start -- --hostname 127.0.0.1
 ```
 
-All commands pass. The test suite contains 11 deterministic and research-rule
-tests. The production build generates the overview, indexes, both document
-pages and all four person pages, with dynamic filtered map, place and review
-views. `npm audit --json` reports zero known vulnerabilities. The production
-server starts successfully at `http://127.0.0.1:3000`.
+All commands pass. The test suite contains 14 deterministic, map-style and
+research-rule tests. The production build generates the overview, indexes,
+both document pages and all four person pages, with dynamic filtered map, place
+and review views. `npm audit --json` reports zero known vulnerabilities. The
+production server starts successfully at `http://127.0.0.1:3000`.
 
-Browser verification covered Overview, Map, Persons, an individual dossier,
-Places, Documents and Review; person search, the separate EHRI filter, map
-person filtering, one-shot timeline playback and the EN/RO control were
-exercised. MapLibre hydrated with five visible core points and four route legs
-at the default state. Desktop and 390-pixel mobile layouts were checked. The
-only browser console messages were headless SwiftShader performance warnings
-while capturing the WebGL map; there were no application errors.
+Browser verification for the corrected map covered 1440×1000 desktop and
+390×844 mobile viewports. MapLibre hydrated with five visible core places, four
+route legs and a connected OpenStreetMap basemap. The browser requested only
+local application assets and OpenStreetMap raster PNG tiles: the inline style
+does not request external style JSON, glyphs or sprites. Basemap, location,
+route, unresolved and EHRI toggles; confidence filtering; person and place
+selection; and one-shot timeline play/reset were exercised. Simulated raster
+failure left the grid, routes, places and controls visible with a fallback
+notice. Simulated WebGL 2 failure produced the diagnostic state. The only
+console messages during the clean connected run were headless SwiftShader
+performance warnings; there were no application errors.
+
+The application is not offline-capable. Without external network access, the
+local project evidence and grid remain usable, but the geographic OpenStreetMap
+basemap is unavailable.
 
 `git diff -- data/source` is empty.
 
@@ -112,6 +136,9 @@ while capturing the WebGL map; there were no application errors.
 
 - [`overview-desktop.png`](../artifacts/screenshots/overview-desktop.png)
 - [`map-desktop.png`](../artifacts/screenshots/map-desktop.png)
+- [`map-working-desktop.png`](../artifacts/screenshots/map-working-desktop.png)
+- [`map-working-mobile.png`](../artifacts/screenshots/map-working-mobile.png)
+- [`map-local-fallback-desktop.png`](../artifacts/screenshots/map-local-fallback-desktop.png)
 - [`person-iancu-aizic.png`](../artifacts/screenshots/person-iancu-aizic.png)
 - [`review-desktop.png`](../artifacts/screenshots/review-desktop.png)
 - [`overview-mobile.png`](../artifacts/screenshots/overview-mobile.png)
@@ -132,7 +159,8 @@ while capturing the WebGL map; there were no application errors.
   catalog. Its type-label conflicts, duplicate/shared coordinates and upstream
   provenance require catalog-level review before any merge.
 - Historical boundaries and WMS/WMTS services are disabled registry
-  placeholders. The default map intentionally uses a neutral local grid.
+  placeholders. The default geographic context uses public OpenStreetMap
+  raster tiles; the neutral local grid is the external-service fallback.
 - Review actions are read-only in V1; there is no persistent adjudication or
   merge workflow.
 - Romanian coverage currently applies to interface messages. Documentary

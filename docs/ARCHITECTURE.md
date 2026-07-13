@@ -144,9 +144,21 @@ normalized repository is the only application data source.
 The map receives purpose-built, serializable view data. MapLibre rendering is
 separate from route semantics:
 
-- the default base is a deterministic local latitude/longitude research grid;
-  it makes no political, administrative or historical boundary claim and does
-  not depend on a third-party style service;
+- the default geographic base is a public, no-key OpenStreetMap raster source
+  with visible contributor attribution; it requires network access and is not
+  treated as an availability-guaranteed service;
+- the MapLibre style document is bundled inline and includes a local neutral
+  background plus latitude/longitude research grid. Project sources and layers
+  register on `style.load`, independently of raster-tile success, so external
+  tile failure leaves routes, places, filters and layer controls usable;
+- the style has no remote style-JSON, glyph or sprite dependency. Project
+  direction symbols are generated in the browser and place labels are local
+  DOM markers;
+- a tile failure activates a visible local-fallback notice; a WebGL or style
+  initialization failure produces a visible diagnostic instead of a blank map;
+- the application is not described as offline-capable: without network access
+  the local grid and project evidence remain available, but the geographic
+  OpenStreetMap basemap does not;
 - resolved place mentions are points;
 - unresolved place mentions appear in the side panel and unresolved layer
   registry, never at fabricated coordinates;

@@ -116,6 +116,11 @@ Status: complete.
 
 - Build the three-column map layout with filter panel, map, contextual details
   and bottom timeline.
+- Use a public no-key OpenStreetMap raster layer for default geographic context
+  while keeping an inline background/grid fallback and project evidence layers
+  independent of external tile availability.
+- Expose basemap availability and MapLibre initialization failures visibly;
+  never leave the map workspace as an unexplained blank region.
 - Add person, household/family, dossier, place, event type, time and confidence
   filters.
 - Add independent layer controls for locations, individual routes, family

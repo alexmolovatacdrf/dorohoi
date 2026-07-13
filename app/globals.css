@@ -115,6 +115,14 @@ summary {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.map-local-fallback-grid {
+  background-color: #dfe3dc;
+  background-image:
+    linear-gradient(rgb(73 103 92 / 18%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(73 103 92 / 18%) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
 .maplibregl-ctrl-attrib {
   font-size: 9px !important;
 }
