@@ -184,3 +184,31 @@ Completion criteria:
 - review actions are read-only until a later persistent workflow exists;
 - interface translation is deliberately small; documentary wording stays in its
   original language.
+
+## Phase 7 — European Borders WWII historical administration layer
+
+Status: in progress.
+
+- Preserve the corrected V1 map as the acceptance baseline and keep the
+  `v0.1.0-map-prototype` tag unchanged.
+- Inventory and checksum the source archive without committing its raw or
+  extracted contents.
+- Document attribution, projection, methodology, use limits, temporal limits
+  and all detected anomalies.
+- Build a pinned, deterministic processor for validation, regional crop,
+  reprojection, conservative simplification, per-month GeoJSON and checksums.
+- Validate Transnistria, Reichskommissariat Ukraine and Territorial_Changes
+  assertions directly from the supplied DBFs.
+- Add an optional selected-month MapLibre polygon layer below person routes and
+  place markers, with legend, opacity, raw details, warning and attribution.
+- Validate only one selected snapshot in the browser, with abortable requests
+  and a visible error state.
+- Add conversion/date-selection/source-distinction tests and exercise desktop
+  and mobile controls in Chromium.
+- Run normalization, tests, typecheck, lint and production build; save final
+  screenshots and commit the integration.
+
+Acceptance requires the real basemap, project places, person routes and layer
+controls to remain visibly usable, with the historical polygons independently
+toggleable. The late `limited_static` interval must be clearly differentiated,
+and no raw source field may be silently corrected.

@@ -312,3 +312,39 @@ become null, and pages do not depend on a dossier's bespoke JSON keys.
 
 Cross-dossier matching produces candidates only. A reviewed merge, when later
 implemented, must keep both source IDs and an auditable decision record.
+
+## 9. Historical administration snapshot model
+
+Historical polygons are derived geographic context, not dossier events and not
+substitutes for person-centred evidence. They remain outside the ten core
+normalized collections.
+
+The committed manifest defines 88 ordered snapshots. Each snapshot record has
+`yearMonth`, exact supplied `snapshotDate`, evidence `status`, relative file and
+URL, byte count, SHA-256, source record count and regional feature count.
+`status` is `primary` through September 1944 and `limited_static` thereafter.
+
+Each monthly feature has a stable ID based on year-month and source record
+index, polygon or multipolygon geometry in `EPSG:4326`, and these properties:
+
+- `Name`, `Foreign_Po`, `Head_of_St`, `Govt_in_Ex`: unchanged raw DBF strings;
+- `snapshotDate` and `yearMonth`: temporal identity without changing supplied
+  dates;
+- `sourceFeatureIndex`: link back to deterministic source record order;
+- `foreignPowerCategory`: controlled display value derived by exact lookup of
+  `Foreign_Po`;
+- `editorialFlagIds`: references into the separate editorial record file.
+
+There is deliberately no civil/military administration field. Empty strings
+and literal `<Null>` remain distinct. Editorial records never overwrite these
+properties.
+
+The regional `Territorial_Changes` derivative retains all source DBF fields as
+serializable raw values, adds an ISO `changeDate`, and retains
+`sourceFeatureIndex`. It supports source validation and research inspection; it
+does not replace the monthly snapshots rendered in the map.
+
+The source manifest, derived manifest, checksum list and separate editorial
+records form the provenance envelope. A valid browser snapshot must match its
+manifest byte count and hash in repository tests, use only coordinates inside
+the documented crop, and contain all four required raw monthly attributes.

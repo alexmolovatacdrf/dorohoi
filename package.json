@@ -5,6 +5,8 @@
   "description": "Person-centred historical research platform for Jewish families from Dorohoi.",
   "scripts": {
     "normalize": "tsx scripts/normalize.ts",
+    "historical:preprocess": "external-data/european-borders-wwii/.venv/bin/python scripts/historical-administration/preprocess.py",
+    "historical:verify": "external-data/european-borders-wwii/.venv/bin/python scripts/historical-administration/preprocess.py --verify-output",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",

@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "policy": "Editorial records never overwrite source fields. Any future correction must name its evidence, author, date and review status, while the original monthly value remains available.",
+  "records": [
+    {
+      "id": "HA-ANOM-ITALY-1941-10-FOREIGN-PO",
+      "snapshot": "1941-10",
+      "featureNameRaw": "Italy",
+      "field": "Foreign_Po",
+      "valueRaw": "Allies",
+      "editorialValue": null,
+      "status": "flagged_unresolved",
+      "note": "The supplied October 1941 DBF classifies Italy as Allies. This likely conflicts with the intended historical classification, but the archive value is preserved pending a separately sourced correction.",
+      "provenance": {
+        "basis": "archive inspection and user-directed anomaly review",
+        "sourceRef": "EuropeanBorders_WWII/October_31_1941.dbf",
+        "reviewedAt": null,
+        "reviewedBy": null
+      }
+    },
+    {
+      "id": "HA-CAUTION-HEAD-OF-STATE",
+      "snapshot": null,
+      "featureNameRaw": null,
+      "field": "Head_of_St",
+      "valueRaw": null,
+      "editorialValue": null,
+      "status": "methodological_caution",
+      "note": "The field sometimes contains a de facto ruler, occupation official, governor, prime minister or military force. It must not be read automatically as the constitutional head of state.",
+      "provenance": {
+        "basis": "systematic review of unique DBF values",
+        "sourceRef": "all monthly DBF files",
+        "reviewedAt": null,
+        "reviewedBy": null
+      }
+    }
+  ]
+}

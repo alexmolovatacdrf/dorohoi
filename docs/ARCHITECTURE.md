@@ -248,3 +248,37 @@ V1 deliberately defers:
 
 Layer registries and source/media references are included now so these features
 can be added without collapsing documentary, analytical and rendering concerns.
+
+## 10. Historical administration extension
+
+The European Borders WWII integration adds a separate deterministic GIS
+boundary without changing the dossier normalization boundary:
+
+```text
+ignored source archive
+  -> pinned Python GIS processor
+  -> one regional EPSG:4326 GeoJSON per year-month
+  -> derived manifest + checksums
+  -> client manifest fetch
+  -> selected-month fetch only
+  -> MapLibre fill/line layers below routes and markers
+```
+
+Raw shapefiles live under ignored `external-data/`; compact derivatives are
+static public assets. The application does not import GIS libraries, extract
+archives or reproject geometry at runtime. Zod validates the derived manifest
+and selected GeoJSON at the client boundary. A month-selection helper is pure
+and testable independently of React and MapLibre.
+
+Historical polygons are registered before route, family-context and place
+layers, preserving the visual priority of person evidence. The historical
+source starts as an empty local GeoJSON collection. Enabling the optional layer
+fetches exactly the selected snapshot, and changing the month aborts an obsolete
+request. Fetch or validation failure leaves the V1 basemap and project evidence
+active and produces a visible layer-specific diagnostic.
+
+The derived `foreignPowerCategory` is a display grouping of exact
+`Foreign_Po` strings. It is explicitly not a civil/military administration
+field. Raw monthly attributes, snapshot date, editorial flags, attribution and
+methodological warning remain available in the map UI. Full methodology and
+reproduction details are in `docs/HISTORICAL_ADMINISTRATION.md`.

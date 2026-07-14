@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "sourceId": "european-borders-wwii-stanford-spatial-history",
+  "title": "European Borders during World War II, 1938–1945",
+  "archive": {
+    "filename": "EuropeanBorders_WWII.zip",
+    "observedLocalPath": "/mnt/c/Users/Alex Molovata/Downloads/EuropeanBorders_WWII.zip",
+    "sizeBytes": 278902121,
+    "uncompressedSizeBytes": 520838193,
+    "entryCount": 622,
+    "sha256": "4f934928531a57dc9e84d3a087cd21643f1232af011a4949621bcc53e099f4ea"
+  },
+  "inventory": {
+    "monthlySnapshotCount": 88,
+    "monthlyStart": "1938-02",
+    "monthlyEnd": "1945-05",
+    "territorialChangesLayer": "Territorial_Changes",
+    "territorialChangesRecordCount": 81,
+    "geometryType": "Polygon",
+    "monthlyRawFields": [
+      "Name",
+      "Foreign_Po",
+      "Head_of_St",
+      "Govt_in_Ex"
+    ]
+  },
+  "projection": {
+    "sourceAuthority": "ESRI:102013",
+    "sourceName": "Europe Albers Equal Area Conic / European 1950",
+    "sourceWkt": "PROJCS[\"Europe_Albers_Equal_Area_Conic\",GEOGCS[\"GCS_European_1950\",DATUM[\"D_European_1950\",SPHEROID[\"International_1924\",6378388.0,297.0]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Albers\"],PARAMETER[\"False_Easting\",0.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",10.0],PARAMETER[\"Standard_Parallel_1\",43.0],PARAMETER[\"Standard_Parallel_2\",62.0],PARAMETER[\"Latitude_Of_Origin\",30.0],UNIT[\"Meter\",1.0]]",
+    "derivedAuthority": "EPSG:4326",
+    "coordinateOrder": "longitude, latitude"
+  },
+  "attribution": {
+    "institution": "Stanford Spatial History Lab",
+    "project": "Holocaust Geographies Project",
+    "researchAndDigitization": "Michael De Groot, Summer 2010",
+    "technicalSupportAndProjectManagement": "Erik Steiner",
+    "additionalSupport": "Kathy Harris, Anne Knowles, Alberto Giordano, Marc Masurovsky, Pavel Ilyin, the United States Holocaust Memorial Museum, and the Center for Advanced Holocaust Studies",
+    "funding": "NSF Award 0820501, Mellon Distinguished Professor Grant (Richard White), and the Stanford Vice Provost for Undergraduate Education",
+    "sourceGeography": "Modern Europe data by ESRI; scanned and georectified historical maps from the Library of Congress and USHMM; military-front data supplied by James Graham",
+    "requiredDisplay": "European Borders during World War II (Stanford Spatial History Lab / Holocaust Geographies Project; Michael De Groot and Erik Steiner). Derived regional adaptation by Dosare Dorohoi."
+  },
+  "useLimit": "Reuse and adaptation are encouraged for scholarly work. Commercial use is strictly prohibited. The source metadata asks users to inform the authors of adaptations or quality improvements.",
+  "sourceMethodologySummary": "Modern European borders were modified using scanned and georectified historical maps. Territorial_Changes records annexations and newly constituted entities. Monthly layers were produced by combining that registry with a February 1938 base geography. Occupation and other events without sufficient spatial reference are represented in attributes rather than as comprehensive front lines.",
+  "primarySupportedInterval": {
+    "start": "1938-02",
+    "end": "1944-09"
+  },
+  "limitedInterval": {
+    "start": "1944-10",
+    "end": "1945-05",
+    "status": "limited_static",
+    "reason": "The source project reports incomplete military-front data. October 1944 through April 1945 reuse the September 1944 shapefile geometry byte-for-byte; May 1945 changes geometry but remains subject to the same frontline limitation."
+  },
+  "knownSourceAnomalies": [
+    {
+      "id": "missing-territorial-shx",
+      "scope": "Territorial_Changes",
+      "description": "The archive contains SHP, DBF and PRJ files for Territorial_Changes but no SHX index. Sequential reading is required."
+    },
+    {
+      "id": "august-day-1938-1939",
+      "scope": "August 1938, August 1939, February 1940 and February 1944",
+      "description": "The supplied filenames use August 30 in 1938–1939 and February 28 in the leap years 1940 and 1944 rather than the final day of those months. Exact supplied dates are retained while the browser selector maps them to their year-month."
+    },
+    {
+      "id": "italy-allies-1941-10",
+      "scope": "October 1941 / Italy / Foreign_Po",
+      "description": "The raw value is Allies. It is preserved and flagged editorially; no silent replacement is made."
+    },
+    {
+      "id": "head-of-state-semantics",
+      "scope": "Head_of_St",
+      "description": "Values sometimes identify a de facto ruler, occupying authority, governor, prime minister or military force rather than a constitutional head of state. The field name and raw wording are retained without normalizing the office."
+    },
+    {
+      "id": "ostland-spelling-variant",
+      "scope": "Name",
+      "description": "Both Reichkommissariat Ostland and Reichskommissariat Ostland occur. The raw spelling is retained."
+    },
+    {
+      "id": "null-encoding",
+      "scope": "Foreign_Po and other character fields",
+      "description": "Both empty strings and the literal text <Null> occur and remain distinct raw values."
+    },
+    {
+      "id": "metadata-1947-reference",
+      "scope": "ArcGIS XML metadata",
+      "description": "The layer metadata contains an internal September_30_1947 geometry-object reference although the delivered monthly series ends in May 1945."
+    },
+    {
+      "id": "april-1939-metadata-log",
+      "scope": "April_30_1939_esritranslate.log",
+      "description": "The archive includes ESRI metadata translation validation errors for contact and dateStamp clauses."
+    }
+  ]
+}
