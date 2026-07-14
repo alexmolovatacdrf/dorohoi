@@ -7,7 +7,10 @@ import {
   defaultHistoricalSnapshot,
   historicalFeatureCollectionSchema,
   historicalManifestSchema,
+  historicalSnapshotFeatureCount,
   historicalSnapshotIndex,
+  historicalTerritorialFeatureCollectionSchema,
+  isRegionalHistoricalSnapshot,
   selectHistoricalSnapshot,
   type HistoricalFeatureCollection,
   type HistoricalManifest,
@@ -114,7 +117,7 @@ describe("European Borders WWII deterministic regional derivative", () => {
       expect(sha256(contents), entry.yearMonth).toBe(entry.sha256);
       const collection = snapshots.get(entry.yearMonth);
       expect(collection?.features, entry.yearMonth).toHaveLength(
-        entry.regionalFeatureCount,
+        historicalSnapshotFeatureCount(entry),
       );
       for (const feature of collection?.features ?? []) {
         expect(feature.properties).toEqual(
@@ -132,6 +135,9 @@ describe("European Borders WWII deterministic regional derivative", () => {
   });
 
   it("contains only EPSG:4326 coordinates inside the documented regional crop", () => {
+    if (manifest.processing.extentMode !== "regional_crop") {
+      throw new Error("The regional manifest did not expose regional processing");
+    }
     const [west, south, east, north] = manifest.processing.regionalBbox;
     for (const [yearMonth, collection] of snapshots) {
       const positions: Array<[number, number]> = [];
@@ -249,6 +255,35 @@ describe("European Borders WWII deterministic regional derivative", () => {
     });
   });
 
+  it("rejects a regional snapshot entry from the full asset path", () => {
+    const snapshot = manifest.snapshots[0];
+    expect(isRegionalHistoricalSnapshot(snapshot)).toBe(true);
+    expect(
+      historicalManifestSchema.safeParse({
+        ...manifest,
+        snapshots: [
+          {
+            ...snapshot,
+            url: "/data/historical-administration-full/snapshots/1938-02.geojson",
+          },
+          ...manifest.snapshots.slice(1),
+        ],
+      }).success,
+    ).toBe(false);
+    expect(
+      historicalManifestSchema.safeParse({
+        ...manifest,
+        snapshots: [
+          {
+            ...snapshot,
+            url: "/data/not-a-historical-dataset/snapshots/1938-02.geojson",
+          },
+          ...manifest.snapshots.slice(1),
+        ],
+      }).success,
+    ).toBe(false);
+  });
+
   it("keeps the UI palette synchronized with the derived controlled vocabulary", () => {
     const manifestColors = Object.fromEntries(
       manifest.derivedForeignPowerVocabulary.legend.map((entry) => [
@@ -260,5 +295,111 @@ describe("European Borders WWII deterministic regional derivative", () => {
     expect(manifest.derivedForeignPowerVocabulary.method).toContain(
       "not an administration-type field",
     );
+  });
+});
+
+describe("European Borders WWII full presentation derivative", () => {
+  const root = join(process.cwd(), "public/data/historical-administration-full");
+  let manifest: HistoricalManifest;
+
+  beforeAll(async () => {
+    manifest = historicalManifestSchema.parse(
+      JSON.parse(await readFile(join(root, "manifest.json"), "utf8")),
+    );
+  });
+
+  it("validates the full manifest scope, public vocabulary and all 88 snapshots", async () => {
+    expect(manifest.scope).toBe("full");
+    expect(manifest.processing.extentMode).toBe("full_source");
+    expect(manifest.presentationVocabulary?.field).toBe("presentationCategory");
+    expect(manifest.snapshots).toHaveLength(88);
+    expect(manifest.territorialChanges.scope).toBe("full");
+    for (const entry of manifest.snapshots) {
+      const parsed = historicalFeatureCollectionSchema.parse(
+        JSON.parse(
+          (await readFile(join(root, entry.file))).toString("utf8"),
+        ),
+      );
+      expect(parsed.metadata.scope, entry.yearMonth).toBe("full");
+      expect(parsed.features, entry.yearMonth).toHaveLength(
+        historicalSnapshotFeatureCount(entry),
+      );
+      expect(entry.scope).toBe("full");
+    }
+  }, 30_000);
+
+  it("accepts both documented asset prefixes and rejects unrelated paths", () => {
+    const snapshot = manifest.snapshots[0];
+    expect(snapshot.url).toMatch(
+      /^\/data\/historical-administration-full\/snapshots\//,
+    );
+    expect(
+      historicalManifestSchema.safeParse({
+        ...manifest,
+        snapshots: [
+          {
+            ...snapshot,
+            url: "/data/historical-administration/snapshots/1938-02.geojson",
+          },
+          ...manifest.snapshots.slice(1),
+        ],
+      }).success,
+    ).toBe(false);
+    expect(
+      historicalManifestSchema.safeParse({
+        ...manifest,
+        snapshots: [
+          {
+            ...snapshot,
+            url: "/data/not-a-historical-dataset/snapshots/1938-02.geojson",
+          },
+          ...manifest.snapshots.slice(1),
+        ],
+      }).success,
+    ).toBe(false);
+  });
+
+  it("keeps full-source geometry and historical distinctions at the key transition months", async () => {
+    const monthFeatures = async (month: string) =>
+      historicalFeatureCollectionSchema.parse(
+        JSON.parse(
+          (await readFile(join(root, `snapshots/${month}.geojson`))).toString(
+            "utf8",
+          ),
+        ),
+      ).features;
+    const before = await monthFeatures("1941-07");
+    const august = await monthFeatures("1941-08");
+    const september = await monthFeatures("1941-09");
+    const march = await monthFeatures("1944-03");
+    const april = await monthFeatures("1944-04");
+    expect(before.some((feature) => feature.properties.Name === "Transnistria")).toBe(false);
+    expect(august.some((feature) => feature.properties.Name === "Transnistria")).toBe(true);
+    expect(august.some((feature) => feature.properties.Name === "Reichskommissariat Ukraine")).toBe(false);
+    const septemberTransnistria = september.find(
+      (feature) => feature.properties.Name === "Transnistria",
+    );
+    const septemberUkraine = september.find(
+      (feature) => feature.properties.Name === "Reichskommissariat Ukraine",
+    );
+    expect(septemberTransnistria?.id).not.toBe(septemberUkraine?.id);
+    expect(septemberUkraine?.properties.Foreign_Po).toBe("German-occupied");
+    expect(march.some((feature) => feature.properties.Name === "Transnistria")).toBe(true);
+    expect(april.some((feature) => feature.properties.Name === "Transnistria")).toBe(false);
+    const transnistria = august.find(
+      (feature) => feature.properties.Name === "Transnistria",
+    );
+    expect(transnistria?.properties).toMatchObject({
+      Foreign_Po: "Romanian-occupied",
+      presentationCategory: "romanian_occupied",
+    });
+    const territorial = historicalTerritorialFeatureCollectionSchema.parse(
+      JSON.parse(
+        (await readFile(join(root, manifest.territorialChanges.file))).toString(
+          "utf8",
+        ),
+      ),
+    );
+    expect(territorial.features).toHaveLength(81);
   });
 });

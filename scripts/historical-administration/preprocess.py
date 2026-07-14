@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Deterministically derive regional monthly GeoJSON from EuropeanBorders_WWII.
+"""Deterministically derive monthly GeoJSON from EuropeanBorders_WWII.
 
 The source archive and its extracted contents stay in ignored ``external-data``.
-Only compact, cropped EPSG:4326 derivatives and their manifests are written to
-``public/data/historical-administration``.
+Compact EPSG:4326 derivatives are written as two independent browser datasets:
+the established regional research window and a simplified, uncropped full-
+source extent for the public Presentation Map.
 """
 
 from __future__ import annotations
@@ -28,7 +29,7 @@ import pyproj
 import shapefile
 import shapely
 from pyproj import Transformer
-from shapely.geometry import GeometryCollection, MultiPolygon, Polygon, box, mapping, shape
+from shapely.geometry import MultiPolygon, Polygon, box, mapping, shape
 from shapely.ops import transform as transform_geometry
 from shapely.ops import unary_union
 from shapely.validation import explain_validity
@@ -39,11 +40,14 @@ SOURCE_MANIFEST = REPO_ROOT / "data/manifests/european-borders-wwii.source.json"
 EDITORIAL_RECORDS = REPO_ROOT / "data/editorial/historical-administration.json"
 DEFAULT_EXTERNAL_DIR = REPO_ROOT / "external-data/european-borders-wwii"
 DEFAULT_OUTPUT_DIR = REPO_ROOT / "public/data/historical-administration"
+DEFAULT_FULL_OUTPUT_DIR = REPO_ROOT / "public/data/historical-administration-full"
 
 SOURCE_CRS = "ESRI:102013"
 TARGET_CRS = "EPSG:4326"
 REGIONAL_BBOX = (19.0, 43.3, 34.5, 52.6)
 SIMPLIFY_TOLERANCE_DEGREES = 0.005
+FULL_SIMPLIFY_TOLERANCE_DEGREES = 0.015
+FULL_SOURCE_SIMPLIFY_TOLERANCE_METRES = 1_250.0
 COORDINATE_DECIMALS = 5
 PRIMARY_END = "1944-09"
 
@@ -100,10 +104,46 @@ CATEGORY_LEGEND = (
     ("german_soviet_occupied", "German and Soviet occupied (raw)", "#69617c"),
 )
 
+# A deliberately small public legend. This remains a derived presentation
+# vocabulary, never a replacement for Name or Foreign_Po. The exact rules are
+# emitted in the full-extent manifest and the raw values remain on every feature.
+PRESENTATION_CATEGORY_LEGEND = (
+    ("sovereign_state", "Sovereign or state territory", "#c8bfa9"),
+    ("romanian_occupied", "Romanian-occupied / administered", "#c87945"),
+    ("german_occupied", "German-occupied / administered", "#76536f"),
+    ("soviet_controlled", "Soviet-controlled territory", "#5f7894"),
+    ("unresolved_other", "Unresolved or other source classification", "#8d8b84"),
+)
+
+PRESENTATION_SOVEREIGN_RAW_VALUES = {
+    "Allied",
+    "Allies",
+    "Axis",
+    "Axis-aligned",
+    "Belligerent",
+    "Neutral",
+    "War with Soviet Union",
+}
+PRESENTATION_GERMAN_RAW_VALUES = {
+    "Axis and German, Italian-occupied",
+    "Axis and German-occupied",
+    "Axis, German, Italian-occupied",
+    "German Protectorate",
+    "German, Bulgarian-occupied",
+    "German, Italian, Bulgarian-occupied",
+    "German, Italian-occupied",
+    "German-occupied",
+}
+
 ATTRIBUTION = (
     "European Borders during World War II (Stanford Spatial History Lab / "
     "Holocaust Geographies Project; Michael De Groot and Erik Steiner). "
     "Derived regional adaptation by Dosare Dorohoi."
+)
+FULL_EXTENT_ATTRIBUTION = (
+    "European Borders during World War II (Stanford Spatial History Lab / "
+    "Holocaust Geographies Project; Michael De Groot and Erik Steiner). "
+    "Derived full-extent presentation adaptation by Dosare Dorohoi."
 )
 METHODOLOGICAL_WARNING = (
     "These are monthly analytical boundary snapshots, not comprehensive front lines and not an "
@@ -313,15 +353,30 @@ def polygonal_only(geometry: Any) -> Polygon | MultiPolygon | None:
         return None
     if isinstance(geometry, (Polygon, MultiPolygon)):
         return geometry
-    if isinstance(geometry, GeometryCollection):
-        polygons: list[Polygon | MultiPolygon] = [
-            part for part in geometry.geoms if isinstance(part, (Polygon, MultiPolygon)) and not part.is_empty
-        ]
-        if not polygons:
-            return None
-        merged = unary_union(polygons)
-        return merged if isinstance(merged, (Polygon, MultiPolygon)) else None
-    return None
+
+    polygons: list[Polygon] = []
+
+    def collect(value: Any) -> None:
+        if value.is_empty:
+            return
+        if isinstance(value, Polygon):
+            polygons.append(value)
+            return
+        if isinstance(value, MultiPolygon):
+            polygons.extend(part for part in value.geoms if not part.is_empty)
+            return
+        # make_valid can produce nested GeometryCollections when source rings
+        # contain both polygonal and line remnants. Traverse all collection
+        # levels and retain only polygonal evidence.
+        if hasattr(value, "geoms"):
+            for part in value.geoms:
+                collect(part)
+
+    collect(geometry)
+    if not polygons:
+        return None
+    merged = unary_union(polygons)
+    return merged if isinstance(merged, (Polygon, MultiPolygon)) else None
 
 
 def bounds_overlap(
@@ -402,6 +457,68 @@ def derive_geometry(
             return None, repairs
     result = mapping(polygonal)
     return {"type": result["type"], "coordinates": round_coordinates(result["coordinates"])}, repairs
+
+
+def derive_full_geometry(
+    source_geometry: dict[str, Any],
+    transformer: Transformer,
+) -> tuple[dict[str, Any] | None, tuple[float, float, float, float] | None, list[str]]:
+    """Reproject and simplify a source polygon without applying a crop."""
+
+    repairs: list[str] = []
+    geometry = shape(source_geometry)
+    if not geometry.is_valid:
+        repairs.append(f"source invalid: {explain_validity(geometry)}")
+        geometry = shapely.make_valid(geometry)
+    polygonal_source = polygonal_only(geometry)
+    if polygonal_source is None:
+        return None, None, repairs
+    # Reduce the very detailed continent-wide source vertices before the CRS
+    # transform. This is topology-preserving generalization, not clipping.
+    geometry = polygonal_source.simplify(
+        FULL_SOURCE_SIMPLIFY_TOLERANCE_METRES,
+        preserve_topology=True,
+    )
+    projected = transform_geometry(transformer.transform, geometry)
+    if not projected.is_valid:
+        repairs.append(f"reprojected invalid: {explain_validity(projected)}")
+        projected = shapely.make_valid(projected)
+    simplified = projected.simplify(
+        FULL_SIMPLIFY_TOLERANCE_DEGREES,
+        preserve_topology=True,
+    )
+    polygonal = polygonal_only(simplified)
+    if polygonal is None or polygonal.is_empty:
+        return None, None, repairs
+    if not polygonal.is_valid:
+        repairs.append(f"simplified invalid: {explain_validity(polygonal)}")
+        polygonal = polygonal_only(shapely.make_valid(polygonal))
+        if polygonal is None:
+            return None, None, repairs
+    result = mapping(polygonal)
+    bounds = tuple(float(value) for value in polygonal.bounds)
+    return (
+        {
+            "type": result["type"],
+            "coordinates": round_coordinates(result["coordinates"]),
+        },
+        (bounds[0], bounds[1], bounds[2], bounds[3]),
+        repairs,
+    )
+
+
+def presentation_category(name_raw: str, foreign_power_raw: str) -> str:
+    """Return a documented public-display category while retaining raw values."""
+
+    if name_raw == "Soviet Union":
+        return "soviet_controlled"
+    if foreign_power_raw == "Romanian-occupied":
+        return "romanian_occupied"
+    if foreign_power_raw in PRESENTATION_GERMAN_RAW_VALUES:
+        return "german_occupied"
+    if foreign_power_raw in PRESENTATION_SOVEREIGN_RAW_VALUES:
+        return "sovereign_state"
+    return "unresolved_other"
 
 
 def editorial_flags(editorial: dict[str, Any], year_month: str, name_raw: str) -> list[str]:
@@ -486,6 +603,105 @@ def convert_snapshot(
     return collection, report
 
 
+def convert_full_snapshot(
+    snapshot: SnapshotSource,
+    transformer: Transformer,
+    source_wkt: str,
+    editorial: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Convert every polygon in one monthly source file without spatial cropping."""
+
+    validate_projection(snapshot.prj, source_wkt)
+    reader = reader_for(snapshot.dbf.with_suffix(""), require_shx=True)
+    schema = field_schema(reader)
+    if schema != EXPECTED_MONTHLY_SCHEMA:
+        raise ValueError(f"Unexpected DBF schema in {snapshot.dbf.name}: {schema}")
+    field_names = [field[0] for field in schema]
+    if any(required not in field_names for required in REQUIRED_MONTHLY_FIELDS):
+        raise ValueError(f"Required monthly attributes missing from {snapshot.dbf.name}")
+
+    features: list[dict[str, Any]] = []
+    repair_notes: list[dict[str, Any]] = []
+    feature_bounds: list[tuple[float, float, float, float]] = []
+    source_count = len(reader)
+    for source_index, shape_record in enumerate(reader.iterShapeRecords()):
+        record = shape_record.record.as_dict()
+        raw = {field: str(record.get(field) or "") for field in REQUIRED_MONTHLY_FIELDS}
+        category = FOREIGN_POWER_CATEGORIES.get(raw["Foreign_Po"])
+        if category is None:
+            raise ValueError(
+                f"Undocumented Foreign_Po value {raw['Foreign_Po']!r} in {snapshot.dbf.name}"
+            )
+        geometry, bounds, repairs = derive_full_geometry(
+            shape_record.shape.__geo_interface__,
+            transformer,
+        )
+        if repairs:
+            repair_notes.append({"sourceFeatureIndex": source_index, "notes": repairs})
+        if geometry is None or bounds is None:
+            continue
+        feature_bounds.append(bounds)
+        properties = {
+            **raw,
+            "editorialFlagIds": editorial_flags(editorial, snapshot.year_month, raw["Name"]),
+            "foreignPowerCategory": category,
+            "presentationCategory": presentation_category(raw["Name"], raw["Foreign_Po"]),
+            "snapshotDate": snapshot.supplied_date,
+            "sourceFeatureIndex": source_index,
+            "yearMonth": snapshot.year_month,
+        }
+        features.append(
+            {
+                "type": "Feature",
+                "id": f"{snapshot.year_month}-{source_index:03d}",
+                "geometry": geometry,
+                "properties": properties,
+            }
+        )
+    reader.close()
+    if not feature_bounds:
+        raise ValueError(f"No full-extent polygon survived conversion for {snapshot.dbf.name}")
+    data_bbox = [
+        min(bounds[0] for bounds in feature_bounds),
+        min(bounds[1] for bounds in feature_bounds),
+        max(bounds[2] for bounds in feature_bounds),
+        max(bounds[3] for bounds in feature_bounds),
+    ]
+    features.sort(
+        key=lambda feature: (
+            feature["properties"]["Name"],
+            feature["properties"]["sourceFeatureIndex"],
+        )
+    )
+    collection = {
+        "type": "FeatureCollection",
+        "features": features,
+        "metadata": {
+            "sourceCrs": SOURCE_CRS,
+            "targetCrs": TARGET_CRS,
+            "extentMode": "full_source",
+            "cropped": False,
+            "dataBbox": data_bbox,
+            "sourceSimplifyToleranceMetres": FULL_SOURCE_SIMPLIFY_TOLERANCE_METRES,
+            "simplifyToleranceDegrees": FULL_SIMPLIFY_TOLERANCE_DEGREES,
+            "snapshotDate": snapshot.supplied_date,
+            "yearMonth": snapshot.year_month,
+        },
+    }
+    report = {
+        "sourceRecordCount": source_count,
+        "featureCount": len(features),
+        "dataBbox": data_bbox,
+        "geometryRepairs": repair_notes,
+    }
+    if len(features) != source_count:
+        raise ValueError(
+            f"Full-extent conversion lost source records for {snapshot.dbf.name}: "
+            f"{len(features)} of {source_count}"
+        )
+    return collection, report
+
+
 def serialize_territorial_value(value: Any) -> Any:
     if isinstance(value, (date, datetime)):
         return value.strftime("%Y%m%d")
@@ -560,6 +776,93 @@ def convert_territorial_changes(
         "missingShxReadMode": "sequential",
     }
     reader.close()
+    return collection, report
+
+
+def convert_full_territorial_changes(
+    stem: Path,
+    transformer: Transformer,
+    source_wkt: str,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    validate_projection(stem.with_suffix(".prj"), source_wkt)
+    reader = reader_for(stem, require_shx=False)
+    fields = [str(field[0]) for field in reader.fields[1:]]
+    required = {"TERRITORY_", "ALT_NAME", "GOVT", "FORMER_GOV", "CHANGE_DAT", "TYPE"}
+    if not required.issubset(fields):
+        raise ValueError("Territorial_Changes is missing required fields")
+    features: list[dict[str, Any]] = []
+    repairs: list[dict[str, Any]] = []
+    feature_bounds: list[tuple[float, float, float, float]] = []
+    for source_index, shape_record in enumerate(reader.iterShapeRecords()):
+        properties = {
+            key: serialize_territorial_value(value)
+            for key, value in shape_record.record.as_dict().items()
+        }
+        change_raw = properties["CHANGE_DAT"]
+        if not re.fullmatch(r"\d{8}", change_raw):
+            raise ValueError(f"Invalid Territorial_Changes date: {change_raw!r}")
+        properties.update(
+            {
+                "changeDate": f"{change_raw[:4]}-{change_raw[4:6]}-{change_raw[6:]}",
+                "sourceFeatureIndex": source_index,
+            }
+        )
+        geometry, bounds, geometry_repairs = derive_full_geometry(
+            shape_record.shape.__geo_interface__,
+            transformer,
+        )
+        if geometry_repairs:
+            repairs.append({"sourceFeatureIndex": source_index, "notes": geometry_repairs})
+        if geometry is None or bounds is None:
+            continue
+        feature_bounds.append(bounds)
+        features.append(
+            {
+                "type": "Feature",
+                "id": f"territorial-change-{source_index:03d}",
+                "geometry": geometry,
+                "properties": properties,
+            }
+        )
+    source_count = len(reader)
+    reader.close()
+    if len(features) != source_count or not feature_bounds:
+        raise ValueError(
+            f"Full Territorial_Changes conversion retained {len(features)} of {source_count} records"
+        )
+    features.sort(
+        key=lambda feature: (
+            feature["properties"]["CHANGE_DAT"],
+            feature["properties"]["TERRITORY_"],
+            feature["properties"]["sourceFeatureIndex"],
+        )
+    )
+    data_bbox = [
+        min(bounds[0] for bounds in feature_bounds),
+        min(bounds[1] for bounds in feature_bounds),
+        max(bounds[2] for bounds in feature_bounds),
+        max(bounds[3] for bounds in feature_bounds),
+    ]
+    collection = {
+        "type": "FeatureCollection",
+        "features": features,
+        "metadata": {
+            "sourceCrs": SOURCE_CRS,
+            "targetCrs": TARGET_CRS,
+            "extentMode": "full_source",
+            "cropped": False,
+            "dataBbox": data_bbox,
+            "sourceSimplifyToleranceMetres": FULL_SOURCE_SIMPLIFY_TOLERANCE_METRES,
+            "simplifyToleranceDegrees": FULL_SIMPLIFY_TOLERANCE_DEGREES,
+        },
+    }
+    report = {
+        "sourceRecordCount": source_count,
+        "featureCount": len(features),
+        "dataBbox": data_bbox,
+        "geometryRepairs": repairs,
+        "missingShxReadMode": "sequential",
+    }
     return collection, report
 
 
@@ -828,6 +1131,208 @@ def build(
         raise
 
 
+def build_full(
+    archive_path: Path,
+    external_dir: Path,
+    output_dir: Path,
+) -> None:
+    """Build the uncropped, conservatively simplified browser derivative."""
+
+    source_manifest = load_json(SOURCE_MANIFEST)
+    editorial = load_json(EDITORIAL_RECORDS)
+    verify_archive(archive_path, source_manifest)
+    source_dir = extract_archive(
+        archive_path,
+        external_dir,
+        source_manifest["archive"]["sha256"],
+    )
+    snapshots, territorial_stem = inventory_snapshots(source_dir)
+    source_assertions = validate_source_assertions(source_dir)
+    transformer = Transformer.from_crs(
+        SOURCE_CRS,
+        TARGET_CRS,
+        always_xy=True,
+        allow_ballpark=False,
+        only_best=True,
+    )
+    staging = Path(
+        tempfile.mkdtemp(
+            prefix="historical-administration-full-",
+            dir=output_dir.parent,
+        )
+    )
+    try:
+        snapshot_entries: list[dict[str, Any]] = []
+        all_repairs: list[dict[str, Any]] = []
+        for snapshot in snapshots:
+            collection, report = convert_full_snapshot(
+                snapshot,
+                transformer,
+                source_manifest["projection"]["sourceWkt"],
+                editorial,
+            )
+            target = staging / "snapshots" / f"{snapshot.year_month}.geojson"
+            payload = write_stable_json(target, collection)
+            entry = {
+                "yearMonth": snapshot.year_month,
+                "snapshotDate": snapshot.supplied_date,
+                "status": "primary" if snapshot.year_month <= PRIMARY_END else "limited_static",
+                "file": f"snapshots/{snapshot.year_month}.geojson",
+                "url": f"/data/historical-administration-full/snapshots/{snapshot.year_month}.geojson",
+                "sha256": hashlib.sha256(payload).hexdigest(),
+                "bytes": len(payload),
+                **{
+                    key: value
+                    for key, value in report.items()
+                    if key != "geometryRepairs"
+                },
+            }
+            snapshot_entries.append(entry)
+            print(
+                f"Converted full {snapshot.year_month}: {entry['featureCount']} source features",
+                flush=True,
+            )
+            if report["geometryRepairs"]:
+                all_repairs.append(
+                    {
+                        "yearMonth": snapshot.year_month,
+                        "features": report["geometryRepairs"],
+                    }
+                )
+
+        territorial_collection, territorial_report = convert_full_territorial_changes(
+            territorial_stem,
+            transformer,
+            source_manifest["projection"]["sourceWkt"],
+        )
+        territorial_target = staging / "territorial-changes.geojson"
+        territorial_payload = write_stable_json(
+            territorial_target,
+            territorial_collection,
+        )
+        operation = transformer.get_last_used_operation()
+        full_extent_bbox = [
+            min(entry["dataBbox"][0] for entry in snapshot_entries),
+            min(entry["dataBbox"][1] for entry in snapshot_entries),
+            max(entry["dataBbox"][2] for entry in snapshot_entries),
+            max(entry["dataBbox"][3] for entry in snapshot_entries),
+        ]
+
+        category_values = sorted(set(FOREIGN_POWER_CATEGORIES.values()))
+        legend_values = [item[0] for item in CATEGORY_LEGEND]
+        if category_values != sorted(legend_values):
+            raise ValueError("Foreign-power category mapping and legend are inconsistent")
+
+        manifest = {
+            "schemaVersion": 1,
+            "source": {
+                "id": source_manifest["sourceId"],
+                "title": source_manifest["title"],
+                "archiveSha256": source_manifest["archive"]["sha256"],
+                "attribution": FULL_EXTENT_ATTRIBUTION,
+                "useLimit": source_manifest["useLimit"],
+            },
+            "projection": {
+                "source": SOURCE_CRS,
+                "target": TARGET_CRS,
+                "coordinateOrder": "longitude, latitude",
+                "transformationDescription": operation.description,
+                "transformationDefinition": operation.definition,
+                "transformationAccuracyMetres": operation.accuracy,
+            },
+            "processing": {
+                "extentMode": "full_source",
+                "cropped": False,
+                "fullExtentBbox": full_extent_bbox,
+                "scope": "Every polygon present in each original monthly shapefile; no regional crop is applied.",
+                "simplifyToleranceDegrees": FULL_SIMPLIFY_TOLERANCE_DEGREES,
+                "sourceSimplifyToleranceMetres": FULL_SOURCE_SIMPLIFY_TOLERANCE_METRES,
+                "coordinateDecimals": COORDINATE_DECIMALS,
+                "geometryRepairPolicy": "Invalid geometries are detected, reported and repaired with Shapely make_valid before topology-preserving simplification; source files are unchanged.",
+                "geometryRepairs": all_repairs,
+                "tools": {
+                    "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+                    "pyproj": pyproj.__version__,
+                    "pyshp": shapefile.__version__,
+                    "shapely": shapely.__version__,
+                },
+            },
+            "temporalCoverage": {
+                "start": "1938-02",
+                "end": "1945-05",
+                "primarySupported": {"start": "1938-02", "end": PRIMARY_END},
+                "limitedStatic": {
+                    "start": "1944-10",
+                    "end": "1945-05",
+                    "reason": source_manifest["limitedInterval"]["reason"],
+                },
+                "defaultYearMonth": "1941-08",
+            },
+            "rawMonthlyAttributes": list(REQUIRED_MONTHLY_FIELDS),
+            "derivedForeignPowerVocabulary": {
+                "field": "foreignPowerCategory",
+                "sourceField": "Foreign_Po",
+                "method": "Exact, documented lookup of the unmodified raw Foreign_Po string; this is not an administration-type field.",
+                "rawValueMapping": FOREIGN_POWER_CATEGORIES,
+                "legend": [
+                    {"value": value, "label": label, "color": color}
+                    for value, label, color in CATEGORY_LEGEND
+                ],
+            },
+            "presentationVocabulary": {
+                "field": "presentationCategory",
+                "sourceFields": ["Name", "Foreign_Po"],
+                "method": "Public display grouping only. Soviet Union is matched by exact raw Name; Romanian and German groupings use exact listed raw Foreign_Po strings; the remaining documented state-status values are grouped as sovereign/state territory; every other raw combination remains unresolved/other.",
+                "rules": {
+                    "sovietControlledExactNames": ["Soviet Union"],
+                    "romanianOccupiedExactForeignPowerValues": ["Romanian-occupied"],
+                    "germanOccupiedExactForeignPowerValues": sorted(PRESENTATION_GERMAN_RAW_VALUES),
+                    "sovereignStateExactForeignPowerValues": sorted(PRESENTATION_SOVEREIGN_RAW_VALUES),
+                    "fallback": "unresolved_other",
+                },
+                "legend": [
+                    {"value": value, "label": label, "color": color}
+                    for value, label, color in PRESENTATION_CATEGORY_LEGEND
+                ],
+            },
+            "methodologicalWarning": METHODOLOGICAL_WARNING,
+            "snapshots": snapshot_entries,
+            "snapshotByYearMonth": {
+                entry["yearMonth"]: entry["file"] for entry in snapshot_entries
+            },
+            "territorialChanges": {
+                "file": "territorial-changes.geojson",
+                "url": "/data/historical-administration-full/territorial-changes.geojson",
+                "sha256": hashlib.sha256(territorial_payload).hexdigest(),
+                "bytes": len(territorial_payload),
+                **{
+                    key: value
+                    for key, value in territorial_report.items()
+                    if key != "geometryRepairs"
+                },
+            },
+            "sourceAssertions": source_assertions,
+        }
+        manifest_payload = write_stable_json(staging / "manifest.json", manifest)
+        checksum_lines = [
+            f"{entry['sha256']}  {entry['file']}" for entry in snapshot_entries
+        ]
+        checksum_lines.extend(
+            [
+                f"{manifest['territorialChanges']['sha256']}  territorial-changes.geojson",
+                f"{hashlib.sha256(manifest_payload).hexdigest()}  manifest.json",
+            ]
+        )
+        (staging / "derived.sha256").write_text(
+            "\n".join(checksum_lines) + "\n",
+            encoding="ascii",
+        )
+        replace_output(staging, output_dir)
+    except Exception:
+        shutil.rmtree(staging, ignore_errors=True)
+        raise
+
+
 def verify_output(output_dir: Path) -> None:
     manifest = load_json(output_dir / "manifest.json")
     entries = [
@@ -868,6 +1373,17 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--external-dir", type=Path, default=DEFAULT_EXTERNAL_DIR)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument(
+        "--full-output-dir",
+        type=Path,
+        default=DEFAULT_FULL_OUTPUT_DIR,
+    )
+    parser.add_argument(
+        "--scope",
+        choices=("regional", "full", "all"),
+        default="all",
+        help="Build or verify the regional derivative, the uncropped full derivative, or both",
+    )
     parser.add_argument("--verify-output", action="store_true", help="Verify committed derivatives without reading the source archive")
     return parser.parse_args()
 
@@ -875,10 +1391,21 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     if args.verify_output:
-        verify_output(args.output_dir.resolve())
+        if args.scope in ("regional", "all"):
+            verify_output(args.output_dir.resolve())
+        if args.scope in ("full", "all"):
+            verify_output(args.full_output_dir.resolve())
         return
-    build(args.archive.resolve(), args.external_dir.resolve(), args.output_dir.resolve())
-    verify_output(args.output_dir.resolve())
+    archive = args.archive.resolve()
+    external = args.external_dir.resolve()
+    if args.scope in ("regional", "all"):
+        regional_output = args.output_dir.resolve()
+        build(archive, external, regional_output)
+        verify_output(regional_output)
+    if args.scope in ("full", "all"):
+        full_output = args.full_output_dir.resolve()
+        build_full(archive, external, full_output)
+        verify_output(full_output)
 
 
 if __name__ == "__main__":

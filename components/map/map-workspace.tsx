@@ -32,6 +32,7 @@ import {
   historicalFeatureCollectionSchema,
   historicalFeaturePropertiesSchema,
   historicalManifestSchema,
+  historicalSnapshotFeatureCount,
   historicalSnapshotIndex,
   selectHistoricalSnapshot,
   type HistoricalFeatureCollection,
@@ -910,12 +911,12 @@ export function MapWorkspace({
             `Snapshot metadata is ${parsed.metadata.yearMonth}, expected ${selectedHistoricalSnapshot.yearMonth}`,
           );
         }
-        if (
-          parsed.features.length !==
-          selectedHistoricalSnapshot.regionalFeatureCount
-        ) {
+        const expectedFeatureCount = historicalSnapshotFeatureCount(
+          selectedHistoricalSnapshot,
+        );
+        if (parsed.features.length !== expectedFeatureCount) {
           throw new Error(
-            `Snapshot feature count is ${parsed.features.length}, expected ${selectedHistoricalSnapshot.regionalFeatureCount}`,
+            `Snapshot feature count is ${parsed.features.length}, expected ${expectedFeatureCount}`,
           );
         }
         source.setData(parsed as HistoricalFeatureCollection);
