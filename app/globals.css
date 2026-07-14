@@ -170,6 +170,43 @@ summary {
   line-height: 1;
 }
 
+.historical-map-popup {
+  min-width: 12rem;
+  color: #26342f;
+}
+
+.historical-map-popup__date {
+  margin: 0;
+  color: #76536f;
+  font-size: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.historical-map-popup__name {
+  margin: 0.3rem 0 0.4rem;
+  color: #173f36;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.historical-map-popup__detail,
+.historical-map-popup__instruction {
+  margin: 0.2rem 0 0;
+  font-size: 0.57rem;
+  line-height: 1.35;
+}
+
+.historical-map-popup__instruction {
+  margin-top: 0.45rem;
+  border-top: 1px solid #ded8cc;
+  padding-top: 0.35rem;
+  color: #747c78;
+}
+
 .skip-link {
   position: fixed;
   left: 1rem;

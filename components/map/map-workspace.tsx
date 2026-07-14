@@ -1,9 +1,17 @@
 "use client";
 
-import type { FeatureCollection, GeoJsonProperties, LineString, Point } from "geojson";
+import type {
+  FeatureCollection,
+  GeoJsonProperties,
+  LineString,
+  MultiPolygon,
+  Point,
+  Polygon,
+} from "geojson";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import maplibregl, {
+  type ExpressionSpecification,
   type GeoJSONSource,
   type Map as MapLibreMap,
   type Marker,
@@ -12,6 +20,24 @@ import { useLanguage } from "@/components/shell/language-provider";
 import { StatusBadge, confidenceTone } from "@/components/ui/status-badge";
 import { humanizeSlug, rawValueLabel } from "@/lib/data/format";
 import type { MapPlaceDatum, MapRouteDatum, MapViewModel } from "@/lib/data/selectors";
+import {
+  HISTORICAL_CATEGORY_COLORS,
+  HISTORICAL_FILL_LAYER_ID,
+  HISTORICAL_LINE_LAYER_ID,
+  HISTORICAL_MANIFEST_URL,
+  HISTORICAL_SOURCE_ID,
+  defaultHistoricalSnapshot,
+  displayRawHistoricalValue,
+  formatYearMonth,
+  historicalFeatureCollectionSchema,
+  historicalFeaturePropertiesSchema,
+  historicalManifestSchema,
+  historicalSnapshotIndex,
+  selectHistoricalSnapshot,
+  type HistoricalFeatureCollection,
+  type HistoricalFeatureProperties,
+  type HistoricalManifest,
+} from "@/lib/historical-administration/schemas";
 import {
   BASEMAP_LAYER_ID,
   BASEMAP_SOURCE_ID,
@@ -32,6 +58,7 @@ interface Filters {
 
 interface Layers {
   basemap: boolean;
+  historicalAdministration: boolean;
   locations: boolean;
   individualRoutes: boolean;
   familyContext: boolean;
@@ -46,9 +73,13 @@ interface Layers {
   inferred: boolean;
 }
 
-type Selection = { kind: "place" | "route"; id: string } | null;
+type Selection =
+  | { kind: "place" | "route"; id: string }
+  | { kind: "historical"; properties: HistoricalFeatureProperties }
+  | null;
 type MapLifecycle = "initializing" | "ready" | "failed";
 type BasemapStatus = "loading" | "available" | "unavailable";
+type HistoricalLayerStatus = "loading_manifest" | "idle" | "loading_snapshot" | "ready" | "failed";
 
 const emptyPointCollection: FeatureCollection<Point, GeoJsonProperties> = {
   type: "FeatureCollection",
@@ -58,6 +89,41 @@ const emptyLineCollection: FeatureCollection<LineString, GeoJsonProperties> = {
   type: "FeatureCollection",
   features: [],
 };
+const emptyHistoricalCollection: FeatureCollection<
+  Polygon | MultiPolygon,
+  HistoricalFeatureProperties
+> = {
+  type: "FeatureCollection",
+  features: [],
+};
+
+const historicalFillColorExpression: ExpressionSpecification = [
+  "match",
+  ["get", "foreignPowerCategory"],
+  "unclassified",
+  HISTORICAL_CATEGORY_COLORS.unclassified,
+  "neutral",
+  HISTORICAL_CATEGORY_COLORS.neutral,
+  "allied",
+  HISTORICAL_CATEGORY_COLORS.allied,
+  "axis",
+  HISTORICAL_CATEGORY_COLORS.axis,
+  "axis_aligned",
+  HISTORICAL_CATEGORY_COLORS.axis_aligned,
+  "belligerent",
+  HISTORICAL_CATEGORY_COLORS.belligerent,
+  "german_occupied",
+  HISTORICAL_CATEGORY_COLORS.german_occupied,
+  "italian_occupied",
+  HISTORICAL_CATEGORY_COLORS.italian_occupied,
+  "romanian_occupied",
+  HISTORICAL_CATEGORY_COLORS.romanian_occupied,
+  "multinational_axis_occupied",
+  HISTORICAL_CATEGORY_COLORS.multinational_axis_occupied,
+  "german_soviet_occupied",
+  HISTORICAL_CATEGORY_COLORS.german_soviet_occupied,
+  "#aea99e",
+];
 
 const controlClass =
   "w-full border border-[#c8c3b8] bg-white px-2.5 py-2 text-[11px] text-[#34473f] outline-none focus:border-[#2f6658]";
@@ -99,6 +165,56 @@ function errorDetails(error: unknown): string {
     return message.includes(url) ? message : `${message} (${url})`;
   }
   return message;
+}
+
+function historicalPopupContent(
+  properties: HistoricalFeatureProperties,
+): HTMLDivElement {
+  const root = document.createElement("div");
+  root.className = "historical-map-popup";
+
+  const dateLabel = document.createElement("p");
+  dateLabel.className = "historical-map-popup__date";
+  dateLabel.textContent = `${formatYearMonth(properties.yearMonth)} · supplied ${properties.snapshotDate}`;
+
+  const name = document.createElement("p");
+  name.className = "historical-map-popup__name";
+  name.textContent = displayRawHistoricalValue(properties.Name);
+
+  const foreignPower = document.createElement("p");
+  foreignPower.className = "historical-map-popup__detail";
+  foreignPower.textContent = `Foreign_Po: ${displayRawHistoricalValue(properties.Foreign_Po)}`;
+
+  const headOfState = document.createElement("p");
+  headOfState.className = "historical-map-popup__detail";
+  headOfState.textContent = `Head_of_St: ${displayRawHistoricalValue(properties.Head_of_St)}`;
+
+  const instruction = document.createElement("p");
+  instruction.className = "historical-map-popup__instruction";
+  instruction.textContent = "Click for all raw fields and methodology.";
+
+  root.append(dateLabel, name, foreignPower, headOfState, instruction);
+  return root;
+}
+
+function historicalPropertiesFromRenderedFeature(
+  properties: GeoJsonProperties,
+): HistoricalFeatureProperties | null {
+  if (!properties) return null;
+  let editorialFlagIds: unknown = properties.editorialFlagIds;
+  if (typeof editorialFlagIds === "string") {
+    try {
+      editorialFlagIds = JSON.parse(editorialFlagIds);
+    } catch {
+      editorialFlagIds = [];
+    }
+  }
+  const parsed = historicalFeaturePropertiesSchema.safeParse({
+    ...properties,
+    editorialFlagIds,
+    sourceFeatureIndex: Number(properties.sourceFeatureIndex),
+  });
+  return parsed.success ? parsed.data : null;
 }
 
 function hasWebGl2(): boolean {
@@ -221,10 +337,19 @@ export function MapWorkspace({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const coreMarkersRef = useRef<Marker[]>([]);
+  const historicalPopupRef = useRef<maplibregl.Popup | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [mapLifecycle, setMapLifecycle] = useState<MapLifecycle>("initializing");
   const [mapDiagnostic, setMapDiagnostic] = useState<string | null>(null);
   const [basemapStatus, setBasemapStatus] = useState<BasemapStatus>("loading");
+  const [historicalManifest, setHistoricalManifest] = useState<HistoricalManifest | null>(null);
+  const [historicalYearMonth, setHistoricalYearMonth] = useState("1941-08");
+  const [historicalOpacity, setHistoricalOpacity] = useState(0.5);
+  const [historicalLayerStatus, setHistoricalLayerStatus] = useState<HistoricalLayerStatus>("loading_manifest");
+  const [historicalDiagnostic, setHistoricalDiagnostic] = useState<string | null>(null);
+  const [historicalFeatureCount, setHistoricalFeatureCount] = useState(0);
+  const [historicalReloadToken, setHistoricalReloadToken] = useState(0);
+  const [historicalSnapshotReloadToken, setHistoricalSnapshotReloadToken] = useState(0);
   const [selection, setSelection] = useState<Selection>(
     initialPlace ? { kind: "place", id: initialPlace } : null,
   );
@@ -240,6 +365,7 @@ export function MapWorkspace({
   });
   const [layers, setLayers] = useState<Layers>({
     basemap: true,
+    historicalAdministration: false,
     locations: true,
     individualRoutes: true,
     familyContext: true,
@@ -261,6 +387,18 @@ export function MapWorkspace({
   const selectedPersonRoutes = useMemo(
     () => data.routes.filter((route) => route.personId === filters.person).sort((left, right) => left.sequence - right.sequence),
     [data.routes, filters.person],
+  );
+  const selectedHistoricalSnapshot = useMemo(
+    () => historicalManifest
+      ? selectHistoricalSnapshot(historicalManifest, historicalYearMonth)
+      : null,
+    [historicalManifest, historicalYearMonth],
+  );
+  const selectedHistoricalIndex = useMemo(
+    () => historicalManifest
+      ? historicalSnapshotIndex(historicalManifest, historicalYearMonth)
+      : 0,
+    [historicalManifest, historicalYearMonth],
   );
 
   const matchesYear = (years: number[]): boolean => {
@@ -365,6 +503,42 @@ export function MapWorkspace({
   );
 
   useEffect(() => {
+    const controller = new AbortController();
+    window.queueMicrotask(() => {
+      if (controller.signal.aborted) return;
+      setHistoricalLayerStatus("loading_manifest");
+      setHistoricalDiagnostic(null);
+    });
+
+    const loadManifest = async () => {
+      try {
+        const response = await fetch(HISTORICAL_MANIFEST_URL, {
+          signal: controller.signal,
+        });
+        if (!response.ok) {
+          throw new Error(`Manifest request failed with HTTP ${response.status}`);
+        }
+        const parsed = historicalManifestSchema.parse(await response.json());
+        const initialSnapshot = defaultHistoricalSnapshot(parsed);
+        setHistoricalManifest(parsed);
+        setHistoricalYearMonth(initialSnapshot.yearMonth);
+        setHistoricalLayerStatus("idle");
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        setHistoricalManifest(null);
+        setHistoricalFeatureCount(0);
+        setHistoricalLayerStatus("failed");
+        setHistoricalDiagnostic(
+          `Historical layer manifest could not be loaded: ${errorDetails(error)}`,
+        );
+      }
+    };
+
+    void loadManifest();
+    return () => controller.abort();
+  }, [historicalReloadToken]);
+
+  useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
     let activeMap: MapLibreMap | null = null;
     let basemapFailed = false;
@@ -423,10 +597,36 @@ export function MapWorkspace({
         if (disposed || projectLayersRegistered) return;
         projectLayersRegistered = true;
         try {
+          map.addSource(HISTORICAL_SOURCE_ID, {
+            type: "geojson",
+            data: emptyHistoricalCollection,
+          });
           map.addSource("research-places", { type: "geojson", data: emptyPointCollection });
           map.addSource("ehri-places", { type: "geojson", data: emptyPointCollection });
           map.addSource("family-places", { type: "geojson", data: emptyPointCollection });
           map.addSource("research-routes", { type: "geojson", data: emptyLineCollection });
+
+          map.addLayer({
+            id: HISTORICAL_FILL_LAYER_ID,
+            type: "fill",
+            source: HISTORICAL_SOURCE_ID,
+            layout: { visibility: "none" },
+            paint: {
+              "fill-color": historicalFillColorExpression,
+              "fill-opacity": 0.48,
+            },
+          });
+          map.addLayer({
+            id: HISTORICAL_LINE_LAYER_ID,
+            type: "line",
+            source: HISTORICAL_SOURCE_ID,
+            layout: { visibility: "none" },
+            paint: {
+              "line-color": "#3f403d",
+              "line-opacity": 0.72,
+              "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.55, 8, 1.25],
+            },
+          });
 
           map.addLayer({
             id: "routes-explicit",
@@ -531,7 +731,8 @@ export function MapWorkspace({
               if (typeof id === "string") setSelection({ kind: "place", id });
             });
           }
-          for (const layerId of ["routes-explicit", "routes-partial", "routes-inferred", "route-direction"]) {
+          const routeLayers = ["routes-explicit", "routes-partial", "routes-inferred", "route-direction"];
+          for (const layerId of routeLayers) {
             map.on("mouseenter", layerId, () => { map.getCanvas().style.cursor = "pointer"; });
             map.on("mouseleave", layerId, () => { map.getCanvas().style.cursor = ""; });
             map.on("click", layerId, (event) => {
@@ -539,6 +740,49 @@ export function MapWorkspace({
               if (typeof id === "string") setSelection({ kind: "route", id });
             });
           }
+          const projectInteractiveLayers = [...placeLayers, ...routeLayers];
+          map.on("mousemove", HISTORICAL_FILL_LAYER_ID, (event) => {
+            if (
+              map.queryRenderedFeatures(event.point, {
+                layers: projectInteractiveLayers,
+              }).length
+            ) {
+              historicalPopupRef.current?.remove();
+              historicalPopupRef.current = null;
+              return;
+            }
+            const properties = historicalPropertiesFromRenderedFeature(
+              event.features?.[0]?.properties ?? null,
+            );
+            if (!properties) return;
+            map.getCanvas().style.cursor = "pointer";
+            historicalPopupRef.current?.remove();
+            historicalPopupRef.current = new maplibregl.Popup({
+              closeButton: false,
+              closeOnClick: false,
+              maxWidth: "300px",
+              offset: 12,
+            })
+              .setLngLat(event.lngLat)
+              .setDOMContent(historicalPopupContent(properties))
+              .addTo(map);
+          });
+          map.on("mouseleave", HISTORICAL_FILL_LAYER_ID, () => {
+            map.getCanvas().style.cursor = "";
+            historicalPopupRef.current?.remove();
+            historicalPopupRef.current = null;
+          });
+          map.on("click", HISTORICAL_FILL_LAYER_ID, (event) => {
+            if (
+              map.queryRenderedFeatures(event.point, {
+                layers: projectInteractiveLayers,
+              }).length
+            ) return;
+            const properties = historicalPropertiesFromRenderedFeature(
+              event.features?.[0]?.properties ?? null,
+            );
+            if (properties) setSelection({ kind: "historical", properties });
+          });
           if (styleTimer !== undefined) window.clearTimeout(styleTimer);
           setMapReady(true);
           setMapLifecycle("ready");
@@ -589,6 +833,8 @@ export function MapWorkspace({
       if (basemapTimer !== undefined) window.clearTimeout(basemapTimer);
       coreMarkersRef.current.forEach((marker) => marker.remove());
       coreMarkersRef.current = [];
+      historicalPopupRef.current?.remove();
+      historicalPopupRef.current = null;
       activeMap?.remove();
       if (mapRef.current === activeMap) mapRef.current = null;
     };
@@ -608,6 +854,111 @@ export function MapWorkspace({
     if (!mapReady || !map || !map.getLayer(BASEMAP_LAYER_ID)) return;
     map.setLayoutProperty(BASEMAP_LAYER_ID, "visibility", layers.basemap ? "visible" : "none");
   }, [layers.basemap, mapReady]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!mapReady || !map || !map.getSource(HISTORICAL_SOURCE_ID)) return;
+    const source = map.getSource(HISTORICAL_SOURCE_ID) as GeoJSONSource;
+    let disposed = false;
+
+    if (!layers.historicalAdministration) {
+      source.setData(emptyHistoricalCollection);
+      if (map.getLayer(HISTORICAL_FILL_LAYER_ID)) {
+        map.setLayoutProperty(HISTORICAL_FILL_LAYER_ID, "visibility", "none");
+      }
+      if (map.getLayer(HISTORICAL_LINE_LAYER_ID)) {
+        map.setLayoutProperty(HISTORICAL_LINE_LAYER_ID, "visibility", "none");
+      }
+      historicalPopupRef.current?.remove();
+      historicalPopupRef.current = null;
+      window.queueMicrotask(() => {
+        if (disposed) return;
+        setHistoricalFeatureCount(0);
+        if (historicalManifest) {
+          setHistoricalLayerStatus("idle");
+          setHistoricalDiagnostic(null);
+        }
+      });
+      return () => { disposed = true; };
+    }
+
+    if (!historicalManifest || !selectedHistoricalSnapshot) return;
+    const controller = new AbortController();
+    source.setData(emptyHistoricalCollection);
+    map.setLayoutProperty(HISTORICAL_FILL_LAYER_ID, "visibility", "visible");
+    map.setLayoutProperty(HISTORICAL_LINE_LAYER_ID, "visibility", "visible");
+    window.queueMicrotask(() => {
+      if (controller.signal.aborted) return;
+      setHistoricalFeatureCount(0);
+      setHistoricalLayerStatus("loading_snapshot");
+      setHistoricalDiagnostic(null);
+    });
+
+    const loadSnapshot = async () => {
+      try {
+        const response = await fetch(selectedHistoricalSnapshot.url, {
+          signal: controller.signal,
+        });
+        if (!response.ok) {
+          throw new Error(`Snapshot request failed with HTTP ${response.status}`);
+        }
+        const parsed = historicalFeatureCollectionSchema.parse(
+          await response.json(),
+        );
+        if (parsed.metadata.yearMonth !== selectedHistoricalSnapshot.yearMonth) {
+          throw new Error(
+            `Snapshot metadata is ${parsed.metadata.yearMonth}, expected ${selectedHistoricalSnapshot.yearMonth}`,
+          );
+        }
+        if (
+          parsed.features.length !==
+          selectedHistoricalSnapshot.regionalFeatureCount
+        ) {
+          throw new Error(
+            `Snapshot feature count is ${parsed.features.length}, expected ${selectedHistoricalSnapshot.regionalFeatureCount}`,
+          );
+        }
+        source.setData(parsed as HistoricalFeatureCollection);
+        setHistoricalFeatureCount(parsed.features.length);
+        setHistoricalLayerStatus("ready");
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        source.setData(emptyHistoricalCollection);
+        setHistoricalFeatureCount(0);
+        setHistoricalLayerStatus("failed");
+        setHistoricalDiagnostic(
+          `Historical snapshot ${selectedHistoricalSnapshot.yearMonth} could not be rendered: ${errorDetails(error)}`,
+        );
+      }
+    };
+
+    void loadSnapshot();
+    return () => {
+      disposed = true;
+      controller.abort();
+    };
+  }, [
+    historicalManifest,
+    historicalSnapshotReloadToken,
+    layers.historicalAdministration,
+    mapReady,
+    selectedHistoricalSnapshot,
+  ]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!mapReady || !map || !map.getLayer(HISTORICAL_FILL_LAYER_ID)) return;
+    map.setPaintProperty(
+      HISTORICAL_FILL_LAYER_ID,
+      "fill-opacity",
+      historicalOpacity,
+    );
+    map.setPaintProperty(
+      HISTORICAL_LINE_LAYER_ID,
+      "line-opacity",
+      Math.min(1, historicalOpacity + 0.22),
+    );
+  }, [historicalOpacity, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -663,6 +1014,7 @@ export function MapWorkspace({
 
   const selectedPlace = selection?.kind === "place" ? data.places.find((place) => place.id === selection.id) : null;
   const selectedRoute = selection?.kind === "route" ? data.routes.find((route) => route.id === selection.id) : null;
+  const selectedHistorical = selection?.kind === "historical" ? selection.properties : null;
 
   const updateFilter = <K extends keyof Filters>(key: K, value: Filters[K]) =>
     setFilters((current) => ({ ...current, [key]: value }));
@@ -759,9 +1111,175 @@ export function MapWorkspace({
                   ? "Public raster tiles · connected"
                   : basemapStatus === "unavailable"
                     ? "Unavailable; local fallback active"
-                    : "Loading public raster tiles"
+              : "Loading public raster tiles"
             }
           />
+          <LayerToggle
+            label="Historical administration"
+            marker="▧"
+            checked={layers.historicalAdministration}
+            onChange={(value) => {
+              updateLayer("historicalAdministration", value);
+              if (!value && selection?.kind === "historical") setSelection(null);
+            }}
+            note={
+              historicalLayerStatus === "loading_manifest"
+                ? "Loading local snapshot index"
+                : layers.historicalAdministration
+                  ? historicalLayerStatus === "ready"
+                    ? `${historicalFeatureCount} regional polygons · ${historicalYearMonth}`
+                    : historicalLayerStatus === "loading_snapshot"
+                      ? `Loading ${historicalYearMonth}`
+                      : historicalLayerStatus === "failed"
+                        ? "Local historical data error"
+                        : "Ready to load selected month"
+                  : "Optional · local monthly snapshots"
+            }
+          />
+          {layers.historicalAdministration ? (
+            <div
+              className="mb-3 border border-[#c9bba5] bg-[#fffaf0] p-2.5"
+              data-testid="historical-administration-controls"
+            >
+              {historicalManifest && selectedHistoricalSnapshot ? (
+                <>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="text-[8px] font-black tracking-[0.12em] text-[#76536f] uppercase">
+                        Monthly snapshot
+                      </p>
+                      <p className="font-editorial mt-0.5 text-base font-bold text-[#173f36]" data-testid="historical-snapshot-label">
+                        {formatYearMonth(historicalYearMonth)}
+                      </p>
+                    </div>
+                    <StatusBadge tone={selectedHistoricalSnapshot.status === "primary" ? "green" : "rust"}>
+                      {selectedHistoricalSnapshot.status === "primary" ? "primary" : "limited / static"}
+                    </StatusBadge>
+                  </div>
+                  <select
+                    aria-label="Historical administration month"
+                    className={`${controlClass} mt-2`}
+                    value={historicalYearMonth}
+                    onChange={(event) => {
+                      setHistoricalYearMonth(event.target.value);
+                      if (selection?.kind === "historical") setSelection(null);
+                    }}
+                    data-testid="historical-month-select"
+                  >
+                    {historicalManifest.snapshots.map((snapshot) => (
+                      <option key={snapshot.yearMonth} value={snapshot.yearMonth}>
+                        {formatYearMonth(snapshot.yearMonth)}{snapshot.status === "limited_static" ? " — limited/static" : ""}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    aria-label="Historical administration timeline"
+                    type="range"
+                    min={0}
+                    max={historicalManifest.snapshots.length - 1}
+                    step={1}
+                    value={selectedHistoricalIndex}
+                    onChange={(event) => {
+                      const snapshot = historicalManifest.snapshots[Number(event.target.value)];
+                      if (snapshot) {
+                        setHistoricalYearMonth(snapshot.yearMonth);
+                        if (selection?.kind === "historical") setSelection(null);
+                      }
+                    }}
+                    className="mt-2 w-full accent-[#76536f]"
+                    data-testid="historical-month-range"
+                  />
+                  <div className="mt-1 flex items-center justify-between gap-2">
+                    <button
+                      type="button"
+                      disabled={selectedHistoricalIndex === 0}
+                      onClick={() => {
+                        setHistoricalYearMonth(historicalManifest.snapshots[selectedHistoricalIndex - 1]?.yearMonth ?? historicalYearMonth);
+                        if (selection?.kind === "historical") setSelection(null);
+                      }}
+                      className="border border-[#b9ad9b] bg-white px-2 py-1 text-[8px] font-black uppercase disabled:opacity-35"
+                    >
+                      Previous
+                    </button>
+                    <span className="text-center text-[8px] text-[#717a75]">
+                      Supplied {selectedHistoricalSnapshot.snapshotDate}
+                    </span>
+                    <button
+                      type="button"
+                      disabled={selectedHistoricalIndex === historicalManifest.snapshots.length - 1}
+                      onClick={() => {
+                        setHistoricalYearMonth(historicalManifest.snapshots[selectedHistoricalIndex + 1]?.yearMonth ?? historicalYearMonth);
+                        if (selection?.kind === "historical") setSelection(null);
+                      }}
+                      className="border border-[#b9ad9b] bg-white px-2 py-1 text-[8px] font-black uppercase disabled:opacity-35"
+                    >
+                      Next
+                    </button>
+                  </div>
+
+                  <label className="mt-3 block border-t border-[#ddd0bc] pt-2">
+                    <span className="flex justify-between text-[8px] font-black tracking-[0.1em] text-[#66736d] uppercase">
+                      <span>Polygon opacity</span>
+                      <span>{Math.round(historicalOpacity * 100)}%</span>
+                    </span>
+                    <input
+                      aria-label="Historical administration opacity"
+                      type="range"
+                      min={0.1}
+                      max={0.85}
+                      step={0.05}
+                      value={historicalOpacity}
+                      onChange={(event) => setHistoricalOpacity(Number(event.target.value))}
+                      className="mt-1 w-full accent-[#76536f]"
+                      data-testid="historical-opacity"
+                    />
+                  </label>
+
+                  <div className="mt-3 border-t border-[#ddd0bc] pt-2" aria-label="Historical administration legend">
+                    <p className="text-[8px] font-black tracking-[0.12em] text-[#76536f] uppercase">Foreign_Po display legend</p>
+                    <div className="mt-1.5 max-h-32 space-y-1 overflow-y-auto pr-1">
+                      {historicalManifest.derivedForeignPowerVocabulary.legend.map((entry) => (
+                        <div key={entry.value} className="flex items-start gap-2 text-[8px] leading-3 text-[#52605a]">
+                          <span aria-hidden="true" className="mt-0.5 size-2.5 shrink-0 border border-black/20" style={{ backgroundColor: entry.color }} />
+                          <span>{entry.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="mt-1.5 text-[8px] leading-3 text-[#7b7165]">Display grouping only; no civil/military administration field exists in the monthly DBFs.</p>
+                  </div>
+
+                  {selectedHistoricalSnapshot.status === "limited_static" ? (
+                    <p role="note" className="mt-2 border border-[#c9967e] bg-[#fff2eb] p-2 text-[8px] leading-3 text-[#7d3e2f]">
+                      Limited/static evidence: October 1944–May 1945 lacks equivalent frontline evidence; most late geometry repeats September 1944.
+                    </p>
+                  ) : null}
+                  <p className="mt-2 text-[8px] leading-3 text-[#655f58]">{historicalManifest.methodologicalWarning}</p>
+                  <p className="mt-2 border-t border-[#ddd0bc] pt-2 text-[7px] leading-3 text-[#7f7770]">{historicalManifest.source.attribution}</p>
+                </>
+              ) : null}
+
+              {historicalLayerStatus === "loading_manifest" || historicalLayerStatus === "loading_snapshot" ? (
+                <p role="status" className="mt-2 text-[8px] font-bold text-[#76536f]">
+                  {historicalLayerStatus === "loading_manifest" ? "Loading local historical manifest…" : `Loading ${historicalYearMonth} only…`}
+                </p>
+              ) : null}
+              {historicalLayerStatus === "failed" && historicalDiagnostic ? (
+                <div role="alert" className="mt-2 border border-[#9d4d3b] bg-[#fff3ee] p-2 text-[8px] leading-3 text-[#7d3528]" data-testid="historical-error">
+                  <p>{historicalDiagnostic}</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (historicalManifest) setHistoricalSnapshotReloadToken((value) => value + 1);
+                      else setHistoricalReloadToken((value) => value + 1);
+                    }}
+                    className="mt-1.5 border border-[#9d4d3b] bg-white px-2 py-1 font-black uppercase"
+                  >
+                    Retry local layer
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
           <LayerToggle label="Locations" marker="●" checked={layers.locations} onChange={(value) => updateLayer("locations", value)} />
           <LayerToggle label="Individual routes" marker="→" checked={layers.individualRoutes} onChange={(value) => updateLayer("individualRoutes", value)} />
           <LayerToggle label="Family / household context" marker="○" checked={layers.familyContext} onChange={(value) => updateLayer("familyContext", value)} note="Gold rings; requires a group filter" />
@@ -775,7 +1293,6 @@ export function MapWorkspace({
           <LayerToggle label="Local EHRI overlay" marker="■" checked={layers.localEhri} onChange={(value) => updateLayer("localEhri", value)} note={`${data.places.filter((place) => place.layer === "ehri_local").length} supplied records`} />
           <LayerToggle label="Inferred routes" marker="⋯" checked={layers.inferred} onChange={(value) => updateLayer("inferred", value)} note="Disabled by default; none in pilot" />
           <div className="mt-2 border-t border-[#ddd7ca] pt-2">
-            <LayerToggle label="Historical boundaries" marker="▧" checked={false} onChange={() => undefined} disabled note="Registry placeholder" />
             <LayerToggle label="WMS / WMTS services" marker="▤" checked={false} onChange={() => undefined} disabled note="Registry placeholder" />
           </div>
         </div>
@@ -813,9 +1330,15 @@ export function MapWorkspace({
             <p className="mt-1 text-[9px] leading-4 text-[#5e665f]">{mapDiagnostic}</p>
           </div>
         ) : null}
+        {mapLifecycle === "ready" && layers.historicalAdministration && historicalLayerStatus === "failed" && historicalDiagnostic ? (
+          <div role="alert" className="absolute top-3 right-14 z-10 max-w-sm border border-[#9d4d3b] bg-[#fff3ee]/97 px-3 py-2 shadow-lg" data-testid="historical-map-error">
+            <p className="text-[8px] font-black tracking-[0.11em] text-[#8d352c] uppercase">Historical layer unavailable</p>
+            <p className="mt-1 text-[8px] leading-3 text-[#6f453a]">{historicalDiagnostic}</p>
+          </div>
+        ) : null}
         <div className="pointer-events-none absolute top-3 left-3 border border-[#a9a397] bg-[#fffdf8]/92 px-3 py-2 shadow-md backdrop-blur-sm">
           <p className="text-[8px] font-black tracking-[0.13em] text-[#6f7974] uppercase">Visible evidence</p>
-          <p className="mt-1 text-xs font-bold text-[#173f36]">{visibleCorePlaces.length} core · {visibleRoutes.length} routes · {visibleEhriPlaces.length} EHRI</p>
+          <p className="mt-1 text-xs font-bold text-[#173f36]">{visibleCorePlaces.length} core · {visibleRoutes.length} routes · {visibleEhriPlaces.length} EHRI{layers.historicalAdministration ? ` · ${historicalFeatureCount} historical` : ""}</p>
           <p className="mt-1 text-[8px] text-[#707b76]" data-testid="map-service-status">
             {mapLifecycle === "ready"
               ? layers.basemap
@@ -829,6 +1352,11 @@ export function MapWorkspace({
                 ? "Map initialization failed"
                 : "Map initializing"}
           </p>
+          {layers.historicalAdministration ? (
+            <p className="mt-0.5 text-[8px] text-[#76536f]" data-testid="historical-map-status">
+              Historical {historicalYearMonth} · {historicalLayerStatus.replaceAll("_", " ")}
+            </p>
+          ) : null}
           <p className="mt-0.5 text-[8px] text-[#707b76]">Research grid · no boundary claims</p>
         </div>
       </div>
@@ -870,6 +1398,47 @@ export function MapWorkspace({
             {selectedRoute.notes ? <p className="mt-3 text-xs leading-5 text-[#61706a]">{selectedRoute.notes}</p> : null}
             <p className="mt-3 break-all text-[9px] leading-4 text-[#838b87]">{selectedRoute.sourceLabel}</p>
             <Link href={`/persons/${selectedRoute.personId}`} className="mt-4 flex justify-center bg-[#173f36] px-4 py-2.5 text-[9px] font-black tracking-[0.11em] text-white uppercase">Open person dossier</Link>
+          </div>
+        ) : selectedHistorical ? (
+          <div data-testid="historical-feature-details">
+            <div className="flex flex-wrap gap-1.5">
+              <StatusBadge tone="blue">Historical context</StatusBadge>
+              <StatusBadge tone={selectedHistoricalSnapshot?.status === "limited_static" ? "rust" : "green"}>
+                {selectedHistoricalSnapshot?.status === "limited_static" ? "limited / static" : "primary interval"}
+              </StatusBadge>
+            </div>
+            <p className="mt-3 text-[9px] font-black tracking-[0.12em] text-[#76536f] uppercase">
+              {formatYearMonth(selectedHistorical.yearMonth)} · supplied {selectedHistorical.snapshotDate}
+            </p>
+            <h3 className="font-editorial mt-1 text-2xl leading-7 font-bold text-[#173f36]">
+              {displayRawHistoricalValue(selectedHistorical.Name)}
+            </h3>
+            <p className="mt-2 text-[9px] leading-4 text-[#6c746f]">
+              Raw monthly DBF attributes. Field names and values are retained as supplied.
+            </p>
+            <dl className="mt-4 space-y-2 border-y border-[#ded8cc] py-3 text-[10px] leading-4">
+              <div><dt className="font-bold text-[#4c5954]">Name</dt><dd className="break-words">{displayRawHistoricalValue(selectedHistorical.Name)}</dd></div>
+              <div><dt className="font-bold text-[#4c5954]">Foreign_Po</dt><dd className="break-words">{displayRawHistoricalValue(selectedHistorical.Foreign_Po)}</dd></div>
+              <div><dt className="font-bold text-[#4c5954]">Head_of_St</dt><dd className="break-words">{displayRawHistoricalValue(selectedHistorical.Head_of_St)}</dd></div>
+              <div><dt className="font-bold text-[#4c5954]">Govt_in_Ex</dt><dd className="break-words">{displayRawHistoricalValue(selectedHistorical.Govt_in_Ex)}</dd></div>
+            </dl>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              <StatusBadge tone="gold">{selectedHistorical.foreignPowerCategory.replaceAll("_", " ")}</StatusBadge>
+              <StatusBadge tone="blue">source row {selectedHistorical.sourceFeatureIndex}</StatusBadge>
+            </div>
+            {selectedHistorical.editorialFlagIds.length ? (
+              <div className="mt-3 border border-[#c89372] bg-[#fff5e9] p-2.5">
+                <p className="text-[8px] font-black tracking-[0.11em] text-[#8c4b32] uppercase">Editorial / method flags</p>
+                {selectedHistorical.editorialFlagIds.map((flag) => <p key={flag} className="mt-1 break-all text-[8px] leading-3 text-[#6b5d52]">{flag}</p>)}
+              </div>
+            ) : null}
+            <p className="mt-3 text-[9px] leading-4 text-[#6f675f]"><code>Head_of_St</code> may identify a de facto ruler, governor, occupation official, prime minister or force rather than a constitutional head of state.</p>
+            {historicalManifest ? (
+              <>
+                <p className="mt-3 border-t border-[#ded8cc] pt-3 text-[8px] leading-4 text-[#77716b]">{historicalManifest.methodologicalWarning}</p>
+                <p className="mt-2 text-[7px] leading-3 text-[#8a837c]">{historicalManifest.source.attribution}</p>
+              </>
+            ) : null}
           </div>
         ) : (
           <div>

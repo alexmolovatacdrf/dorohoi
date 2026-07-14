@@ -187,7 +187,7 @@ Completion criteria:
 
 ## Phase 7 — European Borders WWII historical administration layer
 
-Status: in progress.
+Status: complete.
 
 - Preserve the corrected V1 map as the acceptance baseline and keep the
   `v0.1.0-map-prototype` tag unchanged.

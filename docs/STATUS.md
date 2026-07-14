@@ -25,6 +25,32 @@ on `style.load`, and reports both tile fallback and MapLibre/WebGL failure
 states visibly. The original `v0.1.0-map-prototype` tag remains on the
 pre-correction V1 checkpoint.
 
+## European Borders WWII integration
+
+The historical administration extension is complete on
+`feature/historical-administration-layer`. The source archive was found at
+`/mnt/c/Users/Alex Molovata/Downloads/EuropeanBorders_WWII.zip`; its committed
+SHA-256 is
+`4f934928531a57dc9e84d3a087cd21643f1232af011a4949621bcc53e099f4ea`.
+The archive and extracted approximately 500 MB source tree remain in ignored
+`external-data/` and are not tracked by Git.
+
+The pinned preprocessing pipeline validates all 88 monthly shapefiles and
+`Territorial_Changes`, retains raw monthly attributes, crops the documented
+regional research window, transforms `ESRI:102013` to `EPSG:4326`, simplifies
+conservatively and writes one compact GeoJSON per year-month. Two complete runs
+produced identical derived and manifest hashes. Source geometry repairs,
+projection operation, attribution, use limits, late-period limitations and
+source anomalies are explicit in the manifests and methodology.
+
+The optional MapLibre layer fetches only the selected snapshot. It is below
+person routes and place markers and provides month selection, timeline slider,
+opacity, legend, raw hover/click details, attribution and methodology. A failed
+snapshot request leaves the basemap and project evidence usable and presents a
+retryable diagnostic. October 1944–May 1945 is visibly marked limited/static.
+Transnistria and Reichskommissariat Ukraine remain separate raw source
+features; no civil/military administration field is invented.
+
 ## Completed scope
 
 - strict Next.js App Router, React, TypeScript and Tailwind foundation;
@@ -56,6 +82,8 @@ pre-correction V1 checkpoint.
   filters and layer controls usable when raster tiles fail, with a visible
   fallback notice;
 - an explicit MapLibre/WebGL initialization diagnostic instead of a blank map;
+- a locally served optional Historical administration layer with 88 selected-
+  month snapshots, raw attributes, legend, opacity and methodological warning;
 - dependency audit remediation by overriding Next's nested PostCSS 8.4.31 with
   the compatible patched 8.5.19 already used elsewhere in the project.
 
@@ -100,19 +128,17 @@ The final verification sequence on 13 July 2026 is:
 
 ```bash
 npm run normalize
+npm run historical:verify
 npm test
 npm run typecheck
 npm run lint
 npm run build
-npm audit --json
-npm run start -- --hostname 127.0.0.1
 ```
 
-All commands pass. The test suite contains 14 deterministic, map-style and
-research-rule tests. The production build generates the overview, indexes,
-both document pages and all four person pages, with dynamic filtered map, place
-and review views. `npm audit --json` reports zero known vulnerabilities. The
-production server starts successfully at `http://127.0.0.1:3000`.
+All commands pass. The test suite contains 23 deterministic, map-style,
+research-rule, conversion, date-selection and historical-distinction tests.
+The production build generates the overview, indexes, both document pages and
+all four person pages, with dynamic filtered map, place and review views.
 
 Browser verification for the corrected map covered 1440×1000 desktop and
 390×844 mobile viewports. MapLibre hydrated with five visible core places, four
@@ -126,9 +152,20 @@ notice. Simulated WebGL 2 failure produced the diagnostic state. The only
 console messages during the clean connected run were headless SwiftShader
 performance warnings; there were no application errors.
 
-The application is not offline-capable. Without external network access, the
-local project evidence and grid remain usable, but the geographic OpenStreetMap
-basemap is unavailable.
+The historical acceptance pass exercised 1440×1000 desktop and 390×844 mobile
+widths. It verified the month selector, timeline slider, opacity, primary and
+limited/static states, raw hover/click details, source warning and attribution.
+The August 1941 map visibly rendered Transnistria with raw
+`Romanian-occupied` and `Gheorghe Alexianu (Governor)` details while the five
+core places and four person routes remained above the polygons. Network
+inspection showed the manifest plus only the selected monthly GeoJSON, never
+all snapshots. A forced historical-snapshot failure kept the basemap, places,
+routes and controls active and exposed the retry action.
+
+The application is not described as fully offline-capable. Without external
+network access, the locally served historical snapshots, project evidence,
+controls and grid remain usable, but the geographic OpenStreetMap basemap is
+unavailable.
 
 `git diff -- data/source` is empty.
 
@@ -142,6 +179,10 @@ basemap is unavailable.
 - [`person-iancu-aizic.png`](../artifacts/screenshots/person-iancu-aizic.png)
 - [`review-desktop.png`](../artifacts/screenshots/review-desktop.png)
 - [`overview-mobile.png`](../artifacts/screenshots/overview-mobile.png)
+- [`historical-administration-desktop.png`](../artifacts/screenshots/historical-administration-desktop.png)
+- [`historical-administration-transnistria-desktop.png`](../artifacts/screenshots/historical-administration-transnistria-desktop.png)
+- [`historical-administration-mobile-controls.png`](../artifacts/screenshots/historical-administration-mobile-controls.png)
+- [`historical-administration-mobile-map.png`](../artifacts/screenshots/historical-administration-mobile-map.png)
 
 ## Known placeholders and unresolved research
 
@@ -158,9 +199,10 @@ basemap is unavailable.
 - The 385-place EHRI file is a supplied local extract, not a live synchronized
   catalog. Its type-label conflicts, duplicate/shared coordinates and upstream
   provenance require catalog-level review before any merge.
-- Historical boundaries and WMS/WMTS services are disabled registry
-  placeholders. The default geographic context uses public OpenStreetMap
-  raster tiles; the neutral local grid is the external-service fallback.
+- WMS/WMTS services remain a disabled registry placeholder. The new European
+  Borders WWII layer is local and month-aware; the default geographic basemap
+  still uses public OpenStreetMap raster tiles, with the neutral local grid as
+  its external-service fallback.
 - Review actions are read-only in V1; there is no persistent adjudication or
   merge workflow.
 - Romanian coverage currently applies to interface messages. Documentary
@@ -174,8 +216,8 @@ basemap is unavailable.
    documented adjudication records rather than overwriting current evidence.
 3. Reconcile the local EHRI extract with authoritative upstream identifiers,
    provenance and licenses before matching or merging places.
-4. Add optional dated historical boundaries and licensed WMS/WMTS services
-   through the layer registry.
+4. Add any further dated boundary datasets or licensed WMS/WMTS services
+   through the layer registry with equally explicit provenance and limits.
 5. Design a persistent, auditable review-decision workflow only after the
    file-backed V1 research process has been evaluated by researchers.
 6. Add future dossier adapters behind the existing normalized contracts and
