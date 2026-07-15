@@ -7,7 +7,7 @@ Acest document păstrează punctul de continuare pentru următoarea sesiune. Con
 ## Starea Git
 
 - Branch: `feature/public-presentation-map`
-- HEAD: `fc7549a fix: refine presentation map navigation and people panels`
+- HEAD: `ca343ab fix: separate reverse presentation routes`
 - Worktree: curat la momentul salvării
 - Nu au fost folosite reset, clean, checkout/restore destructiv și nu au fost șterse date existente.
 
@@ -22,6 +22,7 @@ Checkpoint-urile relevante, în ordine:
 7. `29733a4` — separate Presentation Map people controls
 8. `98007da` — family/person panel and map interaction fixes
 9. `fc7549a` — compact people sections, active camera states, place context and route lanes
+10. `ca343ab` — separate reverse route lanes, compact family card and person search
 
 ## Server și URL-uri
 
@@ -59,7 +60,9 @@ URL-uri:
 - Lista familiei afișează capul/declarantul o singură dată; persoanele menționate sunt într-un `<details>` închis implicit.
 - Antetul sticky al ambelor panouri păstrează butonul de închidere accesibil în timpul scroll-ului.
 - Traseele inverse/repetate între aceleași localități primesc benzi vizuale diferite. Animația are acum 3,6 secunde per segment.
+- Pentru o listă mare, panoul drept are căutare după nume de persoană sau familie; secțiunile menționate rămân închise până la deschidere.
 - Click pe o localitate poate afișa persoanele asociate, grupate după contextul explicit documentat; în timpul animației este afișat locul curent și nota traseului.
+- În Research Map, persoanele se selectează în `Filters → Person` sau `Filters → Group` din panoul stâng. Traseele apar când `Layers → People and movement → Individual routes` rămâne activ; click pe un traseu deschide detaliile în panoul `Context` din dreapta.
 
 ## Datele din varianta Claude
 
@@ -121,6 +124,7 @@ Observație: `npm run build` poate rescrie automat importul din `next-env.d.ts` 
 - Mai trebuie făcută verificarea vizuală completă în browser după ultimele modificări de panou și interacțiuni. Playwright este instalat ca CLI, dar mediul actual nu are Chrome/Chromium disponibil (`/opt/google/chrome/chrome`); instalarea automată a Chrome a eșuat deoarece cere sudo.
 - Trebuie salvate/confirmate screenshot-urile finale pentru Presentation Map Europe view, persoană selectată, interfață ascunsă, Research Map și mobil.
 - Trebuie confirmat în browser că toate layerele Presentation Map (basemap, persoane, trasee, locuri, EHRI și unresolved) se afișează corect cu ambele surse de date.
+- Trebuie verificat vizual un caz real cu două mișcări inverse între aceleași localități pentru a confirma că benzile nu se suprapun în MapLibre.
 - Integrarea viitoare a unei persoane menționate în mai multe dosare trebuie să folosească un identificator stabil și legături documentate între apariții/dosare; nu trebuie făcută deduplicare automată pe nume.
 - Orice optimizare a dataset-ului istoric full trebuie validată înainte de înlocuirea celor 91 de fișiere existente.
 
