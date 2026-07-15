@@ -380,13 +380,19 @@ The development server is intentionally left running at
 ## Vercel access
 
 The linked Vercel project is `dosare-dorohoi-platform-chatgpt` under the
-`alexmolovatacdrfs-projects` scope. Vercel Deployment Protection currently
-reports SSO/Vercel Authentication protection for non-custom deployment URLs.
-For a private review, Eugenia should access the deployment through her own
-Vercel account after being added as a viewer/member to the Vercel team; a shared
-password is not stored in this repository. On Hobby, Vercel Authentication is
-available, while production-domain protection and password protection have plan
-limits. The exact setting is in Vercel Dashboard → Project → Settings →
-Deployment Protection. See the official [Deployment Protection
-documentation](https://vercel.com/docs/deployment-protection) and [Vercel
-Authentication documentation](https://vercel.com/docs/deployment-protection/methods-to-protect-deployments/vercel-authentication).
+`alexmolovatacdrfs-projects` scope. Vercel Authentication is explicitly enabled
+for production deployment URLs and all previews. The current unique Production
+deployment URL is protected and redirects unauthenticated visitors to Vercel
+login. Eugenia should use her own Vercel account after being added as a
+viewer/member to the Vercel team; a shared password is not stored in this
+repository.
+
+Important plan limitation: on Hobby, the stable project production domain can
+remain publicly accessible even when standard Vercel Authentication is enabled.
+For the private review use the protected unique deployment URL supplied in the
+handoff, not the stable `*.vercel.app` project alias. If the stable alias must
+also be private, use a Pro plan with the required Deployment Protection scope
+or an eligible Password Protection add-on. The exact setting is in Vercel
+Dashboard → Project → Settings → Deployment Protection. See the official
+[Deployment Protection documentation](https://vercel.com/docs/deployment-protection)
+and [Vercel Authentication documentation](https://vercel.com/docs/deployment-protection/methods-to-protect-deployments/vercel-authentication).

@@ -7,8 +7,8 @@ Acest document păstrează punctul de continuare pentru următoarea sesiune. Con
 ## Starea Git
 
 - Branch: `feature/public-presentation-map`
-- HEAD: current checkpoint commit `fix: unify map dates and route playback`
-- Worktree: curat după checkpoint; nu au fost folosite reset, clean,
+- HEAD: `95ad1c4` (`docs: record person story and Vercel access`)
+- Worktree: clean after the implementation checkpoint; nu au fost folosite reset, clean,
   checkout/restore destructiv și nu au fost șterse date existente.
 - Nu au fost folosite reset, clean, checkout/restore destructiv și nu au fost șterse date existente.
 
@@ -30,6 +30,9 @@ Checkpoint-urile relevante, în ordine:
 14. `85d8f4a` — compact family cards with count/arrow on the head row and internal record inside the expanded content
 15. `fff2ec9` — person-place context summaries on map clicks and tighter left control spacing
 16. `24893f1` — anchored concise person-place popup beside the clicked map point
+17. `abf33c6` — source-bound map person stories and richer Claude fixture
+18. `6aa9756` — map people popup actions, central story dialog and public legend
+19. `95ad1c4` — person story and Vercel access documentation
 
 ## Server și URL-uri
 
@@ -44,6 +47,17 @@ URL-uri:
 - Presentation Map cu datele proiectului: `http://127.0.0.1:3000/presentation/map?dataset=project`
 - Presentation Map cu fixture-ul derivat din Claude: `http://127.0.0.1:3000/presentation/map?dataset=claude-demo`
 - Research Map: `http://127.0.0.1:3000/map`
+
+Vercel Production după ultimul deploy:
+
+- protected unique deployment: `https://dosare-dorohoi-platform-chatgpt-kgytv82kx.vercel.app`
+- Presentation Map project: `https://dosare-dorohoi-platform-chatgpt-kgytv82kx.vercel.app/presentation/map?dataset=project`
+- Presentation Map Claude: `https://dosare-dorohoi-platform-chatgpt-kgytv82kx.vercel.app/presentation/map?dataset=claude-demo`
+- Research Map Claude: `https://dosare-dorohoi-platform-chatgpt-kgytv82kx.vercel.app/map?dataset=claude-demo`
+
+Deployment Protection is Vercel Authentication. Without a Vercel session the
+unique deployment returns a redirect to Vercel SSO; the stable project alias is
+not the private review link on the Hobby plan.
 
 ## Ce este implementat acum
 
