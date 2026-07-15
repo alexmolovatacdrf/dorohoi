@@ -7,7 +7,7 @@ Acest document păstrează punctul de continuare pentru următoarea sesiune. Con
 ## Starea Git
 
 - Branch: `feature/public-presentation-map`
-- HEAD: `fff2ec9 feat: show person place context on map clicks`
+- HEAD: `24893f1 feat: add anchored person place map popup`
 - Worktree: curat la momentul salvării
 - Nu au fost folosite reset, clean, checkout/restore destructiv și nu au fost șterse date existente.
 
@@ -28,6 +28,7 @@ Checkpoint-urile relevante, în ordine:
 13. `6d0e6c0` — visible disclosure triangles for family and mentioned-people lists
 14. `85d8f4a` — compact family cards with count/arrow on the head row and internal record inside the expanded content
 15. `fff2ec9` — person-place context summaries on map clicks and tighter left control spacing
+16. `24893f1` — anchored concise person-place popup beside the clicked map point
 
 ## Server și URL-uri
 
@@ -68,6 +69,7 @@ URL-uri:
 - Pentru o listă mare, panoul drept are căutare după nume de persoană sau familie; secțiunile menționate rămân închise până la deschidere.
 - Click pe o localitate poate afișa persoanele asociate, grupate după contextul explicit documentat; în timpul animației este afișat locul curent și nota traseului.
 - Când o persoană este selectată, click pe un punct/localitate arată în panoul de detalii conexiunile persoană-loc documentate: categorie publică, data disponibilă, descriere, rolul sursă și sursa. Capetele de rută sunt marcate ca atare și nu sunt transformate în evenimente.
+- Același rezumat apare acum și într-un popup MapLibre ancorat lângă punctul apăsat; panoul lateral rămâne versiunea extinsă. Popup-ul include categoria, persoana, data și descrierea concisă, iar butonul nativ îl poate închide.
 - Panoul stâng al ambelor hărți păstrează aceleași controale și ținte accesibile, dar are spațiere verticală mai compactă pentru a reduce scroll-ul.
 - În Research Map, persoanele se selectează în `Filters → Person` sau `Filters → Group` din panoul stâng. Traseele apar când `Layers → People and movement → Individual routes` rămâne activ; click pe un traseu deschide detaliile în panoul `Context` din dreapta.
 - După selectarea unei persoane în Research Map, panoul `Context` din dreapta afișează acum numele persoanei, numărul de segmente și lista traseelor selectabile; un click pe un segment deschide detaliile sale de proveniență.
