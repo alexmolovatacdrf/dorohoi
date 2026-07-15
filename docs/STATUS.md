@@ -28,6 +28,8 @@ routes remain individual and evidence-bound.
 
 The public playback now draws slow, smooth visual curves between documented
 endpoints, moves a progress marker along the active curve, runs once and stops.
+The same curved geometry, directional arrows and separate reverse/repeated
+movement lanes are now used by the Research Map route layer as well.
 The MapLibre compass/pitch arrow was removed; only zoom controls remain. The
 presentation status box that had been behind the left control panel is hidden
 from the public canvas because its information is already available in the
@@ -58,6 +60,12 @@ uses the derived fixture at `data/demo/claude-map-demo.json`, containing 48
 persons, 11 dossiers, 15 places and 26 route segments from the embedded
 `Platforma_WJC (10).html` sample. This fixture is isolated from normalized
 research data and retains the source filename and SHA-256 for traceability.
+
+The Research Map Context panel now contains the same searchable, collapsible
+`Families and mentioned people` directory as Presentation Map. The left side
+continues to hold the advanced research filters and collapsible layer groups;
+selecting a person there or in the shared directory preserves individual route
+ownership and provenance.
 
 The immutable boundary has been preserved: `data/source/` was inspected but not
 modified. All generated research collections are written to
@@ -186,7 +194,7 @@ npm run lint
 npm run build
 ```
 
-All commands pass. The test suite contains 27 deterministic, map-style,
+All commands pass. The test suite contains 29 deterministic, map-style,
 research-rule, conversion, date-selection and historical-distinction tests.
 The production build generates the overview, indexes, both document pages and
 all four person pages, with dynamic filtered map, place and review views.

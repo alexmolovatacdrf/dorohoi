@@ -69,12 +69,13 @@ people under their dossier and marks the documented head/declarant separately.
 The selected-person card also lists other people in the same dossier when the
 normalized data supports that relationship.
 
-The bottom timeline uses a slow, one-shot progression. Each route is rendered
-as a smooth visual curve between its documented endpoints, with a moving
-progress marker; reverse or repeated movements between the same two places are
-assigned separate visual lanes so they do not sit on top of one another. The
-curve is explicitly a presentation aid, not a claim about the exact historical
-road. Playback never starts automatically and never loops. During playback the
+The bottom timeline uses a slow, one-shot progression. In both Presentation Map
+and Research Map, each route is rendered as a smooth visual curve between its
+documented endpoints, with directional arrow symbols and a moving progress
+marker. Reverse or repeated movements between the same two places are assigned
+separate visual lanes so they do not sit on top of one another. The curve is
+explicitly a presentation aid, not a claim about the exact historical road.
+Playback never starts automatically and never loops. During playback the
 current documented place and the route note are shown in the timeline card.
 
 The left panel collapses, the right people panel can also collapse, and the
@@ -108,6 +109,17 @@ set for territory, basemap, places, routes, EHRI and unresolved records.
 Historical polygon details are interaction-based: they do not open on pointer
 hover. A normal click or a right-click on a polygon opens the closeable raw
 attribute popup and the selected-detail panel.
+
+## Shared people and route presentation
+
+The right-side `Families and mentioned people` directory is available in both
+map modes. It uses the same person-centred grouping: the documented head or
+declarant appears as the family entry, while people mentioned in that dossier
+are inside a native collapsible subsection and are selectable individually.
+The directory includes name/family search and keeps dossier identifiers as
+secondary internal-record metadata. In Research Map this directory is in the
+right `Context` panel; advanced filters remain in the left `Filters` panel and
+the route layer remains under `Layers → People and movement`.
 
 ## Typed module configuration
 

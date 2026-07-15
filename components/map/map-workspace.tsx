@@ -1171,7 +1171,7 @@ export function MapWorkspace({
         visibleRoutes,
         activePlaybackRoute?.id ?? null,
         timelineProgress,
-        isPresentation,
+        true,
         isPresentation ? selectedPersonRoutes : visibleRoutes,
       ),
     );
@@ -1633,6 +1633,59 @@ export function MapWorkspace({
       || person.label.toLocaleLowerCase("ro").includes(normalizedPresentationPersonQuery),
   );
 
+  const peopleDirectory = (
+    <div className="presentation-people-list" data-testid="people-directory">
+      <label className="presentation-person-search">
+        <span className="presentation-label">Find a person or family</span>
+        <input
+          type="search"
+          value={presentationPersonQuery}
+          onChange={(event) => setPresentationPersonQuery(event.target.value)}
+          placeholder="Type a name…"
+          aria-label="Find a person or family"
+          data-testid="presentation-person-search"
+        />
+      </label>
+      <p className="presentation-label">Families and mentioned people</p>
+      <p className="presentation-card__meta">Each family starts with its documented head/declarant. People mentioned in the same file remain selectable individual records.</p>
+      {presentationGroups.map((group) => {
+        const groupPeople = data.persons
+          .filter((person) => group.personIds.includes(person.id))
+          .sort((left, right) => {
+            const leftHead = left.roles.some((role) => /^declarant$|cap de familie|head/i.test(role));
+            const rightHead = right.roles.some((role) => /^declarant$|cap de familie|head/i.test(role));
+            return Number(rightHead) - Number(leftHead) || left.label.localeCompare(right.label);
+          });
+        const head = groupPeople.find((person) => person.roles.some((role) => /^declarant$|cap de familie|head/i.test(role)));
+        const mentionedPeople = groupPeople.filter((person) => person.id !== head?.id);
+        const dossier = data.dossiers.find((item) => item.id === (head ?? groupPeople[0])?.dossierId);
+        return (
+          <div key={group.id} className="presentation-family-card">
+            <button type="button" className={`presentation-group-option${(head ? filters.person === head.id : filters.group === group.id) ? " presentation-group-option--selected" : ""}`} onClick={() => head ? selectPresentationPerson(head.id) : selectPresentationGroup(group.id)} aria-pressed={head ? filters.person === head.id : filters.group === group.id}>
+              <span><strong>{head?.label ?? group.label.replace(/\s+·\s+dosar\s+.*$/i, "")}</strong><small className="presentation-family-card__hint">{head ? "documented head / declarant" : "family or dossier group"}</small></span>
+              <span className="presentation-person-option__role">{mentionedPeople.length ? `${mentionedPeople.length} mentioned` : "declarant"}</span>
+            </button>
+            {mentionedPeople.length ? (
+              <details className="presentation-people-dossier">
+                <summary><span>People mentioned in this dossier</span><span>{mentionedPeople.length}</span></summary>
+                <div className="presentation-people-dossier__items">
+                  {mentionedPeople.map((person) => (
+                    <button key={person.id} type="button" className={`presentation-person-option${filters.person === person.id ? " presentation-person-option--selected" : ""}`} onClick={() => selectPresentationPerson(person.id)} aria-pressed={filters.person === person.id}>
+                      <span>{person.label}</span><span className="presentation-person-option__role">{person.roles[0] ?? "mentioned person"}</span>
+                    </button>
+                  ))}
+                </div>
+              </details>
+            ) : null}
+            {dossier ? <p className="presentation-family-card__meta">Internal record: {dossier.label}</p> : null}
+          </div>
+        );
+      })}
+      {filteredUngroupedPresentationPeople.length ? <div className="presentation-family-card"><p className="presentation-label">Other individual records</p>{filteredUngroupedPresentationPeople.map((person) => <button key={person.id} type="button" className={`presentation-person-option${filters.person === person.id ? " presentation-person-option--selected" : ""}`} onClick={() => selectPresentationPerson(person.id)} aria-pressed={filters.person === person.id}><span>{person.label}</span><span className="presentation-person-option__role">{person.roles[0] ?? "mentioned person"}</span></button>)}</div> : null}
+      {!presentationGroups.length && !filteredUngroupedPresentationPeople.length ? <p className="presentation-card__meta">No matching people or families.</p> : null}
+    </div>
+  );
+
   const presentationPanel = presentationPanelOpen ? (
     <aside className="presentation-map__panel absolute top-3 left-3 z-20 w-[min(23rem,calc(100%-1.5rem))] overflow-y-auto border border-[#bdb7aa] bg-[#fffdf8]/96 p-4 shadow-[0_18px_45px_rgba(22,42,35,0.2)] backdrop-blur-md sm:top-5 sm:left-5 sm:max-h-[calc(100%-8rem)]">
       <div className="presentation-panel__header flex items-start justify-between gap-3">
@@ -1714,57 +1767,7 @@ export function MapWorkspace({
       <button type="button" className={`presentation-person-option presentation-person-option--all${!filters.person && !filters.group ? " presentation-person-option--selected" : ""}`} onClick={clearPresentationSelection} aria-pressed={!filters.person && !filters.group}>
         <span>All stories</span><span className="presentation-person-option__role">Europe view</span>
       </button>
-      <label className="presentation-person-search">
-        <span className="presentation-label">Find a person or family</span>
-        <input
-          type="search"
-          value={presentationPersonQuery}
-          onChange={(event) => setPresentationPersonQuery(event.target.value)}
-          placeholder="Type a name…"
-          aria-label="Find a person or family"
-          data-testid="presentation-person-search"
-        />
-      </label>
-
-      <div className="presentation-people-list">
-        <p className="presentation-label">Families and mentioned people</p>
-        <p className="presentation-card__meta">Each family starts with its documented head/declarant. People mentioned in the same file remain selectable individual records.</p>
-        {presentationGroups.map((group) => {
-          const groupPeople = data.persons
-            .filter((person) => group.personIds.includes(person.id))
-            .sort((left, right) => {
-              const leftHead = left.roles.some((role) => /^declarant$|cap de familie|head/i.test(role));
-              const rightHead = right.roles.some((role) => /^declarant$|cap de familie|head/i.test(role));
-              return Number(rightHead) - Number(leftHead) || left.label.localeCompare(right.label);
-          });
-          const head = groupPeople.find((person) => person.roles.some((role) => /^declarant$|cap de familie|head/i.test(role)));
-          const mentionedPeople = groupPeople.filter((person) => person.id !== head?.id);
-          const dossier = data.dossiers.find((item) => item.id === (head ?? groupPeople[0])?.dossierId);
-          return (
-            <div key={group.id} className="presentation-family-card">
-              <button type="button" className={`presentation-group-option${(head ? filters.person === head.id : filters.group === group.id) ? " presentation-group-option--selected" : ""}`} onClick={() => head ? selectPresentationPerson(head.id) : selectPresentationGroup(group.id)} aria-pressed={head ? filters.person === head.id : filters.group === group.id}>
-                <span><strong>{head?.label ?? group.label.replace(/\s+·\s+dosar\s+.*$/i, "")}</strong><small className="presentation-family-card__hint">{head ? "documented head / declarant" : "family or dossier group"}</small></span>
-                <span className="presentation-person-option__role">{mentionedPeople.length ? `${mentionedPeople.length} mentioned` : "declarant"}</span>
-              </button>
-              {mentionedPeople.length ? (
-                <details className="presentation-people-dossier">
-                  <summary><span>People mentioned in this dossier</span><span>{mentionedPeople.length}</span></summary>
-                  <div className="presentation-people-dossier__items">
-                    {mentionedPeople.map((person) => (
-                      <button key={person.id} type="button" className={`presentation-person-option${filters.person === person.id ? " presentation-person-option--selected" : ""}`} onClick={() => selectPresentationPerson(person.id)} aria-pressed={filters.person === person.id}>
-                        <span>{person.label}</span><span className="presentation-person-option__role">{person.roles[0] ?? "mentioned person"}</span>
-                      </button>
-                    ))}
-                  </div>
-                </details>
-              ) : null}
-              {dossier ? <p className="presentation-family-card__meta">Internal record: {dossier.label}</p> : null}
-            </div>
-          );
-        })}
-        {filteredUngroupedPresentationPeople.length ? <div className="presentation-family-card"><p className="presentation-label">Other individual records</p>{filteredUngroupedPresentationPeople.map((person) => <button key={person.id} type="button" className={`presentation-person-option${filters.person === person.id ? " presentation-person-option--selected" : ""}`} onClick={() => selectPresentationPerson(person.id)} aria-pressed={filters.person === person.id}><span>{person.label}</span><span className="presentation-person-option__role">{person.roles[0] ?? "mentioned person"}</span></button>)}</div> : null}
-        {!presentationGroups.length && !filteredUngroupedPresentationPeople.length ? <p className="presentation-card__meta">No matching people or families.</p> : null}
-      </div>
+      {peopleDirectory}
 
       {(presentationDetails || presentationGroupDetails) ? (
         <div className="presentation-people-detail" data-testid="presentation-story-card">
@@ -2186,6 +2189,10 @@ export function MapWorkspace({
           <h2 className="font-editorial text-xl font-bold text-[#173f36]">{t("map.context")}</h2>
           {selection ? <button type="button" onClick={() => setSelection(null)} className="text-[9px] font-black tracking-[0.1em] text-[#a54f32] uppercase">{t("common.clear")}</button> : null}
         </div>
+        <details className="research-control-group research-people-directory" open>
+          <summary>Families and mentioned people</summary>
+          <div className="mt-2">{peopleDirectory}</div>
+        </details>
         {selectedPlace ? (
           <div>
             <div className="flex flex-wrap gap-1.5">
