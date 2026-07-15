@@ -7,7 +7,7 @@ Acest document păstrează punctul de continuare pentru următoarea sesiune. Con
 ## Starea Git
 
 - Branch: `feature/public-presentation-map`
-- HEAD: `85d8f4a refactor: compact family disclosure details`
+- HEAD: `fff2ec9 feat: show person place context on map clicks`
 - Worktree: curat la momentul salvării
 - Nu au fost folosite reset, clean, checkout/restore destructiv și nu au fost șterse date existente.
 
@@ -27,6 +27,7 @@ Checkpoint-urile relevante, în ordine:
 12. `c807fae` — shared curved route geometry and family/person directory in both maps
 13. `6d0e6c0` — visible disclosure triangles for family and mentioned-people lists
 14. `85d8f4a` — compact family cards with count/arrow on the head row and internal record inside the expanded content
+15. `fff2ec9` — person-place context summaries on map clicks and tighter left control spacing
 
 ## Server și URL-uri
 
@@ -66,6 +67,8 @@ URL-uri:
 - Traseele inverse/repetate între aceleași localități primesc benzi vizuale diferite. Animația are acum 3,6 secunde per segment.
 - Pentru o listă mare, panoul drept are căutare după nume de persoană sau familie; secțiunile menționate rămân închise până la deschidere.
 - Click pe o localitate poate afișa persoanele asociate, grupate după contextul explicit documentat; în timpul animației este afișat locul curent și nota traseului.
+- Când o persoană este selectată, click pe un punct/localitate arată în panoul de detalii conexiunile persoană-loc documentate: categorie publică, data disponibilă, descriere, rolul sursă și sursa. Capetele de rută sunt marcate ca atare și nu sunt transformate în evenimente.
+- Panoul stâng al ambelor hărți păstrează aceleași controale și ținte accesibile, dar are spațiere verticală mai compactă pentru a reduce scroll-ul.
 - În Research Map, persoanele se selectează în `Filters → Person` sau `Filters → Group` din panoul stâng. Traseele apar când `Layers → People and movement → Individual routes` rămâne activ; click pe un traseu deschide detaliile în panoul `Context` din dreapta.
 - După selectarea unei persoane în Research Map, panoul `Context` din dreapta afișează acum numele persoanei, numărul de segmente și lista traseelor selectabile; un click pe un segment deschide detaliile sale de proveniență.
 - Research Map folosește acum aceeași geometrie de prezentare pentru trasee ca Presentation Map: curbe Bézier, săgeți direcționale și benzi separate pentru mișcări inverse sau repetate între aceleași localități.
