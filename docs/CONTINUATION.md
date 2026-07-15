@@ -7,7 +7,7 @@ Acest document păstrează punctul de continuare pentru următoarea sesiune. Con
 ## Starea Git
 
 - Branch: `feature/public-presentation-map`
-- HEAD: `6d0e6c0 fix: show family directory disclosure arrows`
+- HEAD: `85d8f4a refactor: compact family disclosure details`
 - Worktree: curat la momentul salvării
 - Nu au fost folosite reset, clean, checkout/restore destructiv și nu au fost șterse date existente.
 
@@ -26,6 +26,7 @@ Checkpoint-urile relevante, în ordine:
 11. `57c5249` — visible selected-person route list in Research Map context panel
 12. `c807fae` — shared curved route geometry and family/person directory in both maps
 13. `6d0e6c0` — visible disclosure triangles for family and mentioned-people lists
+14. `85d8f4a` — compact family cards with count/arrow on the head row and internal record inside the expanded content
 
 ## Server și URL-uri
 
@@ -70,6 +71,7 @@ URL-uri:
 - Research Map folosește acum aceeași geometrie de prezentare pentru trasee ca Presentation Map: curbe Bézier, săgeți direcționale și benzi separate pentru mișcări inverse sau repetate între aceleași localități.
 - Panoul `Context` din Research Map include acum directorul comun `Families and mentioned people`, cu căutare și secțiuni dropdown pentru persoanele menționate. Capul/declarantul nu este repetat în lista de membri.
 - Directorul `Families and mentioned people` este acum el însuși un dropdown vizibil în ambele hărți: triunghiul `▸` închide lista, iar `▾` o extinde. Listele interne ale persoanelor menționate folosesc aceeași convenție.
+- Cardul fiecărei familii nu mai repetă rândul `People mentioned in this dossier`. Numărul și triunghiul sunt pe rândul capului/declarantului; la extindere apar numele individuale și linia `Internal record`. Cardul de detalii al persoanei selectate folosește aceeași structură compactă.
 
 ## Datele din varianta Claude
 
