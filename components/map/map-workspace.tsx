@@ -23,6 +23,7 @@ import { StatusBadge, confidenceTone } from "@/components/ui/status-badge";
 import { humanizeSlug, rawValueLabel } from "@/lib/data/format";
 import type {
   MapPlaceDatum,
+  MapPlacePersonConnection,
   MapPlacePersonContext,
   MapRouteDatum,
   MapViewModel,
@@ -537,14 +538,23 @@ function publicPlaceCategoryLabel(category: MapPlaceDatum["categories"][number])
 }
 
 function publicPlaceContextLabel(context: MapPlacePersonContext): string {
-  const value = [...context.roles, ...context.eventTypes].join(" ").toLocaleLowerCase("ro");
+  return publicPlaceContextLabelForValues(context.roles, context.eventTypes);
+}
+
+function publicPlaceContextLabelForValues(roles: string[], eventTypes: string[]): string {
+  const value = [...roles, ...eventTypes].join(" ").toLocaleLowerCase("ro");
   if (/deces|death|mort|loss/.test(value)) return "Death or loss";
   if (/lagar|lagăr|ghetou|ghetto|camp|intern/.test(value)) return "Camp, ghetto or internment";
   if (/munca|muncă|forced|work/.test(value)) return "Forced labour";
   if (/deport|evac/.test(value)) return "Evacuation or deportation";
   if (/intoarc|întoarc|return|repatri/.test(value)) return "Return or repatriation";
+  if (/route origin|route destination/.test(value)) return "Movement / route endpoint";
   if (/nastere|naștere|birth|origin|domiciliu|residence|locuire/.test(value)) return "Birth, origin or residence";
   return "Other documented connection";
+}
+
+function publicPlaceConnectionLabel(connection: MapPlacePersonConnection): string {
+  return publicPlaceContextLabelForValues(connection.roles, connection.eventTypes);
 }
 
 export function MapWorkspace({
@@ -1056,6 +1066,7 @@ export function MapWorkspace({
             map.on("mouseenter", layerId, () => { map.getCanvas().style.cursor = "pointer"; });
             map.on("mouseleave", layerId, () => { map.getCanvas().style.cursor = ""; });
             map.on("click", layerId, (event) => {
+              if (map.queryRenderedFeatures(event.point, { layers: placeLayers }).length) return;
               const id = event.features?.[0]?.properties?.id;
               if (typeof id === "string") setSelection({ kind: "route", id });
             });
@@ -1453,6 +1464,7 @@ export function MapWorkspace({
           roles: [],
           eventTypes: [],
           dossierIds: [],
+          connections: [],
         }));
     const grouped = new Map<string, Array<{ id: string; label: string }>>();
     for (const context of contexts) {
@@ -1467,6 +1479,37 @@ export function MapWorkspace({
     }
     return [...grouped.entries()].map(([label, people]) => ({ label, people }));
   }, [data.persons, selectedPlace]);
+  const selectedPersonPlaceContext = useMemo<MapPlacePersonContext | null>(() => {
+    if (!selectedPlace || !selectedPerson) return null;
+    const directContext = selectedPlace.personContexts.find((context) => context.personId === selectedPerson.id);
+    const routeConnections = data.routes
+      .filter(
+        (route) =>
+          route.personId === selectedPerson.id
+          && (route.originId === selectedPlace.id || route.destinationId === selectedPlace.id),
+      )
+      .map((route): MapPlacePersonConnection => ({
+        id: `route-${route.id}`,
+        roles: [route.originId === selectedPlace.id ? "route origin" : "route destination"],
+        eventTypes: route.eventTypes,
+        dateLabel: typeof route.dateRaw === "string"
+          ? route.dateRaw
+          : route.dateRaw === null || route.dateRaw === undefined
+            ? null
+            : rawValueLabel(route.dateRaw),
+        description: route.notes,
+        sourceLabel: route.sourceLabel,
+      }));
+    const connections = [...(directContext?.connections ?? []), ...routeConnections];
+    const uniqueConnections = [...new Map(connections.map((connection) => [connection.id, connection])).values()];
+    return {
+      personId: selectedPerson.id,
+      roles: [...new Set([...(directContext?.roles ?? []), ...routeConnections.flatMap((connection) => connection.roles)])],
+      eventTypes: [...new Set([...(directContext?.eventTypes ?? []), ...routeConnections.flatMap((connection) => connection.eventTypes)])],
+      dossierIds: [...new Set([...(directContext?.dossierIds ?? []), ...(selectedPerson.dossierId ? [selectedPerson.dossierId] : [])])],
+      connections: uniqueConnections,
+    };
+  }, [data.routes, selectedPerson, selectedPlace]);
   const activePlaybackWaypoint = useMemo(() => {
     if (!activePlaybackRoute) return null;
     const placeId = timelineProgress >= 1 ? activePlaybackRoute.destinationId : activePlaybackRoute.originId;
@@ -1549,6 +1592,27 @@ export function MapWorkspace({
   };
 
   const presentationLegend = historicalManifest?.presentationVocabulary?.legend ?? [];
+  const selectedPersonPlaceContextCard = selectedPerson && selectedPlace && selectedPersonPlaceContext ? (
+    <div className="presentation-place-person-context">
+      <p className="presentation-label">Selected person at this place</p>
+      <p className="presentation-card__body">{selectedPerson.label} has {selectedPersonPlaceContext.connections.length ? "the following documented connection" : "no direct documented connection"} with this place.</p>
+      {selectedPersonPlaceContext.connections.length ? (
+        <div className="presentation-place-person-context__items">
+          {selectedPersonPlaceContext.connections.map((connection) => (
+            <div key={connection.id} className="presentation-place-person-context__item">
+              <div className="flex items-start justify-between gap-2">
+                <strong>{publicPlaceConnectionLabel(connection)}</strong>
+                <span>{connection.dateLabel ?? "Date not supplied"}</span>
+              </div>
+              {connection.roles.length ? <p>Documented as: {connection.roles.join(" · ")}</p> : null}
+              {connection.description ? <p>{connection.description}</p> : null}
+              <p className="break-all">Source: {connection.sourceLabel}</p>
+            </div>
+          ))}
+        </div>
+      ) : <p className="presentation-card__meta">The place may be visible in the wider dossier or map context, but the current evidence does not link it directly to this person.</p>}
+    </div>
+  ) : null;
 
   const presentationDetails = selectedPlace ? (
     <>
@@ -1559,7 +1623,8 @@ export function MapWorkspace({
           ? selectedPlace.categories.map(publicPlaceCategoryLabel).join(" · ")
           : "A documented place in the current research collection."}
       </p>
-      {selectedPlacePeople.length ? (
+      {selectedPersonPlaceContextCard}
+      {!selectedPerson && selectedPlacePeople.length ? (
         <div className="presentation-place-people">
           <p className="presentation-label">People documented here</p>
           <p className="presentation-card__meta">Grouped only where the source gives an explicit person/place or event/place connection.</p>
@@ -1932,7 +1997,7 @@ export function MapWorkspace({
 
   return (
     <div className="map-workspace grid min-h-[760px] border-y border-[#bdb7aa] bg-[#e5e0d5] lg:h-[calc(100vh-9rem)] lg:min-h-[720px] lg:grid-cols-[260px_minmax(420px,1fr)_292px] lg:grid-rows-[minmax(480px,1fr)_auto]">
-      <aside className="max-h-[36rem] overflow-y-auto border-b border-[#c8c1b4] bg-[#f6f2e9] p-4 lg:row-span-2 lg:max-h-none lg:border-r lg:border-b-0">
+      <aside className="research-map__filters max-h-[36rem] overflow-y-auto border-b border-[#c8c1b4] bg-[#f6f2e9] p-4 lg:row-span-2 lg:max-h-none lg:border-r lg:border-b-0">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-editorial text-xl font-bold text-[#173f36]">{t("map.filters")}</h2>
           <button
@@ -2244,6 +2309,7 @@ export function MapWorkspace({
             </div>
             <h3 className="font-editorial mt-3 text-2xl leading-7 font-bold text-[#173f36]">{language === "ro" ? selectedPlace.labelRo : selectedPlace.label}</h3>
             <p className="mt-3 text-xs leading-5 text-[#61706a]">{selectedPlace.roles.length ? selectedPlace.roles.join(" · ") : "Overlay location; no direct dossier mention in the current pilot."}</p>
+            {selectedPersonPlaceContextCard}
             {selectedPlace.coordinates ? <p className="mt-3 font-mono text-[10px] text-[#73807a]">{selectedPlace.coordinates.latitude.toFixed(5)}, {selectedPlace.coordinates.longitude.toFixed(5)}</p> : <p className="mt-3 text-xs font-bold text-[#a54f32]">No coordinates assigned</p>}
             <dl className="mt-4 grid grid-cols-2 gap-2 border-y border-[#ded8cc] py-3 text-xs">
               <div><dt className="text-[8px] font-black uppercase">People</dt><dd className="font-editorial text-xl font-bold">{selectedPlace.personIds.length}</dd></div>

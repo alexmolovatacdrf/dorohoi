@@ -290,6 +290,44 @@ summary {
   font-size: 0.8125rem !important;
 }
 
+.presentation-place-person-context {
+  margin-top: 0.8rem;
+  border-top: 1px solid #d6d0c4;
+  padding-top: 0.65rem;
+}
+
+.presentation-place-person-context__items {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.45rem;
+}
+
+.presentation-place-person-context__item {
+  border-left: 2px solid #6d9486;
+  background: #f4f1e8;
+  padding: 0.45rem 0.55rem;
+  color: #52645c;
+}
+
+.presentation-place-person-context__item strong {
+  color: #173f36;
+  font-size: 0.875rem !important;
+}
+
+.presentation-place-person-context__item > div > span {
+  color: #76536f;
+  font-size: 0.75rem !important;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.presentation-place-person-context__item p {
+  margin-top: 0.2rem;
+  color: #68766e;
+  font-size: 0.75rem !important;
+  line-height: 1.35;
+}
+
 .presentation-people-list {
   margin-top: 1rem;
   border-top: 1px solid #d6d0c4;
@@ -744,6 +782,51 @@ summary {
 
 .presentation-group__content > label {
   padding-block: 0.55rem;
+}
+
+/* The left map controls retain their targets and information, but avoid
+   stacking large vertical gaps between related rows. */
+.presentation-map__panel .presentation-group__content > label {
+  padding-block: 0.3rem;
+}
+
+.presentation-map__panel .presentation-group__content > label select,
+.presentation-map__panel .presentation-group__content > label input {
+  min-height: 2.25rem;
+}
+
+.presentation-map__panel .presentation-history-controls {
+  margin-top: 0.5rem;
+  padding: 0.6rem;
+}
+
+.research-map__filters > .space-y-3 {
+  --tw-space-y-reverse: 0;
+  row-gap: 0.5rem;
+}
+
+.research-map__filters > .space-y-3 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0.5rem;
+}
+
+.research-map__filters .research-control-group {
+  margin-top: 0.55rem;
+  padding-top: 0.45rem;
+}
+
+.research-map__filters .research-control-group > summary {
+  min-height: 2.15rem;
+}
+
+.research-map__filters .research-control-group .mt-3 {
+  margin-top: 0.5rem;
+}
+
+.research-map__filters .research-control-group label,
+.research-map__filters .research-control-group button,
+.research-map__filters .research-control-group select,
+.research-map__filters .research-control-group input {
+  min-height: 2.25rem;
 }
 
 .presentation-history-controls {

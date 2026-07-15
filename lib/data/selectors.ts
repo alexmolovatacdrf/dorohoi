@@ -229,6 +229,16 @@ export interface MapPlacePersonContext {
   roles: string[];
   eventTypes: string[];
   dossierIds: string[];
+  connections: MapPlacePersonConnection[];
+}
+
+export interface MapPlacePersonConnection {
+  id: string;
+  roles: string[];
+  eventTypes: string[];
+  dateLabel: string | null;
+  description: string | null;
+  sourceLabel: string;
 }
 
 export interface MapRouteDatum {
@@ -313,10 +323,29 @@ export function getMapViewModel(data: NormalizedBundle = getResearchData()): Map
           roles: [],
           eventTypes: [],
           dossierIds: [],
+          connections: [],
         };
         current.roles = [...new Set([...current.roles, mention.role])];
         if (event) current.eventTypes = [...new Set([...current.eventTypes, event.eventType])];
         current.dossierIds = [...new Set([...current.dossierIds, ...mention.documentIds])];
+        const birthDate = peopleById.get(personId)?.birthDate;
+        const dateLabel = event
+          ? typeof event.date.raw === "string"
+            ? event.date.raw
+            : event.date.start ?? event.date.end
+          : mention.ownerType === "person" && birthDate
+            ? typeof birthDate.raw === "string"
+              ? birthDate.raw
+              : birthDate.start ?? birthDate.end
+            : null;
+        current.connections.push({
+          id: mention.placeMentionId,
+          roles: [mention.role],
+          eventTypes: event ? [event.eventType] : [],
+          dateLabel,
+          description: event?.descriptionRaw ?? null,
+          sourceLabel: event?.sourceRefs[0]?.sourceFile ?? mention.sourceRefs[0]?.sourceFile ?? "Source unavailable",
+        });
         contexts.set(personId, current);
       }
     }

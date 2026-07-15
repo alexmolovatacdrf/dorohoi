@@ -70,6 +70,14 @@ disclosure triangle on the head/declarant row; the expanded content contains
 the names and internal dossier record without a redundant heading. The selected
 Presentation Map story card follows the same compact pattern.
 
+Selecting a person and clicking a visible place now shows the documented
+person-place connections in both map modes, including source date when
+available, public relationship category, source wording/description and source
+label. Route endpoints are shown as route endpoints and are not silently
+reclassified as birth, death or another event. Left-side map controls use
+tighter vertical spacing while retaining their controls and readable target
+sizes.
+
 The immutable boundary has been preserved: `data/source/` was inspected but not
 modified. All generated research collections are written to
 `data/normalized/`.

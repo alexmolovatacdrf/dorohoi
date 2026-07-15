@@ -1,6 +1,7 @@
 import claudeDemo from "@/data/demo/claude-map-demo.json";
 import type {
   MapPlaceDatum,
+  MapPlacePersonConnection,
   MapPlacePersonContext,
   MapRouteDatum,
   MapViewModel,
@@ -29,6 +30,14 @@ const mapData: MapViewModel = {
         roles: [],
         eventTypes: [...new Set(routeContexts.flatMap((route) => route.eventTypes))],
         dossierIds: person?.dossierId ? [person.dossierId] : [],
+        connections: routeContexts.map((route): MapPlacePersonConnection => ({
+          id: `route-${route.id}`,
+          roles: [route.originId === place.id ? "route origin" : "route destination"],
+          eventTypes: route.eventTypes,
+          dateLabel: route.dateRaw,
+          description: route.notes,
+          sourceLabel: route.sourceLabel,
+        })),
       };
     }),
     placeType: place.placeType as MapPlaceDatum["placeType"],

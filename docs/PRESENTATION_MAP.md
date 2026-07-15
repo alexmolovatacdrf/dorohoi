@@ -106,6 +106,16 @@ connections when the normalized data supports them. The global site footer is
 hidden on map workspaces so it cannot reduce the map viewport; it remains
 available on the editorial and research pages.
 
+When a person is selected, clicking one of that person's visible place points
+opens a compact person-at-place summary in the detail panel. It distinguishes
+documented birth/origin, death/loss, camp or ghetto, forced labour,
+deportation/evacuation, return and route-endpoint connections where the source
+supports them, and retains the available source date, description and source
+label. A route endpoint without a direct person-place mention is labelled as a
+route connection rather than being upgraded to an event. The Research Map uses
+the same summary. Map controls keep their readable targets but use tighter row
+spacing so the left panel requires less scrolling.
+
 The map zoom controls are positioned outside the open people panel on desktop
 and above the bottom timeline on mobile. Layer symbols use a consistent visual
 set for territory, basemap, places, routes, EHRI and unresolved records.
