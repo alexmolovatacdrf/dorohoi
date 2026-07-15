@@ -50,10 +50,10 @@ URL-uri:
 
 Vercel Production după ultimul deploy:
 
-- protected unique deployment: `https://dosare-dorohoi-platform-chatgpt-kgytv82kx.vercel.app`
-- Presentation Map project: `https://dosare-dorohoi-platform-chatgpt-kgytv82kx.vercel.app/presentation/map?dataset=project`
-- Presentation Map Claude: `https://dosare-dorohoi-platform-chatgpt-kgytv82kx.vercel.app/presentation/map?dataset=claude-demo`
-- Research Map Claude: `https://dosare-dorohoi-platform-chatgpt-kgytv82kx.vercel.app/map?dataset=claude-demo`
+- protected unique deployment: `https://dosare-dorohoi-platform-chatgpt-pslixdzkj.vercel.app`
+- Presentation Map project: `https://dosare-dorohoi-platform-chatgpt-pslixdzkj.vercel.app/presentation/map?dataset=project`
+- Presentation Map Claude: `https://dosare-dorohoi-platform-chatgpt-pslixdzkj.vercel.app/presentation/map?dataset=claude-demo`
+- Research Map Claude: `https://dosare-dorohoi-platform-chatgpt-pslixdzkj.vercel.app/map?dataset=claude-demo`
 
 Separate gradual-review deployment for Eugenia:
 
