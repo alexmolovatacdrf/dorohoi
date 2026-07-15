@@ -25,6 +25,7 @@ import type {
   MapPlaceDatum,
   MapPlacePersonConnection,
   MapPlacePersonContext,
+  MapPersonStory,
   MapRouteDatum,
   MapViewModel,
 } from "@/lib/data/selectors";
@@ -583,6 +584,8 @@ function personPlacePopupContent(
   language: "en" | "ro",
   selectedPerson: { label: string } | null,
   context: MapPlacePersonContext | null,
+  peopleGroups: Array<{ label: string; people: Array<{ id: string; label: string }> }>,
+  onPersonSelect: (personId: string) => void,
 ): HTMLElement {
   const root = document.createElement("div");
   root.className = "map-place-popup";
@@ -614,15 +617,39 @@ function personPlacePopupContent(
       root.append(popupTextElement("p", "No direct documented person-place connection in the current evidence.", "map-place-popup__muted"));
     }
   } else {
-    root.append(
-      popupTextElement(
+    root.append(popupTextElement(
+      "p",
+      place.categories.length
+        ? place.categories.map(publicPlaceCategoryLabel).join(" · ")
+        : "Documented place in the current collection",
+      "map-place-popup__muted",
+    ));
+    const peopleCount = peopleGroups.reduce((total, group) => total + group.people.length, 0);
+    if (peopleCount) {
+      root.append(popupTextElement(
         "p",
-        place.categories.length
-          ? place.categories.map(publicPlaceCategoryLabel).join(" · ")
-          : "Documented place in the current collection",
-        "map-place-popup__muted",
-      ),
-    );
+        `${peopleCount} ${peopleCount === 1 ? "person" : "people"} connected to this place`,
+        "map-place-popup__people-count",
+      ));
+      const people = document.createElement("div");
+      people.className = "map-place-popup__people";
+      for (const group of peopleGroups) {
+        const groupLabel = popupTextElement("p", group.label, "map-place-popup__people-group");
+        people.append(groupLabel);
+        for (const person of group.people) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "map-place-popup__person-button";
+          button.textContent = person.label;
+          button.addEventListener("click", (event) => {
+            event.stopPropagation();
+            onPersonSelect(person.id);
+          });
+          people.append(button);
+        }
+      }
+      root.append(people);
+    }
   }
 
   return root;
@@ -708,6 +735,7 @@ export function MapWorkspace({
   const [timelineStep, setTimelineStep] = useState<number | null>(null);
   const [timelineProgress, setTimelineProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [storyPersonId, setStoryPersonId] = useState<string | null>(null);
 
   useEffect(() => {
     languageRef.current = language;
@@ -740,6 +768,13 @@ export function MapWorkspace({
 
   const selectedGroup = data.groups.find((group) => group.id === filters.group);
   const selectedPerson = data.persons.find((person) => person.id === filters.person);
+  const storyPerson = storyPersonId
+    ? data.persons.find((person) => person.id === storyPersonId) ?? null
+    : null;
+  const story = storyPerson?.story ?? null;
+  const storyFamily = storyPerson
+    ? data.groups.find((group) => group.personIds.includes(storyPerson.id)) ?? null
+    : null;
   const selectedPersonDossierMembers = useMemo(
     () => selectedPerson
       ? data.persons.filter((person) => person.dossierId === selectedPerson.dossierId && person.id !== selectedPerson.id)
@@ -947,7 +982,10 @@ export function MapWorkspace({
       // The compass/pitch button is not useful for this 2D public atlas and
       // reads as a persistent arrow menu over the map. Keep only zoom controls.
       map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
-      map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
+      // A compact attribution button becomes an unexplained hover menu. Keep
+      // attribution visible as ordinary text on the research map, while the
+      // presentation panel carries its own full source attribution.
+      if (!isPresentation) map.addControl(new maplibregl.AttributionControl({ compact: false }), "bottom-right");
 
       map.on("error", (event) => {
         if (disposed) return;
@@ -1580,6 +1618,15 @@ export function MapWorkspace({
     }
     return [...grouped.entries()].map(([label, people]) => ({ label, people }));
   }, [data.persons, selectedPlace]);
+  const selectPersonFromMap = useCallback((personId: string) => {
+    setFilters((current) => ({ ...current, person: personId, group: "", place: "" }));
+    setPresentationViewport("story");
+    setTimelineStep(null);
+    setTimelineProgress(0);
+    setIsPlaying(false);
+    setSelection(null);
+    setStoryPersonId(personId);
+  }, []);
   const selectedPersonPlaceContext = useMemo<MapPlacePersonContext | null>(() => {
     if (!selectedPlace || !selectedPerson) return null;
     const directContext = selectedPlace.personContexts.find((context) => context.personId === selectedPerson.id);
@@ -1625,7 +1672,7 @@ export function MapWorkspace({
       offset: 16,
     })
       .setLngLat([selectedPlace.coordinates.longitude, selectedPlace.coordinates.latitude])
-      .setDOMContent(personPlacePopupContent(selectedPlace, language, selectedPerson ? { label: selectedPerson.label } : null, selectedPersonPlaceContext))
+      .setDOMContent(personPlacePopupContent(selectedPlace, language, selectedPerson ? { label: selectedPerson.label } : null, selectedPersonPlaceContext, selectedPlacePeople, selectPersonFromMap))
       .addTo(map);
     placePopupRef.current = popup;
 
@@ -1633,7 +1680,7 @@ export function MapWorkspace({
       popup.remove();
       if (placePopupRef.current === popup) placePopupRef.current = null;
     };
-  }, [language, mapReady, selectedPerson, selectedPersonPlaceContext, selectedPlace]);
+  }, [language, mapReady, selectedPerson, selectedPersonPlaceContext, selectedPlace, selectedPlacePeople, selectPersonFromMap]);
   const activePlaybackWaypoint = useMemo(() => {
     if (!activePlaybackRoute) return null;
     const placeId = timelineProgress >= 1 ? activePlaybackRoute.destinationId : activePlaybackRoute.originId;
@@ -1653,7 +1700,24 @@ export function MapWorkspace({
     setTimelineProgress(0);
     setIsPlaying(false);
     setSelection(null);
+    setStoryPersonId(null);
   };
+
+  const openPersonStory = (personId: string) => {
+    selectPresentationPerson(personId);
+    setStoryPersonId(personId);
+  };
+
+  const closePersonStory = () => setStoryPersonId(null);
+
+  useEffect(() => {
+    if (!storyPersonId) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closePersonStory();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [storyPersonId]);
 
   const selectPresentationGroup = (groupId: string) => {
     setPresentationViewport("story");
@@ -1663,6 +1727,7 @@ export function MapWorkspace({
     setTimelineProgress(0);
     setIsPlaying(false);
     setSelection(null);
+    setStoryPersonId(null);
   };
 
   const clearPresentationSelection = () => {
@@ -1673,6 +1738,7 @@ export function MapWorkspace({
     setTimelineProgress(0);
     setIsPlaying(false);
     setSelection(null);
+    setStoryPersonId(null);
     if (isPresentation) {
       fitMapToBbox(historicalManifest ? historicalManifestExtent(historicalManifest) : [-31.2656, 27.6381, 68.6969, 81.8599]);
     }
@@ -1716,6 +1782,16 @@ export function MapWorkspace({
   };
 
   const presentationLegend = historicalManifest?.presentationVocabulary?.legend ?? [];
+  const publicMapLegend = [
+    ...presentationLegend,
+    { value: "origin", label: "Birth, origin or residence", color: "#b9883b" },
+    { value: "movement", label: "Documented movement", color: "#236353" },
+    { value: "deportation", label: "Evacuation or deportation", color: "#a54f32" },
+    { value: "forced-labour", label: "Forced labour", color: "#7a5a2e" },
+    { value: "death", label: "Death or loss", color: "#8d352c" },
+    { value: "ehri", label: "EHRI camp or ghetto", color: "#355b67" },
+    { value: "unresolved", label: "Unresolved place", color: "#7e6b8d" },
+  ].filter((entry, index, entries) => entries.findIndex((candidate) => candidate.label === entry.label) === index);
   const selectedPersonPlaceContextCard = selectedPerson && selectedPlace && selectedPersonPlaceContext ? (
     <div className="presentation-place-person-context">
       <p className="presentation-label">Selected person at this place</p>
@@ -1808,6 +1884,7 @@ export function MapWorkspace({
         </details>
       ) : null}
       <p className="presentation-card__meta">The timeline below draws the route progressively and keeps the underlying evidence available in the research dossier.</p>
+      <button type="button" className="presentation-secondary-button mt-3 w-full" onClick={() => openPersonStory(selectedPerson.id)}>Open person story</button>
     </>
   ) : null;
 
@@ -1819,6 +1896,102 @@ export function MapWorkspace({
       <p className="presentation-card__body">Select an individual above to animate that person’s own documented route.</p>
       <p className="presentation-card__meta">Family context does not assign one person’s route to another person.</p>
     </>
+  ) : null;
+
+  const storyDateLabel = (date: MapPersonStory["profile"]["birthDate"]) => {
+    if (!date || (!date.start && !date.end && typeof date.raw !== "string")) return null;
+    return formatDateRange(date, language);
+  };
+
+  const personStoryModal = storyPerson ? (
+    <div
+      className="person-story-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="person-story-modal-title"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) closePersonStory();
+      }}
+    >
+      <article className="person-story-modal__dialog">
+        <header className="person-story-modal__header">
+          <div>
+            <p className="presentation-card__eyebrow">Person story</p>
+            <h2 id="person-story-modal-title" className="person-story-modal__title">{storyPerson.label}</h2>
+            <p className="person-story-modal__role">
+              {story?.roles.join(" · ") || "Individual record"}
+              {storyFamily ? ` · ${storyFamily.label}` : ""}
+            </p>
+          </div>
+          <button type="button" className="presentation-icon-button" onClick={closePersonStory} aria-label="Close person story">×</button>
+        </header>
+        <div className="person-story-modal__body">
+          <div className="person-story-modal__badges">
+            {story?.profile.fate ? <StatusBadge tone="rust">{story.profile.fate}</StatusBadge> : null}
+            {story?.dossierLabel ? <StatusBadge tone="blue">{story.dossierLabel}</StatusBadge> : null}
+          </div>
+          {story ? (
+            <dl className="person-story-modal__profile">
+              {[
+                ["Birth", storyDateLabel(story.profile.birthDate)],
+                ["Origin", story.profile.origin],
+                ["Sex", story.profile.sex],
+                ["Profession", story.profile.profession],
+                ["Studies", story.profile.studies],
+                ["Civil status", story.profile.civilStatus],
+                ["Address", story.profile.address],
+                ["Destination", story.profile.destination],
+                ["Death place", story.profile.deathPlace],
+                ["Death date", storyDateLabel(story.profile.deathDate)],
+              ].filter((entry): entry is [string, string] => Boolean(entry[1])).map(([label, value]) => (
+                <div key={label}><dt>{label}</dt><dd>{value}</dd></div>
+              ))}
+            </dl>
+          ) : <p className="presentation-card__body">No extended profile is available for this record yet.</p>}
+
+          <section className="person-story-modal__section">
+            <div className="person-story-modal__section-heading"><h3>Life route</h3><span>{story?.timeline.length ?? 0} documented moments</span></div>
+            {story?.timeline.length ? (
+              <ol className="person-story-timeline">
+                {story.timeline.map((item) => (
+                  <li key={item.id} className="person-story-timeline__item">
+                    <span className="person-story-timeline__marker" aria-hidden="true" />
+                    <div className="person-story-timeline__content">
+                      <div className="person-story-timeline__heading">
+                        <strong>{language === "ro" ? item.placeNameRo ?? item.placeName ?? "Loc nespecificat" : item.placeName ?? "Place not specified"}</strong>
+                        <span>{item.date ? formatDateRange(item.date, language) : "Date not supplied"}</span>
+                      </div>
+                      <p className="person-story-timeline__label">{item.label}</p>
+                      {item.description ? <p>{item.description}</p> : null}
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            ) : <p className="presentation-card__meta">No dated event or movement is linked to this person in the current dataset.</p>}
+          </section>
+
+          {story?.materials.length ? (
+            <section className="person-story-modal__section">
+              <div className="person-story-modal__section-heading"><h3>Materials</h3><span>{story.materials.length}</span></div>
+              <div className="person-story-materials">
+                {story.materials.map((material) => <div key={material.id}><strong>{material.label}</strong><span>{material.pageCount ? `${material.pageCount} pages · ` : ""}{material.sourceLabel}</span></div>)}
+              </div>
+            </section>
+          ) : null}
+          {story?.testimony ? (
+            <section className="person-story-modal__section">
+              <div className="person-story-modal__section-heading"><h3>Declarant testimony</h3></div>
+              <p className="person-story-modal__testimony">{story.testimony}</p>
+            </section>
+          ) : null}
+          {story?.sourceLabel ? <p className="person-story-modal__source">Source: {story.sourceLabel}</p> : null}
+          <div className="person-story-modal__actions">
+            <Link href={`/persons/${storyPerson.id}`} className="presentation-link-button">Open full research record</Link>
+            <button type="button" className="presentation-secondary-button" onClick={closePersonStory}>Close</button>
+          </div>
+        </div>
+      </article>
+    </div>
   ) : null;
   const groupedPresentationPersonIds = new Set(data.groups.flatMap((group) => group.personIds));
   const ungroupedPresentationPeople = data.persons.filter((person) => !groupedPresentationPersonIds.has(person.id));
@@ -1863,7 +2036,7 @@ export function MapWorkspace({
         const mentionedPeople = groupPeople.filter((person) => person.id !== head?.id);
         const dossier = data.dossiers.find((item) => item.id === (head ?? groupPeople[0])?.dossierId);
         const hasFamilyDetails = mentionedPeople.length > 0 || Boolean(dossier);
-        const familyCountLabel = mentionedPeople.length ? `${mentionedPeople.length} mentioned` : "0 mentioned";
+        const familyCountLabel = `${groupPeople.length} ${groupPeople.length === 1 ? "person" : "people"}`;
         const selectFamilyHead = () => {
           setPresentationOpenFamilyId(null);
           if (head) selectPresentationPerson(head.id);
@@ -1897,7 +2070,7 @@ export function MapWorkspace({
           hasFamilyDetails ? (
             <details
               key={group.id}
-              className="presentation-family-card presentation-family-card--disclosure"
+              className={`presentation-family-card presentation-family-card--disclosure${head && filters.person === head.id ? " presentation-family-card--selected" : ""}`}
               open={presentationOpenFamilyId === group.id}
               onToggle={(event) => {
                 if (event.currentTarget.open) setPresentationOpenFamilyId(group.id);
@@ -1918,10 +2091,10 @@ export function MapWorkspace({
               </div>
             </details>
           ) : (
-            <div key={group.id} className="presentation-family-card">
+              <div key={group.id} className={`presentation-family-card${head && filters.person === head.id ? " presentation-family-card--selected" : ""}`}>
               <div className="presentation-family-card__summary presentation-family-card__summary--static">
                 {familyHeadButton}
-                <span className="presentation-family-card__count">declarant</span>
+                <span className="presentation-family-card__count">1 person</span>
               </div>
             </div>
           )
@@ -1966,7 +2139,6 @@ export function MapWorkspace({
                 </label>
                 <input aria-label="Presentation historical timeline" type="range" min={0} max={historicalManifest.snapshots.length - 1} step={1} value={selectedHistoricalIndex} onChange={(event) => { const snapshot = historicalManifest.snapshots[Number(event.target.value)]; if (snapshot) { setHistoricalYearMonth(snapshot.yearMonth); setSelection(null); } }} className="mt-3 w-full accent-[#76536f]" data-testid="presentation-month-range" />
                 <div className="presentation-history-controls__row"><span>{formatIsoDate(selectedHistoricalSnapshot.snapshotDate, language)}</span><span>{selectedHistoricalSnapshot.status === "primary" ? "Primary interval" : "Limited/static"}</span></div>
-                {presentationMapConfig.legend && presentationLegend.length ? <div className="presentation-legend" aria-label="Public historical legend"><p className="presentation-label">Public legend</p>{presentationLegend.map((entry) => <div key={entry.value} className="presentation-legend__item"><span style={{ backgroundColor: entry.color }} aria-hidden="true" />{entry.label}</div>)}</div> : null}
                 {selectedHistoricalSnapshot.status === "limited_static" ? <p className="presentation-warning">October 1944–May 1945 is limited/static evidence; it is not equivalent to the primary interval.</p> : null}
                 <p className="presentation-method">{historicalManifest.methodologicalWarning}</p>
                 <p className="presentation-attribution">{historicalManifest.source.attribution}</p>
@@ -2015,6 +2187,18 @@ export function MapWorkspace({
         <span>All stories</span><span className="presentation-person-option__role">Europe view</span>
       </button>
       {peopleDirectory}
+      {presentationMapConfig.legend ? (
+        <details className="presentation-group presentation-right-legend" open>
+          <summary>Map legend</summary>
+          <div className="presentation-group__content">
+            <p className="presentation-label">Historical administration</p>
+            {publicMapLegend.slice(0, presentationLegend.length || 0).map((entry) => <div key={entry.value} className="presentation-right-legend__item"><span style={{ backgroundColor: entry.color }} aria-hidden="true" />{entry.label}</div>)}
+            <p className="presentation-label presentation-right-legend__subheading">People and places</p>
+            {publicMapLegend.slice(presentationLegend.length).map((entry) => <div key={entry.value} className="presentation-right-legend__item"><span style={{ backgroundColor: entry.color }} aria-hidden="true" />{entry.label}</div>)}
+            <p className="presentation-card__meta">Curved lines are visual guides between documented endpoints, not exact historic roads. Place categories remain linked to the underlying evidence.</p>
+          </div>
+        </details>
+      ) : null}
 
       {(presentationDetails || presentationGroupDetails) ? (
         <div className="presentation-people-detail" data-testid="presentation-story-card">
@@ -2058,6 +2242,7 @@ export function MapWorkspace({
         {!interfaceHidden && !presentationPeoplePanelOpen && presentationMapConfig.personSelector ? <button type="button" className="presentation-map__reopen presentation-map__reopen--right absolute top-3 right-3 z-30" onClick={() => setPresentationPeoplePanelOpen(true)}>Show people</button> : null}
         {presentationTimeline}
         {interfaceHidden ? <div className="presentation-map__hidden-tools absolute top-3 left-3 z-30 flex items-center gap-2"><button type="button" className="presentation-secondary-button shadow-lg" onClick={() => setInterfaceHidden(false)}>Show interface</button>{presentationMapConfig.legend && presentationLegend.length ? <div className="presentation-compact-legend">{presentationLegend.map((entry) => <span key={entry.value} title={entry.label} style={{ backgroundColor: entry.color }} />)}</div> : null}</div> : null}
+        {personStoryModal}
       </div>
     );
   }
@@ -2526,6 +2711,7 @@ export function MapWorkspace({
                 </button>
               )) : <p className="mt-2 text-xs text-[#68766e]">The person record remains available for provenance in the dossier.</p>}
             </div>
+            <button type="button" className="presentation-secondary-button mt-3 w-full" onClick={() => openPersonStory(selectedPerson.id)}>Open person story</button>
             <Link href={`/persons/${selectedPerson.id}`} className="mt-4 flex justify-center bg-[#173f36] px-4 py-2.5 text-[9px] font-black tracking-[0.11em] text-white uppercase">Open person dossier</Link>
           </div>
         ) : (
@@ -2588,6 +2774,7 @@ export function MapWorkspace({
         <p className="mt-2 text-[8px] text-[#838b87]">Playback is manual, slow and one-shot. Curved lines are visual guides between documented endpoints, not exact historical roads.</p>
         {activePlaybackWaypoint ? <div className="presentation-waypoint mt-2"><span className="presentation-label">Current documented place</span><strong>{language === "ro" ? activePlaybackWaypoint.labelRo : activePlaybackWaypoint.label}</strong>{activePlaybackRoute?.notes ? <span>{activePlaybackRoute.notes}</span> : null}</div> : null}
       </section>
+      {personStoryModal}
     </div>
   );
 }

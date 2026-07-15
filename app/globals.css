@@ -211,6 +211,49 @@ summary {
   line-height: 1.35 !important;
 }
 
+.map-place-popup__people-count {
+  margin-top: 0.65rem;
+  border-top: 1px solid #ded8cc;
+  padding-top: 0.55rem;
+  color: #173f36;
+  font-size: 0.75rem !important;
+  font-weight: 800;
+}
+
+.map-place-popup__people {
+  display: grid;
+  gap: 0.15rem;
+  margin-top: 0.35rem;
+}
+
+.map-place-popup__people-group {
+  margin-top: 0.35rem;
+  color: #76536f;
+  font-size: 0.625rem !important;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.map-place-popup__person-button {
+  display: block;
+  width: 100%;
+  padding: 0.35rem 0.4rem;
+  color: #315c50;
+  font-size: 0.75rem !important;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-color: #b6c6bd;
+  text-underline-offset: 0.15em;
+}
+
+.map-place-popup__person-button:hover,
+.map-place-popup__person-button:focus-visible {
+  background: #e9f0eb;
+  color: #173f36;
+  outline: none;
+}
+
 /* Map controls are research/presentation interfaces, not annotation-sized UI. */
 .map-workspace button,
 .map-workspace input,
@@ -313,7 +356,7 @@ summary {
 }
 
 .presentation-map-workspace[data-people-panel-open="true"] .maplibregl-ctrl-top-right {
-  right: 25.5rem;
+  right: 26.25rem;
 }
 
 .presentation-view-button {
@@ -433,6 +476,34 @@ summary {
   margin-top: 0;
 }
 
+.presentation-right-legend {
+  margin-top: 1rem;
+}
+
+.presentation-right-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.25rem 0;
+  color: #52645c;
+  font-size: 0.8125rem !important;
+  line-height: 1.35;
+}
+
+.presentation-right-legend__item span {
+  display: block;
+  width: 0.85rem;
+  height: 0.85rem;
+  flex: 0 0 auto;
+  border: 1px solid rgb(23 63 54 / 22%);
+}
+
+.presentation-right-legend__subheading {
+  margin-top: 0.7rem;
+  border-top: 1px solid #ded8cc;
+  padding-top: 0.7rem;
+}
+
 .presentation-family-card {
   margin-top: 0.7rem;
   border: 1px solid #ded8cc;
@@ -501,6 +572,11 @@ summary {
 .presentation-family-card__summary--static .presentation-family-card__count {
   color: #76536f;
   font-size: 0.75rem !important;
+}
+
+.presentation-family-card--selected {
+  border-color: #76536f;
+  box-shadow: inset 3px 0 0 #76536f;
 }
 
 .presentation-place-people {
@@ -997,6 +1073,239 @@ summary {
   border: 1px solid rgb(0 0 0 / 20%);
 }
 
+.person-story-modal {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgb(18 35 29 / 56%);
+  padding: 1rem;
+}
+
+.person-story-modal__dialog {
+  display: flex;
+  width: min(48rem, 100%);
+  max-height: min(88vh, 54rem);
+  flex-direction: column;
+  border: 1px solid #bdb7aa;
+  background: #fffdf8;
+  box-shadow: 0 24px 70px rgb(12 28 23 / 32%);
+}
+
+.person-story-modal__header {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid #ded8cc;
+  background: #fffaf0;
+  padding: 1.25rem 1.35rem;
+}
+
+.person-story-modal__title {
+  margin-top: 0.25rem;
+  color: #173f36;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.person-story-modal__role {
+  margin-top: 0.45rem;
+  color: #68766e;
+  font-size: 0.875rem !important;
+  line-height: 1.45;
+}
+
+.person-story-modal__body {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1.25rem 1.35rem 1.4rem;
+}
+
+.person-story-modal__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.person-story-modal__profile {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem 1rem;
+  margin-top: 1rem;
+  border-block: 1px solid #ded8cc;
+  padding-block: 0.9rem;
+}
+
+.person-story-modal__profile dt {
+  color: #68766e;
+  font-size: 0.75rem !important;
+  font-weight: 800;
+}
+
+.person-story-modal__profile dd {
+  margin-top: 0.15rem;
+  color: #243a32;
+  font-size: 0.9375rem !important;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.person-story-modal__section {
+  margin-top: 1.25rem;
+  border-top: 2px solid #76536f;
+  padding-top: 0.85rem;
+}
+
+.person-story-modal__section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.person-story-modal__section-heading h3 {
+  color: #173f36;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.person-story-modal__section-heading span {
+  color: #76536f;
+  font-size: 0.75rem !important;
+  font-weight: 800;
+}
+
+.person-story-timeline {
+  position: relative;
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+  padding-left: 0.35rem;
+}
+
+.person-story-timeline::before {
+  position: absolute;
+  top: 0.4rem;
+  bottom: 0.4rem;
+  left: 0.58rem;
+  width: 2px;
+  background: #c8d5ce;
+  content: "";
+}
+
+.person-story-timeline__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 0.55rem minmax(0, 1fr);
+  gap: 0.8rem;
+}
+
+.person-story-timeline__marker {
+  z-index: 1;
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-top: 0.35rem;
+  border: 2px solid #fffdf8;
+  border-radius: 999px;
+  background: #a54f32;
+  box-shadow: 0 0 0 1px #a54f32;
+}
+
+.person-story-timeline__content {
+  border-left: 2px solid #d6d0c4;
+  background: #f8f3e8;
+  padding: 0.65rem 0.75rem;
+  color: #52645c;
+}
+
+.person-story-timeline__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.person-story-timeline__heading strong {
+  color: #173f36;
+  font-size: 0.9375rem !important;
+}
+
+.person-story-timeline__heading span {
+  flex: 0 0 auto;
+  color: #76536f;
+  font-size: 0.75rem !important;
+  font-weight: 800;
+  text-align: right;
+}
+
+.person-story-timeline__content p {
+  margin-top: 0.3rem;
+  font-size: 0.875rem !important;
+  line-height: 1.45;
+}
+
+.person-story-timeline__content .person-story-timeline__label {
+  color: #a54f32;
+  font-size: 0.75rem !important;
+  font-weight: 800;
+}
+
+.person-story-materials {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.7rem;
+}
+
+.person-story-materials > div {
+  display: grid;
+  gap: 0.2rem;
+  border: 1px solid #ded8cc;
+  padding: 0.6rem 0.7rem;
+}
+
+.person-story-materials strong {
+  color: #173f36;
+  font-size: 0.875rem !important;
+}
+
+.person-story-materials span,
+.person-story-modal__source {
+  color: #68766e;
+  font-size: 0.75rem !important;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.person-story-modal__testimony {
+  margin-top: 0.7rem;
+  border-left: 3px solid #a54f32;
+  background: #fff8ec;
+  padding: 0.75rem;
+  color: #52645c;
+  font-size: 0.9375rem !important;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.person-story-modal__source {
+  margin-top: 1rem;
+}
+
+.person-story-modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1rem;
+  border-top: 1px solid #ded8cc;
+  padding-top: 1rem;
+}
+
 body.presentation-interface-hidden .site-header,
 body.presentation-interface-hidden .site-footer,
 body.presentation-interface-hidden .presentation-page__intro {
@@ -1044,6 +1353,29 @@ body:has(.map-workspace) .site-footer {
     right: 0.75rem;
     bottom: 0.75rem;
     left: 0.75rem;
+  }
+
+  .person-story-modal {
+    align-items: end;
+    padding: 0;
+  }
+
+  .person-story-modal__dialog {
+    width: 100%;
+    max-height: 92vh;
+  }
+
+  .person-story-modal__profile {
+    grid-template-columns: 1fr;
+  }
+
+  .person-story-timeline__heading {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .person-story-timeline__heading span {
+    text-align: left;
   }
 }
 
