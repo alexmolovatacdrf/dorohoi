@@ -2552,25 +2552,25 @@ export function MapWorkspace({
         ) : null}
       </aside>
 
-      <section className="border-t border-[#bdb7aa] bg-[#f8f5ed] p-4 lg:col-start-2 lg:row-start-2">
+      <section className="research-map__timeline border-t border-[#bdb7aa] bg-[#f8f5ed] p-3 lg:col-start-2 lg:row-start-2" data-testid="research-timeline">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="min-w-44">
-            <p className="text-[8px] font-black tracking-[0.13em] text-[#7b6750] uppercase">{t("map.timeline")}</p>
+            <p className="presentation-card__eyebrow">{t("map.timeline")}</p>
             <p className="font-editorial mt-1 text-lg font-bold text-[#173f36]">{selectedPerson?.label ?? "Select an individual"}</p>
           </div>
           <div className="flex min-w-0 grow items-center gap-2 overflow-x-auto py-1">
             {selectedPersonRoutes.length ? selectedPersonRoutes.map((route, index) => (
               <div key={route.id} className="flex min-w-fit items-center gap-2">
-                <span className={`grid size-6 place-items-center rounded-full border text-[9px] font-bold ${timelineStep !== null && index < timelineStep ? "border-[#173f36] bg-[#173f36] text-white" : "border-[#9fa69f] bg-white text-[#56645e]"}`}>{route.sequence}</span>
-                <span className="max-w-28 truncate text-[9px] text-[#5e6b65]">{route.destinationName}</span>
+                <span className={`grid size-7 place-items-center rounded-full border text-sm font-bold ${timelineStep !== null && index < timelineStep ? "border-[#173f36] bg-[#173f36] text-white" : "border-[#9fa69f] bg-white text-[#56645e]"}`}>{route.sequence}</span>
+                <span className="max-w-32 truncate text-sm text-[#5e6b65]">{route.destinationName}</span>
                 {index < selectedPersonRoutes.length - 1 ? <span className="h-px w-8 bg-[#b9b3a7]" /> : null}
               </div>
             )) : <p className="text-[10px] text-[#747f79]">No person-specific route to play.</p>}
           </div>
           <div className="flex min-w-fit gap-1.5">
-            <button type="button" disabled={!filters.person || !selectedPersonRoutes.length || isPlaying} onClick={startRoutePlayback} className="bg-[#173f36] px-3 py-2 text-[9px] font-black tracking-[0.08em] text-white uppercase disabled:cursor-not-allowed disabled:opacity-35">{t("map.play")}</button>
-            <button type="button" disabled={!isPlaying} onClick={() => setIsPlaying(false)} className="border border-[#9fa49e] px-3 py-2 text-[9px] font-black tracking-[0.08em] uppercase disabled:opacity-35">{t("map.pause")}</button>
-            <button type="button" disabled={!filters.person} onClick={resetView} className="border border-[#9fa49e] px-3 py-2 text-[9px] font-black tracking-[0.08em] uppercase disabled:opacity-35">{t("map.reset")}</button>
+            <button type="button" disabled={!filters.person || !selectedPersonRoutes.length || isPlaying} onClick={startRoutePlayback} className="presentation-primary-button">{t("map.play")}</button>
+            <button type="button" disabled={!isPlaying} onClick={() => setIsPlaying(false)} className="presentation-secondary-button">{t("map.pause")}</button>
+            <button type="button" disabled={!filters.person} onClick={resetView} className="presentation-secondary-button">{t("map.reset")}</button>
           </div>
         </div>
         <p className="mt-2 text-[8px] text-[#838b87]">Playback is manual, slow and one-shot. Curved lines are visual guides between documented endpoints, not exact historical roads.</p>
