@@ -14,7 +14,7 @@ const navItems = [
   { href: "/review", key: "nav.review" as const },
 ];
 
-export function SiteHeader() {
+export function SiteHeader({ presentationOnly = false }: { presentationOnly?: boolean }) {
   const pathname = usePathname();
   const { language, setLanguage, t } = useLanguage();
 
@@ -35,23 +35,25 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav aria-label="Primary navigation" className="hidden self-stretch lg:flex">
-          {navItems.map((item) => {
-            const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`relative flex items-center px-3 text-[11px] font-bold tracking-[0.08em] uppercase transition ${
-                  active ? "text-white" : "text-[#c8d4cf] hover:text-white"
-                }`}
-              >
-                {t(item.key)}
-                {active ? <span className="absolute right-3 bottom-0 left-3 h-0.5 bg-[#d8ab5d]" /> : null}
-              </Link>
-            );
-          })}
-        </nav>
+        {!presentationOnly ? (
+          <nav aria-label="Primary navigation" className="hidden self-stretch lg:flex">
+            {navItems.map((item) => {
+              const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`relative flex items-center px-3 text-[11px] font-bold tracking-[0.08em] uppercase transition ${
+                    active ? "text-white" : "text-[#c8d4cf] hover:text-white"
+                  }`}
+                >
+                  {t(item.key)}
+                  {active ? <span className="absolute right-3 bottom-0 left-3 h-0.5 bg-[#d8ab5d]" /> : null}
+                </Link>
+              );
+            })}
+          </nav>
+        ) : null}
 
         <div className="flex items-center rounded-sm border border-white/15 bg-black/10 p-0.5" aria-label={t("language.label")}>
           {(["en", "ro"] as const).map((item) => (
@@ -70,22 +72,24 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <nav aria-label="Mobile navigation" className="flex overflow-x-auto border-t border-white/8 px-3 lg:hidden">
-        {navItems.map((item) => {
-          const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`min-w-fit border-b-2 px-3 py-2.5 text-[10px] font-bold tracking-[0.08em] uppercase ${
-                active ? "border-[#d8ab5d] text-white" : "border-transparent text-[#c8d4cf]"
-              }`}
-            >
-              {t(item.key)}
-            </Link>
-          );
-        })}
-      </nav>
+      {!presentationOnly ? (
+        <nav aria-label="Mobile navigation" className="flex overflow-x-auto border-t border-white/8 px-3 lg:hidden">
+          {navItems.map((item) => {
+            const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`min-w-fit border-b-2 px-3 py-2.5 text-[10px] font-bold tracking-[0.08em] uppercase ${
+                  active ? "border-[#d8ab5d] text-white" : "border-transparent text-[#c8d4cf]"
+                }`}
+              >
+                {t(item.key)}
+              </Link>
+            );
+          })}
+        </nav>
+      ) : null}
     </header>
   );
 }

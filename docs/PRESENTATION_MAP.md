@@ -37,6 +37,20 @@ the normalized project collection; `/map?dataset=claude-demo` loads the isolated
 Claude fixture into the advanced research interface without mixing it into
 `data/normalized/`.
 
+## Presentation-only review deployment
+
+For a gradual external review, a separate Vercel project can set the server
+environment variable `PRESENTATION_ONLY=true`. The request proxy then permits
+only `/presentation/map`, Next static assets and the full historical snapshot
+resources required by that page. Other application routes redirect to
+Presentation Map, and the global navigation is omitted from that deployment.
+The main project does not set this variable and therefore keeps the complete
+Research Map and research pages.
+
+This is route-level product separation, not a data-secrecy boundary: the
+historical GeoJSON files needed by the browser remain directly requestable as
+public assets. Sensitive material must not be placed in this static deployment.
+
 ## Public experience
 
 The presentation mode uses

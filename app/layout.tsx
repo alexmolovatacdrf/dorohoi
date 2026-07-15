@@ -16,6 +16,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+  const presentationOnly = process.env.PRESENTATION_ONLY === "true";
+
   return (
     <html lang="en">
       <body>
@@ -23,7 +25,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
           <a className="skip-link" href="#main-content">
             Skip to content
           </a>
-          <SiteHeader />
+          <SiteHeader presentationOnly={presentationOnly} />
           <main id="main-content">{children}</main>
           <SiteFooter />
         </LanguageProvider>
