@@ -7,7 +7,7 @@ Acest document păstrează punctul de continuare pentru următoarea sesiune. Con
 ## Starea Git
 
 - Branch: `feature/public-presentation-map`
-- HEAD: `ca343ab fix: separate reverse presentation routes`
+- HEAD: `57c5249 feat: expose research person routes`
 - Worktree: curat la momentul salvării
 - Nu au fost folosite reset, clean, checkout/restore destructiv și nu au fost șterse date existente.
 
@@ -23,6 +23,7 @@ Checkpoint-urile relevante, în ordine:
 8. `98007da` — family/person panel and map interaction fixes
 9. `fc7549a` — compact people sections, active camera states, place context and route lanes
 10. `ca343ab` — separate reverse route lanes, compact family card and person search
+11. `57c5249` — visible selected-person route list in Research Map context panel
 
 ## Server și URL-uri
 
@@ -63,6 +64,7 @@ URL-uri:
 - Pentru o listă mare, panoul drept are căutare după nume de persoană sau familie; secțiunile menționate rămân închise până la deschidere.
 - Click pe o localitate poate afișa persoanele asociate, grupate după contextul explicit documentat; în timpul animației este afișat locul curent și nota traseului.
 - În Research Map, persoanele se selectează în `Filters → Person` sau `Filters → Group` din panoul stâng. Traseele apar când `Layers → People and movement → Individual routes` rămâne activ; click pe un traseu deschide detaliile în panoul `Context` din dreapta.
+- După selectarea unei persoane în Research Map, panoul `Context` din dreapta afișează acum numele persoanei, numărul de segmente și lista traseelor selectabile; un click pe un segment deschide detaliile sale de proveniență.
 
 ## Datele din varianta Claude
 
