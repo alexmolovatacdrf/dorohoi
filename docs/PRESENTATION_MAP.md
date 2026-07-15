@@ -93,7 +93,11 @@ shows only its documented head/declarant by default; people mentioned inside
 the dossier are in a collapsed subsection, visually integrated into the same
 family card, and the head is not repeated there. The panel also has a name/family
 search field so the visible list does not need to be navigated manually when
-the collection grows.
+the collection grows. Each family card keeps the mentioned-person count on the
+head/declarant row; the disclosure triangle follows that count, and expanding
+it reveals only the individual names plus the secondary internal-record line.
+The selected-person story card uses the same compact disclosure pattern for
+other people in that dossier.
 The panel header stays visible while its list is scrolled. Selecting an
 individual fits a closer bounding box over all of that person's documented
 endpoints and places, retains individual route ownership and enables that

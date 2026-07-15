@@ -653,6 +653,12 @@ export function MapWorkspace({
       : [],
     [data.persons, selectedPerson],
   );
+  const selectedPersonDossier = useMemo(
+    () => selectedPerson?.dossierId
+      ? data.dossiers.find((dossier) => dossier.id === selectedPerson.dossierId) ?? null
+      : null,
+    [data.dossiers, selectedPerson],
+  );
   const selectedPersonRoutes = useMemo(
     () => data.routes.filter((route) => route.personId === filters.person).sort((left, right) => left.sequence - right.sequence),
     [data.routes, filters.person],
@@ -1599,11 +1605,18 @@ export function MapWorkspace({
       <h2 className="presentation-card__title">{selectedPerson.label}</h2>
       <p className="presentation-card__body">{selectedPersonRoutes.length ? `${selectedPersonRoutes.length} documented movement segments in the current research collection.` : "No documented route segments in the current research collection."}</p>
       {selectedPersonDossierMembers.length ? (
-        <div className="presentation-card__family-context">
-          <p className="presentation-label">Other people in this dossier</p>
-          <p className="presentation-card__body">{selectedPersonDossierMembers.map((person) => person.label).join(" · ")}</p>
-          <p className="presentation-card__meta">Each person remains an individual record; routes are not assigned to relatives without explicit evidence.</p>
-        </div>
+        <details className="presentation-card__family-context presentation-place-people__group">
+          <summary><span>Other people in this dossier</span><span>{selectedPersonDossierMembers.length}</span></summary>
+          <div className="presentation-place-people__items">
+            {selectedPersonDossierMembers.map((person) => (
+              <button key={person.id} type="button" className="presentation-place-person" onClick={() => selectPresentationPerson(person.id)}>
+                {person.label}
+              </button>
+            ))}
+            {selectedPersonDossier ? <p className="presentation-family-card__meta">Internal record: {selectedPersonDossier.label}</p> : null}
+            <p className="presentation-card__meta">Each person remains an individual record; routes are not assigned to relatives without explicit evidence.</p>
+          </div>
+        </details>
       ) : null}
       <p className="presentation-card__meta">The timeline below draws the route progressively and keeps the underlying evidence available in the research dossier.</p>
     </>
@@ -1660,26 +1673,57 @@ export function MapWorkspace({
         const head = groupPeople.find((person) => person.roles.some((role) => /^declarant$|cap de familie|head/i.test(role)));
         const mentionedPeople = groupPeople.filter((person) => person.id !== head?.id);
         const dossier = data.dossiers.find((item) => item.id === (head ?? groupPeople[0])?.dossierId);
+        const hasFamilyDetails = mentionedPeople.length > 0 || Boolean(dossier);
+        const familyCountLabel = mentionedPeople.length ? `${mentionedPeople.length} mentioned` : "0 mentioned";
+        const selectFamilyHead = () => head ? selectPresentationPerson(head.id) : selectPresentationGroup(group.id);
+        const familyHeadLabel = head?.label ?? group.label.replace(/\s+·\s+dosar\s+.*$/i, "");
+        const familyHeadButton = (
+          <span
+            className="presentation-family-card__head"
+            role="button"
+            tabIndex={0}
+            aria-pressed={head ? filters.person === head.id : filters.group === group.id}
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              selectFamilyHead();
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                event.stopPropagation();
+                selectFamilyHead();
+              }
+            }}
+          >
+            <strong>{familyHeadLabel}</strong>
+            <small className="presentation-family-card__hint">{head ? "documented head / declarant" : "family or dossier group"}</small>
+          </span>
+        );
         return (
-          <div key={group.id} className="presentation-family-card">
-            <button type="button" className={`presentation-group-option${(head ? filters.person === head.id : filters.group === group.id) ? " presentation-group-option--selected" : ""}`} onClick={() => head ? selectPresentationPerson(head.id) : selectPresentationGroup(group.id)} aria-pressed={head ? filters.person === head.id : filters.group === group.id}>
-              <span><strong>{head?.label ?? group.label.replace(/\s+·\s+dosar\s+.*$/i, "")}</strong><small className="presentation-family-card__hint">{head ? "documented head / declarant" : "family or dossier group"}</small></span>
-              <span className="presentation-person-option__role">{mentionedPeople.length ? `${mentionedPeople.length} mentioned` : "declarant"}</span>
-            </button>
-            {mentionedPeople.length ? (
-              <details className="presentation-people-dossier">
-                <summary><span>People mentioned in this dossier</span><span>{mentionedPeople.length}</span></summary>
-                <div className="presentation-people-dossier__items">
-                  {mentionedPeople.map((person) => (
-                    <button key={person.id} type="button" className={`presentation-person-option${filters.person === person.id ? " presentation-person-option--selected" : ""}`} onClick={() => selectPresentationPerson(person.id)} aria-pressed={filters.person === person.id}>
-                      <span>{person.label}</span><span className="presentation-person-option__role">{person.roles[0] ?? "mentioned person"}</span>
-                    </button>
-                  ))}
-                </div>
-              </details>
-            ) : null}
-            {dossier ? <p className="presentation-family-card__meta">Internal record: {dossier.label}</p> : null}
-          </div>
+          hasFamilyDetails ? (
+            <details key={group.id} className="presentation-family-card presentation-family-card--disclosure">
+              <summary className="presentation-family-card__summary" aria-label={`Show ${familyCountLabel} and dossier record for ${familyHeadLabel}`}>
+                {familyHeadButton}
+                <span className="presentation-family-card__count">{familyCountLabel}</span>
+              </summary>
+              <div className="presentation-family-card__items">
+                {mentionedPeople.map((person) => (
+                  <button key={person.id} type="button" className={`presentation-person-option${filters.person === person.id ? " presentation-person-option--selected" : ""}`} onClick={() => selectPresentationPerson(person.id)} aria-pressed={filters.person === person.id}>
+                    <span>{person.label}</span><span className="presentation-person-option__role">{person.roles[0] ?? "mentioned person"}</span>
+                  </button>
+                ))}
+                {dossier ? <p className="presentation-family-card__meta">Internal record: {dossier.label}</p> : null}
+              </div>
+            </details>
+          ) : (
+            <div key={group.id} className="presentation-family-card">
+              <div className="presentation-family-card__summary presentation-family-card__summary--static">
+                {familyHeadButton}
+                <span className="presentation-family-card__count">declarant</span>
+              </div>
+            </div>
+          )
         );
         })}
         {filteredUngroupedPresentationPeople.length ? <div className="presentation-family-card"><p className="presentation-label">Other individual records</p>{filteredUngroupedPresentationPeople.map((person) => <button key={person.id} type="button" className={`presentation-person-option${filters.person === person.id ? " presentation-person-option--selected" : ""}`} onClick={() => selectPresentationPerson(person.id)} aria-pressed={filters.person === person.id}><span>{person.label}</span><span className="presentation-person-option__role">{person.roles[0] ?? "mentioned person"}</span></button>)}</div> : null}

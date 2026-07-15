@@ -65,7 +65,10 @@ The Research Map Context panel now contains the same searchable, collapsible
 `Families and mentioned people` directory as Presentation Map. The left side
 continues to hold the advanced research filters and collapsible layer groups;
 selecting a person there or in the shared directory preserves individual route
-ownership and provenance.
+ownership and provenance. Family cards keep the mentioned-person count and
+disclosure triangle on the head/declarant row; the expanded content contains
+the names and internal dossier record without a redundant heading. The selected
+Presentation Map story card follows the same compact pattern.
 
 The immutable boundary has been preserved: `data/source/` was inspected but not
 modified. All generated research collections are written to
