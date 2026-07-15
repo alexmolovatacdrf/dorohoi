@@ -88,6 +88,14 @@ URL-uri:
 - Animația comună are 4,6 secunde pe segment și este activă în ambele moduri;
   Research Map folosește aceeași curbă, săgeată și bilă de progres ca
   Presentation Map.
+- Layerul EHRI/More Layers nu mai este ascuns când este selectată o persoană;
+  rămâne independent de filtrul persoană și apare când este bifat.
+- Dropdown-urile familiilor sunt controlate exclusiv prin săgeată. Click pe
+  capul unei alte familii închide lista precedentă fără să o deschidă pe cea
+  nouă.
+- Workspace-ul desktop rezervă spațiu pentru Story timeline, iar la pornirea
+  playback-ului camera adaugă padding inferior pentru ca localitatea-destinație
+  și săgeata să nu fie acoperite de bara de jos.
 
 ## Datele din varianta Claude
 
