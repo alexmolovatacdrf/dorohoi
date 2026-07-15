@@ -701,6 +701,74 @@ summary {
   padding-top: 0.9rem;
 }
 
+/* Dense directory treatment shared by Presentation and Research Map. The
+   directory is a navigation aid, so its rows should not consume the vertical
+   space reserved for the selected person's evidence and route details. */
+.map-workspace .presentation-map__panel,
+.map-workspace .presentation-map__people,
+.map-workspace .research-map__context {
+  padding: 0.75rem;
+}
+
+.map-workspace .presentation-panel__header {
+  top: -0.75rem;
+  margin: -0.75rem -0.75rem 0;
+  padding: 0.75rem;
+}
+
+.map-workspace .presentation-group {
+  margin-top: 0.55rem;
+  padding-top: 0.45rem;
+}
+
+.map-workspace .presentation-group > summary,
+.map-workspace .presentation-family-card--disclosure > summary,
+.map-workspace .presentation-place-people__group > summary {
+  min-height: 2.15rem !important;
+  padding-block: 0.3rem;
+}
+
+.map-workspace .presentation-group__content,
+.map-workspace .presentation-people-list {
+  padding-top: 0.25rem;
+}
+
+.map-workspace .presentation-family-card {
+  margin-top: 0.35rem;
+}
+
+.map-workspace .presentation-family-card__summary {
+  min-height: 2.15rem !important;
+  padding: 0.35rem 0.45rem;
+}
+
+.map-workspace .presentation-family-card__items {
+  gap: 0.15rem;
+  padding: 0.2rem;
+}
+
+.map-workspace .presentation-person-option,
+.map-workspace .presentation-group-option {
+  min-height: 2.15rem !important;
+  padding: 0.35rem 0.45rem;
+}
+
+.map-workspace .presentation-person-search {
+  margin-top: 0.45rem;
+  padding: 0.45rem;
+}
+
+.map-workspace .presentation-person-search input {
+  min-height: 2.15rem !important;
+  margin-top: 0.25rem;
+  padding: 0.35rem 0.45rem;
+}
+
+.map-workspace .presentation-people-detail {
+  margin-top: 0.6rem;
+  padding-top: 0.55rem;
+}
+
 .presentation-card__eyebrow,
 .presentation-label {
   display: block;

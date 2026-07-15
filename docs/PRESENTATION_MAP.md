@@ -15,8 +15,11 @@ The presentation page has a visible test-data switcher:
 - `/presentation/map?dataset=claude-demo` uses the separate map fixture derived
   from the embedded data in `Platforma_WJC (10).html`.
 
-The Claude fixture contains 48 persons, 11 dossiers, 15 places and 26 route
-segments. It is deliberately kept under `data/demo/`, outside
+The Claude fixture contains 48 persons, 11 dossiers, 15 prototype places and
+26 route segments. The map adapter adds the separate 385-record local EHRI
+overlay from the normalized catalog when the EHRI layer is enabled; those
+overlay places have no invented person or route associations. The fixture is
+deliberately kept under `data/demo/`, outside
 `data/normalized/`; it is suitable for testing person selection, dossier
 context, camera fitting and playback, but it is not a normalized research
 dataset. Its source SHA-256 is recorded in
@@ -64,10 +67,12 @@ account.
 
 The presentation mode uses
 `/data/historical-administration-full/manifest.json`. Its initial historical
-view fits the full European extent from the manifest and loads August 1941 by
-default. Changing the month changes one selected snapshot; the browser never
-loads all 88 monthly files. Project routes, places and markers are registered
-above the historical polygons.
+view fits the practical Europe camera window `[-11.0, 35.0, 62.5, 72.0]`, from
+Portugal to the Ekaterinburg/Perm area, and loads August 1941 by default. The
+historical layer itself retains the complete source extent; only the initial
+public camera is bounded for useful viewing. Changing the month changes one
+selected snapshot; the browser never loads all 88 monthly files. Project
+routes, places and markers are registered above the historical polygons.
 
 The visible controls are intentionally limited to:
 
@@ -87,13 +92,16 @@ public category and attribution.
 
 ## Camera, timeline and interface
 
-Europe view fits the full historical-data extent. Project region fits the
-documented project window `[19.0, 43.3, 34.5, 52.6]`. Reset returns to the
-contextually relevant state: the selected person's route and places, or the
-full European extent when no person is selected. Selecting a person animates
-to a bounding box covering all of that person's documented route endpoints and
-places; it does not inherit relatives' routes. The person selector groups
-people under their dossier and marks the documented head/declarant separately.
+Europe view fits the practical Portugal–Ekaterinburg/Perm camera window.
+Project region fits the documented project window `[19.0, 43.3, 34.5, 52.6]`.
+Reset returns to the contextually relevant state: the selected person's route
+and places, or the practical Europe window when no person is selected.
+Selecting a person fits a safe camera box covering all of that person's
+documented route endpoints and places while accounting for the left controls,
+right people panel and bottom timeline. Closing or opening either panel does
+not refit or reset the user's current camera. It does not inherit relatives'
+routes. The person selector groups people under their dossier and marks the
+documented head/declarant separately.
 The selected-person card also lists other people in the same dossier when the
 normalized data supports that relationship.
 
@@ -127,7 +135,8 @@ head/declarant row; the disclosure triangle follows that count, and expanding
 it reveals only the individual names plus the secondary internal-record line.
 The selected-person story card uses the same compact disclosure pattern for
 other people in that dossier.
-The panel header stays visible while its list is scrolled. Selecting an
+The panel header stays visible while its compact, tightly spaced list is
+scrolled. Selecting an
 individual fits a closer bounding box over all of that person's documented
 endpoints and places, retains individual route ownership and enables that
 person's timeline. Clicking a place opens grouped, source-bound person
@@ -248,6 +257,10 @@ fields without inventing values. A profile field is omitted when the source is
 empty; dates retain their source precision and use the shared English/Romanian
 formatter. The normalized project selector produces the same typed story model
 from person, event, place, route and document provenance.
+
+Claude Demo uses the same EHRI overlay as Project data: 385 local catalog
+records are available under More layers → EHRI camps and ghettos. They remain
+an independent external/context layer and are not assigned to Claude people.
 
 ## Verification and screenshots
 

@@ -1,4 +1,6 @@
 import claudeDemo from "@/data/demo/claude-map-demo.json";
+import normalizedPlaces from "@/data/normalized/places.json";
+import type { Place } from "@/lib/domain/schemas";
 import type {
   MapPlaceDatum,
   MapPlacePersonConnection,
@@ -11,13 +13,14 @@ import type {
 export const CLAUDE_DEMO_SOURCE = {
   key: "claude-demo",
   label: "Claude demo data",
-  description: "48 persons · 11 dossiers · 15 places · 26 route segments",
+  description: "48 persons · 11 dossiers · 15 Claude places · 385 EHRI overlay records · 26 route segments",
   sourceFile: claudeDemo.metadata.sourceFile,
   sourceSha256: claudeDemo.metadata.sourceSha256,
 } as const;
 
 const mapData: MapViewModel = {
-  places: claudeDemo.places.map((place): MapPlaceDatum => ({
+  places: [
+    ...claudeDemo.places.map((place): MapPlaceDatum => ({
     ...place,
     personContexts: place.personIds.map((personId): MapPlacePersonContext => {
       const routeContexts = claudeDemo.routes.filter(
@@ -66,7 +69,28 @@ const mapData: MapViewModel = {
     confidence: place.confidence as MapPlaceDatum["confidence"],
     resolutionStatus: place.resolutionStatus as MapPlaceDatum["resolutionStatus"],
     categories: place.categories as MapPlaceDatum["categories"],
-  })),
+    })),
+    ...(normalizedPlaces as Place[])
+      .filter((place) => place.layer === "ehri_local" && place.coordinates)
+      .map((place): MapPlaceDatum => ({
+        id: place.placeId,
+        label: place.displayNames.en,
+        labelRo: place.displayNames.ro,
+        coordinates: place.coordinates,
+        placeType: place.placeType,
+        layer: place.layer,
+        confidence: place.confidence,
+        resolutionStatus: place.resolutionStatus,
+        personIds: [],
+        eventTypes: [],
+        years: [],
+        dossierIds: [],
+        roles: [],
+        categories: [],
+        personContexts: [],
+        sourceLabel: place.sourceRefs[0]?.sourceFile ?? "Supplied local EHRI extract",
+      })),
+  ],
   routes: claudeDemo.routes.map((route): MapRouteDatum => ({
     ...route,
     dossierId: route.dossierId ? `claude-dossier-${route.dossierId}` : null,

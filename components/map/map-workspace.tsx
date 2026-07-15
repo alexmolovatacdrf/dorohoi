@@ -43,7 +43,6 @@ import {
   historicalFeatureCollectionSchema,
   historicalFeaturePropertiesSchema,
   historicalManifestSchema,
-  historicalManifestExtent,
   historicalSnapshotFeatureCount,
   historicalSnapshotIndex,
   selectHistoricalSnapshot,
@@ -166,6 +165,17 @@ const PROJECT_REGION_BBOX: [number, number, number, number] = [
   43.3,
   34.5,
   52.6,
+];
+
+// The historical manifest contains distant islands and territories that are
+// valid source features but outside the useful public project view. Keep the
+// full data layer intact while giving Europe View a practical camera window
+// from Portugal to the western Urals (Ekaterinburg / Perm area).
+const PRESENTATION_EUROPE_BBOX: [number, number, number, number] = [
+  -11.0,
+  35.0,
+  62.5,
+  72.0,
 ];
 
 const controlClass =
@@ -696,6 +706,8 @@ export function MapWorkspace({
   const [historicalSnapshotReloadToken, setHistoricalSnapshotReloadToken] = useState(0);
   const [presentationPanelOpen, setPresentationPanelOpen] = useState(true);
   const [presentationPeoplePanelOpen, setPresentationPeoplePanelOpen] = useState(true);
+  const presentationPanelOpenRef = useRef(presentationPanelOpen);
+  const presentationPeoplePanelOpenRef = useRef(presentationPeoplePanelOpen);
   const [presentationOpenFamilyId, setPresentationOpenFamilyId] = useState<string | null>(null);
   const [presentationViewport, setPresentationViewport] = useState<"europe" | "project" | "story">(
     initialPerson ? "story" : "europe",
@@ -735,7 +747,17 @@ export function MapWorkspace({
   const [timelineStep, setTimelineStep] = useState<number | null>(null);
   const [timelineProgress, setTimelineProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const isPlayingRef = useRef(isPlaying);
   const [storyPersonId, setStoryPersonId] = useState<string | null>(null);
+
+  // Camera-fitting callbacks must remain stable when an overlay panel opens or
+  // closes. Otherwise the selection effects below interpret a layout change as
+  // a new selection and reset the user's manually chosen camera.
+  useEffect(() => {
+    presentationPanelOpenRef.current = presentationPanelOpen;
+    presentationPeoplePanelOpenRef.current = presentationPeoplePanelOpen;
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying, presentationPanelOpen, presentationPeoplePanelOpen]);
 
   useEffect(() => {
     languageRef.current = language;
@@ -1453,10 +1475,12 @@ export function MapWorkspace({
     const map = mapRef.current;
     if (!map) return;
     const narrowPresentation = isPresentation && typeof window !== "undefined" && window.innerWidth < 720;
+    const controlsOpen = presentationPanelOpenRef.current;
+    const peopleOpen = presentationPeoplePanelOpenRef.current;
     const padding = isPresentation
       ? narrowPresentation
-        ? { top: presentationPanelOpen ? 360 : 72, right: presentationPeoplePanelOpen ? 360 : 28, bottom: isPlaying ? 250 : 190, left: 28 }
-        : { top: 72, right: presentationPeoplePanelOpen ? 400 : 72, bottom: isPlaying ? 250 : 190, left: presentationPanelOpen ? 400 : 72 }
+        ? { top: controlsOpen || peopleOpen ? 360 : 72, right: peopleOpen ? 360 : 28, bottom: isPlayingRef.current ? 250 : 190, left: 28 }
+        : { top: 110, right: peopleOpen ? 430 : 72, bottom: isPlayingRef.current ? 250 : 210, left: controlsOpen ? 430 : 72 }
       : 36;
     map.fitBounds(
       [
@@ -1469,7 +1493,7 @@ export function MapWorkspace({
         maxZoom: maxZoom ?? (isPresentation ? 7 : 9),
       },
     );
-  }, [isPlaying, isPresentation, presentationPanelOpen, presentationPeoplePanelOpen]);
+  }, [isPresentation]);
 
   const fitPersonView = useCallback(() => {
     if (!filters.person) return;
@@ -1505,7 +1529,7 @@ export function MapWorkspace({
   useEffect(() => {
     if (!isPresentation || !mapReady || !historicalManifest || filters.person) return;
     if (!layers.historicalAdministration) return;
-    fitMapToBbox(historicalManifestExtent(historicalManifest));
+    fitMapToBbox(PRESENTATION_EUROPE_BBOX);
   }, [filters.person, historicalManifest, isPresentation, layers.historicalAdministration, mapReady, fitMapToBbox]);
 
   useEffect(() => {
@@ -1740,7 +1764,7 @@ export function MapWorkspace({
     setSelection(null);
     setStoryPersonId(null);
     if (isPresentation) {
-      fitMapToBbox(historicalManifest ? historicalManifestExtent(historicalManifest) : [-31.2656, 27.6381, 68.6969, 81.8599]);
+      fitMapToBbox(PRESENTATION_EUROPE_BBOX);
     }
   };
 
@@ -1778,7 +1802,7 @@ export function MapWorkspace({
       return;
     }
     setPresentationViewport("europe");
-    if (historicalManifest) fitMapToBbox(historicalManifestExtent(historicalManifest));
+    fitMapToBbox(PRESENTATION_EUROPE_BBOX);
   };
 
   const presentationLegend = historicalManifest?.presentationVocabulary?.legend ?? [];
@@ -2616,7 +2640,7 @@ export function MapWorkspace({
 
       {renderMapCanvas()}
 
-      <aside className="max-h-[38rem] overflow-y-auto border-t border-[#c8c1b4] bg-[#fffdf8] p-4 lg:row-span-2 lg:max-h-none lg:border-t-0 lg:border-l">
+      <aside className="research-map__context max-h-[38rem] overflow-y-auto border-t border-[#c8c1b4] bg-[#fffdf8] p-4 lg:row-span-2 lg:max-h-none lg:border-t-0 lg:border-l">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-editorial text-xl font-bold text-[#173f36]">{t("map.context")}</h2>
           {selection ? <button type="button" onClick={() => setSelection(null)} className="text-[9px] font-black tracking-[0.1em] text-[#a54f32] uppercase">{t("common.clear")}</button> : null}

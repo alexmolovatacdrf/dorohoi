@@ -9,7 +9,8 @@ describe("Claude map demo fixture", () => {
     expect(CLAUDE_DEMO_SOURCE.sourceSha256).toHaveLength(64);
     expect(data.persons).toHaveLength(48);
     expect(data.dossiers).toHaveLength(11);
-    expect(data.places).toHaveLength(15);
+    expect(data.places.filter((place) => place.layer === "core")).toHaveLength(15);
+    expect(data.places.filter((place) => place.layer === "ehri_local")).toHaveLength(385);
     expect(data.routes).toHaveLength(26);
   });
 

@@ -71,9 +71,11 @@ remain selectable individually.
 The Presentation Map now exposes a clearly labelled test-data switcher. The
 Project data option uses the normalized collections. The Claude demo option
 uses the derived fixture at `data/demo/claude-map-demo.json`, containing 48
-persons, 11 dossiers, 15 places and 26 route segments from the embedded
-`Platforma_WJC (10).html` sample. This fixture is isolated from normalized
-research data and retains the source filename and SHA-256 for traceability.
+persons, 11 dossiers, 15 prototype places and 26 route segments from the
+embedded `Platforma_WJC (10).html` sample. Its map adapter adds the separate
+385-record EHRI overlay without assigning those records to Claude persons.
+The fixture remains isolated from normalized person research data and retains
+the source filename and SHA-256 for traceability.
 
 The Research Map now exposes the same Project data / Claude demo switcher. Its
 default remains the normalized regional project data; `/map?dataset=claude-demo`
@@ -340,9 +342,11 @@ data paths.
 The latest presentation-map refinement keeps the people list focused on the
 documented head/declarant and moves mentioned people into collapsed dossier
 subsections integrated into the same family card. A person/family search field
-supports larger collections. Both map panels have sticky headers, camera
-presets expose their active state, and zoom controls reserve space beside the
-people panel. Person selection uses a closer local fit, repeated/reverse route
+supports larger collections. Both map panels have sticky headers, compact
+directory rows, camera presets expose their active state, and zoom controls
+reserve space beside the people panel. Person selection uses a closer local
+fit with safe space for open panels and the timeline; opening or closing a
+panel preserves the current camera. Repeated/reverse route
 segments use separate visual lanes, and place details can show grouped,
 source-bound people and documented context without assigning a relative's route
 to another person. In the Research Map, persons are selected from Filters →

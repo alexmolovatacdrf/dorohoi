@@ -82,6 +82,8 @@ not the private review link on the Hobby plan.
 - Numărul dosarului este afișat discret ca identificator intern, nu ca titlu principal.
 - Modelul păstrează posibilitatea ca aceeași persoană să fie legată ulterior de mai multe dosare; nu se deduce automat identitatea sau traseul rudelor.
 - La selectarea unei persoane, camera se potrivește pe toate punctele și segmentele documentate pentru acea persoană.
+- Europe View folosește fereastra practică `[longitude -11.0..62.5, latitude 35.0..72.0]`, din Portugalia până în zona Ekaterinburg/Perm; datele istorice din sursă rămân complete.
+- Închiderea sau deschiderea panourilor nu mai reface fit-ul și nu mai resetează zoom-ul ales manual. Fit-ul unei persoane rezervă spațiu sigur pentru panouri și timeline.
 - Animația traseului este manuală, o singură dată, lentă și progresivă, cu segmente Bézier/curbe și marker de progres; nu pornește automat și nu se repetă.
 - Controlul tip busolă/săgeată de orientare a fost eliminat.
 - Popup-ul istoric nu mai apare la hover. Apare doar la click normal sau click dreapta și poate fi închis.
@@ -103,6 +105,7 @@ not the private review link on the Hobby plan.
 - După selectarea unei persoane în Research Map, panoul `Context` din dreapta afișează acum numele persoanei, numărul de segmente și lista traseelor selectabile; un click pe un segment deschide detaliile sale de proveniență.
 - Research Map folosește acum aceeași geometrie de prezentare pentru trasee ca Presentation Map: curbe Bézier, săgeți direcționale și benzi separate pentru mișcări inverse sau repetate între aceleași localități.
 - Panoul `Context` din Research Map include acum directorul comun `Families and mentioned people`, cu căutare și secțiuni dropdown pentru persoanele menționate. Capul/declarantul nu este repetat în lista de membri.
+- Listele de persoane, familii și secțiunile aferente folosesc acum spațiere compactă în ambele moduri de hartă, cu rânduri mai scurte și mai puțin spațiu lateral.
 - Directorul `Families and mentioned people` este acum el însuși un dropdown vizibil în ambele hărți: triunghiul `▸` închide lista, iar `▾` o extinde. Listele interne ale persoanelor menționate folosesc aceeași convenție.
 - Cardul fiecărei familii nu mai repetă rândul `People mentioned in this dossier`. Numărul și triunghiul sunt pe rândul capului/declarantului; la extindere apar numele individuale și linia `Internal record`. Cardul de detalii al persoanei selectate folosește aceeași structură compactă.
 - Datele afișate în hartă folosesc `formatIsoDate`, `formatDateRange` și
@@ -117,6 +120,7 @@ not the private review link on the Hobby plan.
   Presentation Map.
 - Layerul EHRI/More Layers nu mai este ascuns când este selectată o persoană;
   rămâne independent de filtrul persoană și apare când este bifat.
+- Claude Demo include acum overlay-ul EHRI local cu 385 de înregistrări, fără asocieri inventate cu persoanele Claude.
 - Dropdown-urile familiilor sunt controlate exclusiv prin săgeată. Click pe
   capul unei alte familii închide lista precedentă fără să o deschidă pe cea
   nouă.
@@ -141,7 +145,7 @@ Fixture-ul rezultat este în:
 - testele: `tests/claude-demo.test.ts`
 - scriptul reproducibil: `scripts/presentation/derive-claude-demo-map.mjs`
 
-Conținut derivat: 48 persoane, 11 dosare, 15 locuri și 26 trasee; 9 persoane au trasee documentate. Referințele interne de dosar Claude sunt normalizate de adaptor astfel încât persoanele să apară sub familia/dosarul corect.
+Conținut derivat: 48 persoane, 11 dosare, 15 locuri Claude și 26 trasee; 9 persoane au trasee documentate. În hartă se adaugă separat overlay-ul EHRI cu 385 de înregistrări. Referințele interne de dosar Claude sunt normalizate de adaptor astfel încât persoanele să apară sub familia/dosarul corect.
 
 Regenerarea fixture-ului, doar dacă sursa este prezentă și după o verificare atentă:
 
