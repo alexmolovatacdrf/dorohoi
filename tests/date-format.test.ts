@@ -21,4 +21,19 @@ describe("localized date display", () => {
       precision: "interval",
     }, "ro")).toBe("1 august 1941 – 31 august 1941");
   });
+
+  it("uses a single localized month label for month-precision dates", () => {
+    expect(formatDateRange({
+      raw: "Iunie 1941",
+      start: "1941-06-01",
+      end: null,
+      precision: "month",
+    }, "en")).toBe("June 1941");
+    expect(formatDateRange({
+      raw: "Iunie 1941",
+      start: "1941-06-01",
+      end: null,
+      precision: "month",
+    }, "ro")).toBe("iunie 1941");
+  });
 });

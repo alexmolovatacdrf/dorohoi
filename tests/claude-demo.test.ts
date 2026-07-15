@@ -25,4 +25,29 @@ describe("Claude map demo fixture", () => {
     expect(data.routes.every((route) => route.sourceLabel.includes("Claude demo"))).toBe(true);
     expect(data.places.every((place) => place.personContexts.length === place.personIds.length)).toBe(true);
   });
+
+  it("exposes source-bound profile chronology for the central person story", () => {
+    const data = getClaudeDemoMapViewModel();
+    const roza = data.persons.find((person) => person.label === "Goldemberg Roza");
+
+    expect(roza?.story?.profile).toMatchObject({
+      birthDate: { precision: "year", start: "1894-01-01" },
+      studies: "4 clase primare",
+      origin: "Zvorâștea",
+      destination: "Șargorod",
+      fate: "deportat",
+    });
+    expect(roza?.story?.timeline.map((item) => item.label)).toEqual([
+      "Birth / origin",
+      "Evacuation / deportation",
+      "Evacuation / deportation",
+      "Evacuation / deportation",
+      "Return / repatriation",
+    ]);
+    const zvorastea = data.places.find((place) => place.label === "Zvorâștea");
+    expect(zvorastea?.personContexts.find((context) => context.personId === roza?.id)?.connections[0]).toMatchObject({
+      roles: ["Birth / origin"],
+      date: { precision: "year", start: "1894-01-01" },
+    });
+  });
 });

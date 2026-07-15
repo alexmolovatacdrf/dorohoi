@@ -16,8 +16,16 @@ export function formatDateRange(date: DateRange, language: DateLanguage = "en"):
   if (!date.start && !date.end) {
     return typeof date.raw === "string" ? date.raw : "Date unresolved";
   }
-  if (date.start === date.end && date.start) return formatIsoDate(date.start, language);
   if (date.precision === "year" && date.start) return date.start.slice(0, 4);
+  if (date.precision === "month" && date.start) {
+    const [year, month] = date.start.split("-").map(Number);
+    return new Intl.DateTimeFormat(language === "ro" ? "ro-RO" : "en-GB", {
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(new Date(Date.UTC(year, month - 1, 1)));
+  }
+  if (date.start === date.end && date.start) return formatIsoDate(date.start, language);
   const start = date.start ? formatIsoDate(date.start, language) : "?";
   const end = date.end ? formatIsoDate(date.end, language) : "?";
   return `${start} – ${end}`;

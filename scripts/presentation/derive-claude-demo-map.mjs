@@ -13,14 +13,93 @@ const slug = (value) => value
   .replace(/[^a-z0-9]+/g, "-")
   .replace(/^-|-$/g, "");
 const sourceLabel = "Platforma_WJC (10).html · embedded Claude demo";
+
+const dateRangeFrom = (raw, iso, precision) => {
+  const value = typeof iso === "string" && /^\d{4}-\d{2}-\d{2}$/.test(iso) ? iso : null;
+  const rawValue = raw ?? null;
+  if (!value) return { raw: rawValue, start: null, end: null, precision: "unknown" };
+  const normalizedPrecision = precision === "zi"
+    ? "day"
+    : precision === "luna"
+      ? "month"
+      : precision === "an"
+        ? "year"
+        : "unknown";
+  return { raw: rawValue, start: value, end: normalizedPrecision === "day" ? value : null, precision: normalizedPrecision };
+};
+
+const dateRangeFromYear = (value) => {
+  if (typeof value !== "string" || !/^\d{4}$/.test(value)) {
+    return { raw: value ?? null, start: null, end: null, precision: "unknown" };
+  }
+  return { raw: value, start: `${value}-01-01`, end: null, precision: "year" };
+};
+
+const deathDateRange = (value) => {
+  if (typeof value !== "string") return dateRangeFrom(null, null, null);
+  const match = value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  return match
+    ? dateRangeFrom(value, `${match[3]}-${match[2]}-${match[1]}`, "zi")
+    : dateRangeFrom(value, null, null);
+};
+
+const publicEventLabel = (type) => {
+  const value = String(type || "").toLocaleLowerCase("ro");
+  if (/nastere|naștere/.test(value)) return "Birth / origin";
+  if (/evacu|deport|intern/.test(value)) return "Evacuation / deportation";
+  if (/munca|muncă/.test(value)) return "Forced labour";
+  if (/lagar|lagăr|ghetou|ghetto/.test(value)) return "Camp / ghetto";
+  if (/deces|death|mort/.test(value)) return "Death / loss";
+  if (/intoarcere|întoarcere|return|repatri/.test(value)) return "Return / repatriation";
+  return String(type || "Documented event").replaceAll("_", " ");
+};
+
+const placeId = (name) => `claude-place-${slug(name)}`;
+
 const people = data.persoane.map((person) => ({
   id: person.id,
   label: person.nume,
   dossierId: person.dosare[0] || null,
   roles: person.roluri || [],
+  story: {
+    personId: person.id,
+    dossierId: person.dosare[0] || null,
+    dossierLabel: person.dosare[0] ? `Dosar ${person.dosare[0]}` : null,
+    roles: person.roluri || [],
+    profile: {
+      birthDate: dateRangeFromYear(person.an_nastere),
+      sex: person.sex || null,
+      profession: person.profesie || null,
+      studies: person.studii || null,
+      civilStatus: person.stare_civila || null,
+      address: person.adresa || null,
+      origin: person.origine || null,
+      destination: person.destinatie || null,
+      fate: person.soarta || null,
+      deathPlace: person.loc_deces || null,
+      deathDate: deathDateRange(person.data_deces),
+    },
+    timeline: (person.evenimente || []).map((event, index) => ({
+      id: `${person.id}-event-${index + 1}`,
+      placeId: event.loc ? placeId(event.loc) : null,
+      placeName: event.loc || null,
+      placeNameRo: event.loc || null,
+      date: dateRangeFrom(event.data_text, event.data_iso, event.data_precizie),
+      label: publicEventLabel(event.tip),
+      description: event.descriere || null,
+      sourceLabel,
+    })),
+    materials: (person.dosare || []).map((dossierId) => ({
+      id: `claude-dossier-${dossierId}`,
+      label: `Dosar ${dossierId}`,
+      sourceLabel,
+      pageCount: null,
+    })),
+    testimony: typeof person.narativ === "string" && person.narativ.trim() ? person.narativ : null,
+    sourceLabel,
+  },
 }));
 const peopleByName = new Map(people.map((person) => [person.label, person.id]));
-const placeId = (name) => `claude-place-${slug(name)}`;
 const categoriesFor = (types) => types.flatMap((type) => {
   if (/nastere/.test(type)) return ["origin"];
   if (/evac|deport/.test(type)) return ["evacuation_deportation"];

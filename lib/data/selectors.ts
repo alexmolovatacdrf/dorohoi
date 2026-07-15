@@ -272,10 +272,60 @@ export interface MapGroupDatum {
   kind: "household" | "family";
 }
 
+export interface MapPersonStoryProfile {
+  birthDate: DateRange | null;
+  sex: string | null;
+  profession: string | null;
+  studies: string | null;
+  civilStatus: string | null;
+  address: string | null;
+  origin: string | null;
+  destination: string | null;
+  fate: string | null;
+  deathPlace: string | null;
+  deathDate: DateRange | null;
+}
+
+export interface MapPersonStoryTimelineItem {
+  id: string;
+  placeId: string | null;
+  placeName: string | null;
+  placeNameRo: string | null;
+  date: DateRange | null;
+  label: string;
+  description: string | null;
+  sourceLabel: string;
+}
+
+export interface MapPersonStoryMaterial {
+  id: string;
+  label: string;
+  sourceLabel: string;
+  pageCount: number | null;
+}
+
+export interface MapPersonStory {
+  personId: string;
+  dossierId: string | null;
+  dossierLabel: string | null;
+  roles: string[];
+  profile: MapPersonStoryProfile;
+  timeline: MapPersonStoryTimelineItem[];
+  materials: MapPersonStoryMaterial[];
+  testimony: string | null;
+  sourceLabel: string;
+}
+
 export interface MapViewModel {
   places: MapPlaceDatum[];
   routes: MapRouteDatum[];
-  persons: Array<{ id: string; label: string; dossierId: string | null; roles: string[] }>;
+  persons: Array<{
+    id: string;
+    label: string;
+    dossierId: string | null;
+    roles: string[];
+    story?: MapPersonStory;
+  }>;
   groups: MapGroupDatum[];
   dossiers: Array<{ id: string; label: string }>;
   eventTypes: string[];
@@ -298,6 +348,108 @@ function categoriesForPlace(roles: string[], eventTypes: string[]): MapPlaceDatu
   if (/deces|death|deced/.test(joinedEvents + joinedRoles)) categories.push("death");
   if (/return|repatri|întoarc|intoarc/.test(joinedEvents + joinedRoles)) categories.push("return");
   return categories;
+}
+
+function rawString(raw: unknown, keys: string[]): string | null {
+  if (!raw || typeof raw !== "object") return null;
+  for (const key of keys) {
+    const value = (raw as Record<string, unknown>)[key];
+    if (typeof value === "string" && value.trim()) return value.trim();
+  }
+  return null;
+}
+
+function publicEventLabel(eventType: string): string {
+  const value = eventType.toLocaleLowerCase("ro");
+  if (/naștere|nastere|birth/.test(value)) return "Birth / origin";
+  if (/evacu|deport|intern/.test(value)) return "Evacuation / deportation";
+  if (/muncă|munca|forced/.test(value)) return "Forced labour";
+  if (/ghetou|ghetto|lagăr|lagar|camp/.test(value)) return "Camp / ghetto";
+  if (/deces|death|mort/.test(value)) return "Death / loss";
+  if (/întoarc|intoarc|return|repatri/.test(value)) return "Return / repatriation";
+  return eventType.replaceAll("_", " ");
+}
+
+export function getMapPersonStory(
+  personId: string,
+  data = getResearchData(),
+): MapPersonStory | null {
+  const detail = getPersonDetail(personId, data);
+  if (!detail) return null;
+  const placesById = new Map(detail.places.map((place) => [place.placeId, place]));
+  const placeMentionById = new Map(data.placeMentions.map((mention) => [mention.placeMentionId, mention]));
+  const birthMention = detail.mentions.find((mention) => mention.placeMentionId === detail.person.birthPlaceMentionId);
+  const birthPlace = birthMention?.placeId ? placesById.get(birthMention.placeId) : undefined;
+  const eventTimeline = detail.events.flatMap((event): MapPersonStoryTimelineItem[] => {
+    const linkedMentions = event.placeMentionIds
+      .map((mentionId) => placeMentionById.get(mentionId))
+      .filter((mention): mention is PlaceMention => Boolean(mention));
+    const linkedPlaces = linkedMentions
+      .map((mention) => mention.placeId ? placesById.get(mention.placeId) : undefined)
+      .filter((place): place is Place => Boolean(place));
+    const places = linkedPlaces.length ? linkedPlaces : [undefined];
+    return places.map((place) => ({
+      id: `${event.eventId}-${place?.placeId ?? "no-place"}`,
+      placeId: place?.placeId ?? null,
+      placeName: place?.displayNames.en ?? null,
+      placeNameRo: place?.displayNames.ro ?? null,
+      date: event.date,
+      label: publicEventLabel(event.eventType),
+      description: event.descriptionRaw,
+      sourceLabel: event.sourceRefs[0]?.sourceFile ?? "Source unavailable",
+    }));
+  });
+  const routeTimeline = detail.routes
+    .filter((route) => !eventTimeline.some((item) => item.placeId === route.destinationPlaceId && item.date?.start === route.date.start))
+    .map((route): MapPersonStoryTimelineItem => ({
+      id: `route-${route.routeSegmentId}`,
+      placeId: route.destinationPlaceId,
+      placeName: placesById.get(route.destinationPlaceId)?.displayNames.en ?? null,
+      placeNameRo: placesById.get(route.destinationPlaceId)?.displayNames.ro ?? null,
+      date: route.date,
+      label: "Documented movement",
+      description: route.notes,
+      sourceLabel: route.sourceRefs[0]?.sourceFile ?? "Source unavailable",
+    }));
+  const timeline = [...eventTimeline, ...routeTimeline].sort((left, right) => {
+    const leftDate = left.date?.start ?? "9999-99-99";
+    const rightDate = right.date?.start ?? "9999-99-99";
+    return leftDate.localeCompare(rightDate) || left.id.localeCompare(right.id);
+  });
+  const deathEvent = detail.events.find((event) => /deces|death|mort/i.test(event.eventType));
+  const deathMention = deathEvent?.placeMentionIds
+    .map((mentionId) => placeMentionById.get(mentionId))
+    .find((mention) => Boolean(mention?.placeId));
+  const deathPlace = deathMention?.placeId ? placesById.get(deathMention.placeId) : undefined;
+  const raw = detail.person.raw;
+  return {
+    personId,
+    dossierId: detail.person.dossierId,
+    dossierLabel: detail.documents[0]?.title ?? detail.person.dossierId,
+    roles: detail.person.roles,
+    profile: {
+      birthDate: detail.person.birthDate,
+      sex: rawString(raw, ["sex", "sex_raw"]) ?? detail.person.sex,
+      profession: rawString(raw, ["profesie", "profession", "profesie_raw"]),
+      studies: rawString(raw, ["studii", "studies"]),
+      civilStatus: detail.person.civilStatusRaw,
+      address: rawString(raw, ["adresa", "address", "domiciliu_raw"]),
+      origin: birthPlace?.displayNames.en ?? rawString(raw, ["origine", "loc_nastere_raw"]),
+      destination: rawString(raw, ["destinatie", "destination", "deportation_destination"]),
+      fate: rawString(raw, ["soarta", "fate"]),
+      deathPlace: deathPlace?.displayNames.en ?? rawString(raw, ["loc_deces", "death_place"]),
+      deathDate: deathEvent?.date ?? null,
+    },
+    timeline,
+    materials: detail.documents.map((document) => ({
+      id: document.documentId,
+      label: document.title,
+      sourceLabel: document.sourceRefs[0]?.sourceFile ?? document.fileName,
+      pageCount: document.pageCount,
+    })),
+    testimony: rawString(raw, ["testimony", "marturie", "declaratie", "narativ"]),
+    sourceLabel: detail.person.sourceRefs[0]?.sourceFile ?? "Source unavailable",
+  };
 }
 
 export function getMapViewModel(data: NormalizedBundle = getResearchData()): MapViewModel {
@@ -441,6 +593,7 @@ export function getMapViewModel(data: NormalizedBundle = getResearchData()): Map
       label: person.displayName,
       dossierId: person.dossierId,
       roles: person.roles,
+      story: getMapPersonStory(person.personId, data) ?? undefined,
     })),
     groups,
     dossiers: data.documents.map((document) => ({ id: document.documentId, label: document.title })),

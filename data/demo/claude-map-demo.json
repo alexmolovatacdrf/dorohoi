@@ -1428,7 +1428,125 @@
       "dossierId": "2534_2",
       "roles": [
         "cap de familie"
-      ]
+      ],
+      "story": {
+        "personId": "pers-000",
+        "dossierId": "2534_2",
+        "dossierLabel": "Dosar 2534_2",
+        "roles": [
+          "cap de familie"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1894",
+            "start": "1894-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": "F",
+          "profession": null,
+          "studies": "4 clase primare",
+          "civilStatus": "văduvă",
+          "address": "Tăutu nr. 31",
+          "origin": "Zvorâștea",
+          "destination": "Șargorod",
+          "fate": "deportat",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [
+          {
+            "id": "pers-000-event-1",
+            "placeId": "claude-place-zvorastea",
+            "placeName": "Zvorâștea",
+            "placeNameRo": "Zvorâștea",
+            "date": {
+              "raw": "1894",
+              "start": "1894-01-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Birth / origin",
+            "description": "Locul nașterii",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-000-event-2",
+            "placeId": "claude-place-zvorastea",
+            "placeName": "Zvorâștea",
+            "placeNameRo": "Zvorâștea",
+            "date": {
+              "raw": null,
+              "start": "1941-06-01",
+              "end": null,
+              "precision": "month"
+            },
+            "label": "Evacuation / deportation",
+            "description": "Evacuare: Iunie 1941 din com Zvorâștea Jud. Dorohoi - la Dorohoi",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-000-event-3",
+            "placeId": "claude-place-dorohoi",
+            "placeName": "Dorohoi",
+            "placeNameRo": "Dorohoi",
+            "date": {
+              "raw": "1941. Noembrie 12",
+              "start": "1941-11-12",
+              "end": "1941-11-12",
+              "precision": "day"
+            },
+            "label": "Evacuation / deportation",
+            "description": "Deportat de la: Dorohoi",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-000-event-4",
+            "placeId": "claude-place-sargorod",
+            "placeName": "Șargorod",
+            "placeNameRo": "Șargorod",
+            "date": {
+              "raw": "1941. Noembrie 12",
+              "start": "1941-11-12",
+              "end": "1941-11-12",
+              "precision": "day"
+            },
+            "label": "Evacuation / deportation",
+            "description": "Deportat la: Șargorod Jud. Moghileu",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-000-event-5",
+            "placeId": "claude-place-dorohoi",
+            "placeName": "Dorohoi",
+            "placeNameRo": "Dorohoi",
+            "date": {
+              "raw": "1945",
+              "start": "1945-06-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Return / repatriation",
+            "description": "Repatriat — prezent la ancheta C.M.E. (1945)",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          }
+        ],
+        "materials": [
+          {
+            "id": "claude-dossier-2534_2",
+            "label": "Dosar 2534_2",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-001",
@@ -1436,7 +1554,49 @@
       "dossierId": "2534_2",
       "roles": [
         "fiică"
-      ]
+      ],
+      "story": {
+        "personId": "pers-001",
+        "dossierId": "2534_2",
+        "dossierLabel": "Dosar 2534_2",
+        "roles": [
+          "fiică"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1923",
+            "start": "1923-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2534_2",
+            "label": "Dosar 2534_2",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-002",
@@ -1444,7 +1604,49 @@
       "dossierId": "2534_2",
       "roles": [
         "fiu"
-      ]
+      ],
+      "story": {
+        "personId": "pers-002",
+        "dossierId": "2534_2",
+        "dossierLabel": "Dosar 2534_2",
+        "roles": [
+          "fiu"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1924",
+            "start": "1924-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2534_2",
+            "label": "Dosar 2534_2",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-003",
@@ -1452,7 +1654,49 @@
       "dossierId": "2534_2",
       "roles": [
         "fiu"
-      ]
+      ],
+      "story": {
+        "personId": "pers-003",
+        "dossierId": "2534_2",
+        "dossierLabel": "Dosar 2534_2",
+        "roles": [
+          "fiu"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1930",
+            "start": "1930-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2534_2",
+            "label": "Dosar 2534_2",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-004",
@@ -1460,7 +1704,49 @@
       "dossierId": "2534_2",
       "roles": [
         "fiică"
-      ]
+      ],
+      "story": {
+        "personId": "pers-004",
+        "dossierId": "2534_2",
+        "dossierLabel": "Dosar 2534_2",
+        "roles": [
+          "fiică"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1931",
+            "start": "1931-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2534_2",
+            "label": "Dosar 2534_2",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-005",
@@ -1468,7 +1754,49 @@
       "dossierId": "2534_2",
       "roles": [
         "fiu"
-      ]
+      ],
+      "story": {
+        "personId": "pers-005",
+        "dossierId": "2534_2",
+        "dossierLabel": "Dosar 2534_2",
+        "roles": [
+          "fiu"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1932",
+            "start": "1932-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2534_2",
+            "label": "Dosar 2534_2",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-006",
@@ -1476,7 +1804,65 @@
       "dossierId": "2534_2",
       "roles": [
         "victimă (soț)"
-      ]
+      ],
+      "story": {
+        "personId": "pers-006",
+        "dossierId": "2534_2",
+        "dossierLabel": "Dosar 2534_2",
+        "roles": [
+          "victimă (soț)"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "decedat",
+          "deathPlace": "Șargorod",
+          "deathDate": {
+            "raw": "25.02.1942",
+            "start": "1942-02-25",
+            "end": "1942-02-25",
+            "precision": "day"
+          }
+        },
+        "timeline": [
+          {
+            "id": "pers-006-event-1",
+            "placeId": "claude-place-sargorod",
+            "placeName": "Șargorod",
+            "placeNameRo": "Șargorod",
+            "date": {
+              "raw": "Șargorod 25 Februarie 1942",
+              "start": "1942-02-25",
+              "end": "1942-02-25",
+              "precision": "day"
+            },
+            "label": "Death / loss",
+            "description": "Deces — boală (Șargorod 25 Februarie 1942)",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          }
+        ],
+        "materials": [
+          {
+            "id": "claude-dossier-2534_2",
+            "label": "Dosar 2534_2",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-007",
@@ -1484,7 +1870,125 @@
       "dossierId": "2540",
       "roles": [
         "cap de familie"
-      ]
+      ],
+      "story": {
+        "personId": "pers-007",
+        "dossierId": "2540",
+        "dossierLabel": "Dosar 2540",
+        "roles": [
+          "cap de familie"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1902",
+            "start": "1902-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": "M",
+          "profession": "libera",
+          "studies": "4 clase primare",
+          "civilStatus": "casatorit",
+          "address": null,
+          "origin": "Zvorâștea",
+          "destination": "Mogilev-Podolsk",
+          "fate": "deportat",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [
+          {
+            "id": "pers-007-event-1",
+            "placeId": "claude-place-zvorastea",
+            "placeName": "Zvorâștea",
+            "placeNameRo": "Zvorâștea",
+            "date": {
+              "raw": "1902",
+              "start": "1902-01-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Birth / origin",
+            "description": "Locul nașterii",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-007-event-2",
+            "placeId": "claude-place-dorohoi",
+            "placeName": "Dorohoi",
+            "placeNameRo": "Dorohoi",
+            "date": {
+              "raw": "1941 noembrie 13",
+              "start": "1941-11-13",
+              "end": "1941-11-13",
+              "precision": "day"
+            },
+            "label": "Evacuation / deportation",
+            "description": "Deportat de la: Dorohoi",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-007-event-3",
+            "placeId": "claude-place-mogilev-podolsk",
+            "placeName": "Mogilev-Podolsk",
+            "placeNameRo": "Mogilev-Podolsk",
+            "date": {
+              "raw": "1941 noembrie 13",
+              "start": "1941-11-13",
+              "end": "1941-11-13",
+              "precision": "day"
+            },
+            "label": "Evacuation / deportation",
+            "description": "Deportat la: Moghilau",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-007-event-4",
+            "placeId": "claude-place-dorohoi",
+            "placeName": "Dorohoi",
+            "placeNameRo": "Dorohoi",
+            "date": {
+              "raw": "1945",
+              "start": "1945-06-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Return / repatriation",
+            "description": "Repatriat — prezent la ancheta C.M.E. (1945)",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-007-event-5",
+            "placeId": "claude-place-dorohoi",
+            "placeName": "Dorohoi",
+            "placeNameRo": "Dorohoi",
+            "date": {
+              "raw": null,
+              "start": null,
+              "end": null,
+              "precision": "unknown"
+            },
+            "label": "Forced labour",
+            "description": "Detașament de muncă: Dorohoi - la piaza",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          }
+        ],
+        "materials": [
+          {
+            "id": "claude-dossier-2540",
+            "label": "Dosar 2540",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-008",
@@ -1492,7 +1996,49 @@
       "dossierId": "2540",
       "roles": [
         "sotie"
-      ]
+      ],
+      "story": {
+        "personId": "pers-008",
+        "dossierId": "2540",
+        "dossierLabel": "Dosar 2540",
+        "roles": [
+          "sotie"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1904",
+            "start": "1904-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2540",
+            "label": "Dosar 2540",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-009",
@@ -1500,7 +2046,49 @@
       "dossierId": "2540",
       "roles": [
         "fiu"
-      ]
+      ],
+      "story": {
+        "personId": "pers-009",
+        "dossierId": "2540",
+        "dossierLabel": "Dosar 2540",
+        "roles": [
+          "fiu"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1931",
+            "start": "1931-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2540",
+            "label": "Dosar 2540",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-010",
@@ -1508,7 +2096,95 @@
       "dossierId": "2543",
       "roles": [
         "cap de familie"
-      ]
+      ],
+      "story": {
+        "personId": "pers-010",
+        "dossierId": "2543",
+        "dossierLabel": "Dosar 2543",
+        "roles": [
+          "cap de familie"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1898",
+            "start": "1898-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": "M",
+          "profession": "Comerciant.",
+          "studies": "6 clase Primare",
+          "civilStatus": "Casatorit",
+          "address": "Stefan cel Mare nr. 15",
+          "origin": "Dorohoi",
+          "destination": "Mogilev-Podolsk",
+          "fate": "deportat",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [
+          {
+            "id": "pers-010-event-1",
+            "placeId": "claude-place-dorohoi",
+            "placeName": "Dorohoi",
+            "placeNameRo": "Dorohoi",
+            "date": {
+              "raw": "1898",
+              "start": "1898-01-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Birth / origin",
+            "description": "Locul nașterii",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-010-event-2",
+            "placeId": "claude-place-mogilev-podolsk",
+            "placeName": "Mogilev-Podolsk",
+            "placeNameRo": "Mogilev-Podolsk",
+            "date": {
+              "raw": "Noiembrie 1941",
+              "start": "1941-11-01",
+              "end": null,
+              "precision": "month"
+            },
+            "label": "Evacuation / deportation",
+            "description": "Deportat la: in Transnistria La Moghilev",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-010-event-3",
+            "placeId": "claude-place-dorohoi",
+            "placeName": "Dorohoi",
+            "placeNameRo": "Dorohoi",
+            "date": {
+              "raw": "1945",
+              "start": "1945-06-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Return / repatriation",
+            "description": "Repatriat — prezent la ancheta C.M.E. (1945)",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          }
+        ],
+        "materials": [
+          {
+            "id": "claude-dossier-2543",
+            "label": "Dosar 2543",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": "La trecerea nistrului am fost prădat de grăniceri români și anume: un ceas de aur, una brățară de aur a soției cu stilon de aur, un palton de catifea, 3 plăpămi, 4 costume, 6 perne, 2 raglane ale soției, 2 perechi de ghete, una valiză cu inbrăcăminte in valoare de 350.000, 2 perechi de ghete una valiză cu imbrăcăminte in valoare de [ilizibil], 12 indispensabili, 20 perechi de ciorapi, Trei [ilizibil] ghete [ilizibil] anume: 10 căm[ăși], 4 pijamale, 20 flanele, un palton bărbătesc căptușit cu blană. Tot timpul in Transnistria am muncit la tăiat lemne, la pietre la drum, la săpat din greu, la măturat străzile prin fața lagărului și m-am îmbolnăvit grozav zăcând 4 luni la pat și astăzi incă nu-mi pot reveni din cauză că am îndurat mizerie dela soldații români am îndurat de frig și de foame.",
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-011",
@@ -1516,7 +2192,49 @@
       "dossierId": "2543",
       "roles": [
         "Sotie"
-      ]
+      ],
+      "story": {
+        "personId": "pers-011",
+        "dossierId": "2543",
+        "dossierLabel": "Dosar 2543",
+        "roles": [
+          "Sotie"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "40 ani",
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2543",
+            "label": "Dosar 2543",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-012",
@@ -1524,7 +2242,49 @@
       "dossierId": "2543",
       "roles": [
         "Copil"
-      ]
+      ],
+      "story": {
+        "personId": "pers-012",
+        "dossierId": "2543",
+        "dossierLabel": "Dosar 2543",
+        "roles": [
+          "Copil"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "19 ani",
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2543",
+            "label": "Dosar 2543",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-013",
@@ -1532,7 +2292,65 @@
       "dossierId": "2543",
       "roles": [
         "victimă (Mama)"
-      ]
+      ],
+      "story": {
+        "personId": "pers-013",
+        "dossierId": "2543",
+        "dossierLabel": "Dosar 2543",
+        "roles": [
+          "victimă (Mama)"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "decedat",
+          "deathPlace": "Mogilev-Podolsk",
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [
+          {
+            "id": "pers-013-event-1",
+            "placeId": "claude-place-mogilev-podolsk",
+            "placeName": "Mogilev-Podolsk",
+            "placeNameRo": "Mogilev-Podolsk",
+            "date": {
+              "raw": "Moghilev",
+              "start": null,
+              "end": null,
+              "precision": "unknown"
+            },
+            "label": "Death / loss",
+            "description": "Deces — de foame. (Moghilev)",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          }
+        ],
+        "materials": [
+          {
+            "id": "claude-dossier-2543",
+            "label": "Dosar 2543",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-014",
@@ -1540,7 +2358,65 @@
       "dossierId": "2543",
       "roles": [
         "victimă (Soacra)"
-      ]
+      ],
+      "story": {
+        "personId": "pers-014",
+        "dossierId": "2543",
+        "dossierLabel": "Dosar 2543",
+        "roles": [
+          "victimă (Soacra)"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "decedat",
+          "deathPlace": "Mogilev-Podolsk",
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [
+          {
+            "id": "pers-014-event-1",
+            "placeId": "claude-place-mogilev-podolsk",
+            "placeName": "Mogilev-Podolsk",
+            "placeNameRo": "Mogilev-Podolsk",
+            "date": {
+              "raw": "Moghilev.",
+              "start": null,
+              "end": null,
+              "precision": "unknown"
+            },
+            "label": "Death / loss",
+            "description": "Deces — de foame. (Moghilev.)",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          }
+        ],
+        "materials": [
+          {
+            "id": "claude-dossier-2543",
+            "label": "Dosar 2543",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-015",
@@ -1548,7 +2424,110 @@
       "dossierId": "2550",
       "roles": [
         "cap de familie"
-      ]
+      ],
+      "story": {
+        "personId": "pers-015",
+        "dossierId": "2550",
+        "dossierLabel": "Dosar 2550",
+        "roles": [
+          "cap de familie"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1907",
+            "start": "1907-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": "fierar",
+          "studies": null,
+          "civilStatus": "căsătorit",
+          "address": "Reg. Ferdinand nr. 16",
+          "origin": "Ștefănești",
+          "destination": null,
+          "fate": "supraviețuitor",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [
+          {
+            "id": "pers-015-event-1",
+            "placeId": "claude-place-stefanesti",
+            "placeName": "Ștefănești",
+            "placeNameRo": "Ștefănești",
+            "date": {
+              "raw": "1907",
+              "start": "1907-01-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Birth / origin",
+            "description": "Locul nașterii",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-015-event-2",
+            "placeId": "claude-place-targu-jiu",
+            "placeName": "Târgu Jiu",
+            "placeNameRo": "Târgu Jiu",
+            "date": {
+              "raw": null,
+              "start": "1941-06-01",
+              "end": null,
+              "precision": "month"
+            },
+            "label": "Camp / ghetto",
+            "description": "Internare în lagăr: Iunie 1941 - Decemvrie 1941 - Lg Tg-Jiu - ridicarea tuturor Evreilor din Săveni",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-015-event-3",
+            "placeId": "claude-place-dorohoi",
+            "placeName": "Dorohoi",
+            "placeNameRo": "Dorohoi",
+            "date": {
+              "raw": "1945",
+              "start": "1945-06-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Return / repatriation",
+            "description": "Repatriat — prezent la ancheta C.M.E. (1945)",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-015-event-4",
+            "placeId": "claude-place-saveni",
+            "placeName": "Săveni",
+            "placeNameRo": "Săveni",
+            "date": {
+              "raw": null,
+              "start": null,
+              "end": null,
+              "precision": "unknown"
+            },
+            "label": "Evacuation / deportation",
+            "description": "Evacuare: 24 Iulie Săveni Dorohoi.",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          }
+        ],
+        "materials": [
+          {
+            "id": "claude-dossier-2550",
+            "label": "Dosar 2550",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": "In Iunie 1941 am fost evacuat din Săveni. Acolo am părăsit toată averea mea, constând din mobiliar pentru 3 camere și bucătărie un atelier de fierărie cu tot materialul in valoare de 600.000 lei. Eu am fost internat in lagărul din Tg-Jiu, iar nevasta și copiii au fost mutați in Dorohoi. Acolo au locuit la sora nevestei mele. Viața și-a întreținut-o, spălând rufe, spălând podele. Eu după ce am stat 6 luni la Tg-Jiu sub un regim îngrozitor am fost trimis la munca obligatorie la Izvoriste, unde am lucrat la muncile cele mai grele. După aceea am fost trimis la Calfa, unde lucram la cariera de piatră. In anul 1944 am fost rechiziționat la Cernăuți, de unde am fost trimis și în alte orașe. Acolo am lucrat 8 luni fără a mi se plăti un ban.",
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-016",
@@ -1556,7 +2535,49 @@
       "dossierId": "2550",
       "roles": [
         "soție"
-      ]
+      ],
+      "story": {
+        "personId": "pers-016",
+        "dossierId": "2550",
+        "dossierLabel": "Dosar 2550",
+        "roles": [
+          "soție"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1908",
+            "start": "1908-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2550",
+            "label": "Dosar 2550",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-017",
@@ -1564,7 +2585,49 @@
       "dossierId": "2550",
       "roles": [
         "fiică"
-      ]
+      ],
+      "story": {
+        "personId": "pers-017",
+        "dossierId": "2550",
+        "dossierLabel": "Dosar 2550",
+        "roles": [
+          "fiică"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1933",
+            "start": "1933-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2550",
+            "label": "Dosar 2550",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-018",
@@ -1572,7 +2635,49 @@
       "dossierId": "2550",
       "roles": [
         "fiu"
-      ]
+      ],
+      "story": {
+        "personId": "pers-018",
+        "dossierId": "2550",
+        "dossierLabel": "Dosar 2550",
+        "roles": [
+          "fiu"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1935",
+            "start": "1935-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2550",
+            "label": "Dosar 2550",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-019",
@@ -1580,7 +2685,49 @@
       "dossierId": "2550",
       "roles": [
         "fiică"
-      ]
+      ],
+      "story": {
+        "personId": "pers-019",
+        "dossierId": "2550",
+        "dossierLabel": "Dosar 2550",
+        "roles": [
+          "fiică"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1938",
+            "start": "1938-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2550",
+            "label": "Dosar 2550",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-020",
@@ -1588,7 +2735,49 @@
       "dossierId": "2550",
       "roles": [
         "fiu"
-      ]
+      ],
+      "story": {
+        "personId": "pers-020",
+        "dossierId": "2550",
+        "dossierLabel": "Dosar 2550",
+        "roles": [
+          "fiu"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1942",
+            "start": "1942-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2550",
+            "label": "Dosar 2550",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-021",
@@ -1596,7 +2785,65 @@
       "dossierId": "2550",
       "roles": [
         "victimă (soacră)"
-      ]
+      ],
+      "story": {
+        "personId": "pers-021",
+        "dossierId": "2550",
+        "dossierLabel": "Dosar 2550",
+        "roles": [
+          "victimă (soacră)"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "decedat",
+          "deathPlace": "Mogilev-Podolsk",
+          "deathDate": {
+            "raw": "1941",
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [
+          {
+            "id": "pers-021-event-1",
+            "placeId": "claude-place-mogilev-podolsk",
+            "placeName": "Mogilev-Podolsk",
+            "placeNameRo": "Mogilev-Podolsk",
+            "date": {
+              "raw": "Moghileu 1941",
+              "start": "1941-01-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Death / loss",
+            "description": "Deces — foame (Moghileu 1941)",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          }
+        ],
+        "materials": [
+          {
+            "id": "claude-dossier-2550",
+            "label": "Dosar 2550",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-022",
@@ -1604,7 +2851,65 @@
       "dossierId": "2550",
       "roles": [
         "victimă (cumnat)"
-      ]
+      ],
+      "story": {
+        "personId": "pers-022",
+        "dossierId": "2550",
+        "dossierLabel": "Dosar 2550",
+        "roles": [
+          "victimă (cumnat)"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "decedat",
+          "deathPlace": "Mogilev-Podolsk",
+          "deathDate": {
+            "raw": "1941",
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [
+          {
+            "id": "pers-022-event-1",
+            "placeId": "claude-place-mogilev-podolsk",
+            "placeName": "Mogilev-Podolsk",
+            "placeNameRo": "Mogilev-Podolsk",
+            "date": {
+              "raw": "Moghileu 1941",
+              "start": "1941-01-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Death / loss",
+            "description": "Deces — foame (Moghileu 1941)",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          }
+        ],
+        "materials": [
+          {
+            "id": "claude-dossier-2550",
+            "label": "Dosar 2550",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-023",
@@ -1612,7 +2917,125 @@
       "dossierId": "2591",
       "roles": [
         "cap de familie"
-      ]
+      ],
+      "story": {
+        "personId": "pers-023",
+        "dossierId": "2591",
+        "dossierLabel": "Dosar 2591",
+        "roles": [
+          "cap de familie"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1883",
+            "start": "1883-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": "M",
+          "profession": "funcționar",
+          "studies": "6 clase primare",
+          "civilStatus": "văduv",
+          "address": "I.C. Brătianu biș nr. 69",
+          "origin": "Sadagura",
+          "destination": "Mogilev-Podolsk",
+          "fate": "deportat",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [
+          {
+            "id": "pers-023-event-1",
+            "placeId": "claude-place-sadagura",
+            "placeName": "Sadagura",
+            "placeNameRo": "Sadagura",
+            "date": {
+              "raw": "1883",
+              "start": "1883-01-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Birth / origin",
+            "description": "Locul nașterii",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-023-event-2",
+            "placeId": "claude-place-cernauti",
+            "placeName": "Cernăuți",
+            "placeNameRo": "Cernăuți",
+            "date": {
+              "raw": "1941 Octombrie 15",
+              "start": "1941-10-15",
+              "end": "1941-10-15",
+              "precision": "day"
+            },
+            "label": "Evacuation / deportation",
+            "description": "Deportat de la: Cernăuți",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-023-event-3",
+            "placeId": "claude-place-mogilev-podolsk",
+            "placeName": "Mogilev-Podolsk",
+            "placeNameRo": "Mogilev-Podolsk",
+            "date": {
+              "raw": "1941 Octombrie 15",
+              "start": "1941-10-15",
+              "end": "1941-10-15",
+              "precision": "day"
+            },
+            "label": "Evacuation / deportation",
+            "description": "Deportat la: Moghilev",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-023-event-4",
+            "placeId": "claude-place-dorohoi",
+            "placeName": "Dorohoi",
+            "placeNameRo": "Dorohoi",
+            "date": {
+              "raw": "1945",
+              "start": "1945-06-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Return / repatriation",
+            "description": "Repatriat — prezent la ancheta C.M.E. (1945)",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-023-event-5",
+            "placeId": "claude-place-transnistria",
+            "placeName": "Transnistria",
+            "placeNameRo": "Transnistria",
+            "date": {
+              "raw": null,
+              "start": null,
+              "end": null,
+              "precision": "unknown"
+            },
+            "label": "Evacuation / deportation",
+            "description": "Evacuare: Transnistria",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          }
+        ],
+        "materials": [
+          {
+            "id": "claude-dossier-2591",
+            "label": "Dosar 2591",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": "In afară de [ilizibil] pe drum înspre Transnistria neau luat neau boțit bijuteri[e] în valoare de 800.000 lei Valoare de lucrurilor [ilizibil] de aur [ilizibil] mai sus a de Lei 5.000.000.",
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-024",
@@ -1620,7 +3043,49 @@
       "dossierId": "2591",
       "roles": [
         "fica"
-      ]
+      ],
+      "story": {
+        "personId": "pers-024",
+        "dossierId": "2591",
+        "dossierLabel": "Dosar 2591",
+        "roles": [
+          "fica"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1922",
+            "start": "1922-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2591",
+            "label": "Dosar 2591",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-025",
@@ -1628,7 +3093,65 @@
       "dossierId": "2591",
       "roles": [
         "victimă (soție)"
-      ]
+      ],
+      "story": {
+        "personId": "pers-025",
+        "dossierId": "2591",
+        "dossierLabel": "Dosar 2591",
+        "roles": [
+          "victimă (soție)"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "decedat",
+          "deathPlace": "Mogilev-Podolsk",
+          "deathDate": {
+            "raw": "1942",
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [
+          {
+            "id": "pers-025-event-1",
+            "placeId": "claude-place-mogilev-podolsk",
+            "placeName": "Mogilev-Podolsk",
+            "placeNameRo": "Mogilev-Podolsk",
+            "date": {
+              "raw": "Moghilev 1942/22/2",
+              "start": "1942-01-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Death / loss",
+            "description": "Deces —  (Moghilev 1942/22/2)",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          }
+        ],
+        "materials": [
+          {
+            "id": "claude-dossier-2591",
+            "label": "Dosar 2591",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-026",
@@ -1636,7 +3159,65 @@
       "dossierId": "2591",
       "roles": [
         "victimă (cumnat)"
-      ]
+      ],
+      "story": {
+        "personId": "pers-026",
+        "dossierId": "2591",
+        "dossierLabel": "Dosar 2591",
+        "roles": [
+          "victimă (cumnat)"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "decedat",
+          "deathPlace": "Obodovca",
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [
+          {
+            "id": "pers-026-event-1",
+            "placeId": "claude-place-obodovca",
+            "placeName": "Obodovca",
+            "placeNameRo": "Obodovca",
+            "date": {
+              "raw": "Obodovca",
+              "start": null,
+              "end": null,
+              "precision": "unknown"
+            },
+            "label": "Death / loss",
+            "description": "Deces —  (Obodovca)",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          }
+        ],
+        "materials": [
+          {
+            "id": "claude-dossier-2591",
+            "label": "Dosar 2591",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-027",
@@ -1644,7 +3225,65 @@
       "dossierId": "2591",
       "roles": [
         "victimă (socru)"
-      ]
+      ],
+      "story": {
+        "personId": "pers-027",
+        "dossierId": "2591",
+        "dossierLabel": "Dosar 2591",
+        "roles": [
+          "victimă (socru)"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "decedat",
+          "deathPlace": "Mogilev-Podolsk",
+          "deathDate": {
+            "raw": "1942",
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [
+          {
+            "id": "pers-027-event-1",
+            "placeId": "claude-place-mogilev-podolsk",
+            "placeName": "Mogilev-Podolsk",
+            "placeNameRo": "Mogilev-Podolsk",
+            "date": {
+              "raw": "Moghilev 1942",
+              "start": "1942-01-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Death / loss",
+            "description": "Deces —  (Moghilev 1942)",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          }
+        ],
+        "materials": [
+          {
+            "id": "claude-dossier-2591",
+            "label": "Dosar 2591",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-028",
@@ -1652,7 +3291,49 @@
       "dossierId": "2591",
       "roles": [
         "victimă (soacra)"
-      ]
+      ],
+      "story": {
+        "personId": "pers-028",
+        "dossierId": "2591",
+        "dossierLabel": "Dosar 2591",
+        "roles": [
+          "victimă (soacra)"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2591",
+            "label": "Dosar 2591",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-029",
@@ -1660,7 +3341,49 @@
       "dossierId": "2591",
       "roles": [
         "victimă (cumnată)"
-      ]
+      ],
+      "story": {
+        "personId": "pers-029",
+        "dossierId": "2591",
+        "dossierLabel": "Dosar 2591",
+        "roles": [
+          "victimă (cumnată)"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2591",
+            "label": "Dosar 2591",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-030",
@@ -1668,7 +3391,49 @@
       "dossierId": "2591",
       "roles": [
         "victimă (nepot)"
-      ]
+      ],
+      "story": {
+        "personId": "pers-030",
+        "dossierId": "2591",
+        "dossierLabel": "Dosar 2591",
+        "roles": [
+          "victimă (nepot)"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2591",
+            "label": "Dosar 2591",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-031",
@@ -1676,7 +3441,80 @@
       "dossierId": "2592",
       "roles": [
         "cap de familie"
-      ]
+      ],
+      "story": {
+        "personId": "pers-031",
+        "dossierId": "2592",
+        "dossierLabel": "Dosar 2592",
+        "roles": [
+          "cap de familie"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1925",
+            "start": "1925-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": "Văd",
+          "address": "Regele Ferdinand nr. 63",
+          "origin": "Transnistria",
+          "destination": null,
+          "fate": "supraviețuitor",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [
+          {
+            "id": "pers-031-event-1",
+            "placeId": "claude-place-dorohoi",
+            "placeName": "Dorohoi",
+            "placeNameRo": "Dorohoi",
+            "date": {
+              "raw": "1945",
+              "start": "1945-06-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Return / repatriation",
+            "description": "Repatriat — prezent la ancheta C.M.E. (1945)",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-031-event-2",
+            "placeId": "claude-place-transnistria",
+            "placeName": "Transnistria",
+            "placeNameRo": "Transnistria",
+            "date": {
+              "raw": null,
+              "start": null,
+              "end": null,
+              "precision": "unknown"
+            },
+            "label": "Evacuation / deportation",
+            "description": "Evacuare: Da in Transnistria",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          }
+        ],
+        "materials": [
+          {
+            "id": "claude-dossier-2592",
+            "label": "Dosar 2592",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-032",
@@ -1684,7 +3522,49 @@
       "dossierId": "2592",
       "roles": [
         "fiică"
-      ]
+      ],
+      "story": {
+        "personId": "pers-032",
+        "dossierId": "2592",
+        "dossierLabel": "Dosar 2592",
+        "roles": [
+          "fiică"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1925",
+            "start": "1925-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2592",
+            "label": "Dosar 2592",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-033",
@@ -1692,7 +3572,49 @@
       "dossierId": "2592",
       "roles": [
         "fiu"
-      ]
+      ],
+      "story": {
+        "personId": "pers-033",
+        "dossierId": "2592",
+        "dossierLabel": "Dosar 2592",
+        "roles": [
+          "fiu"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1928",
+            "start": "1928-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2592",
+            "label": "Dosar 2592",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-034",
@@ -1700,7 +3622,65 @@
       "dossierId": "2601",
       "roles": [
         "cap de familie"
-      ]
+      ],
+      "story": {
+        "personId": "pers-034",
+        "dossierId": "2601",
+        "dossierLabel": "Dosar 2601",
+        "roles": [
+          "cap de familie"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1890",
+            "start": "1890-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": "F",
+          "profession": "casnică",
+          "studies": "4 clase primare",
+          "civilStatus": "văduvă de răsboiu",
+          "address": "Stefan cel Mare nr. 24",
+          "origin": "Dorohoi",
+          "destination": null,
+          "fate": "supraviețuitor",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [
+          {
+            "id": "pers-034-event-1",
+            "placeId": "claude-place-dorohoi",
+            "placeName": "Dorohoi",
+            "placeNameRo": "Dorohoi",
+            "date": {
+              "raw": "1890",
+              "start": "1890-01-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Birth / origin",
+            "description": "Locul nașterii",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          }
+        ],
+        "materials": [
+          {
+            "id": "claude-dossier-2601",
+            "label": "Dosar 2601",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-035",
@@ -1708,7 +3688,125 @@
       "dossierId": "2603",
       "roles": [
         "cap de familie"
-      ]
+      ],
+      "story": {
+        "personId": "pers-035",
+        "dossierId": "2603",
+        "dossierLabel": "Dosar 2603",
+        "roles": [
+          "cap de familie"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1895",
+            "start": "1895-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": "M",
+          "profession": "Tâmplar",
+          "studies": "4 clase Primare",
+          "civilStatus": "Căsătorit",
+          "address": "Costache Negri nr. 6",
+          "origin": "Ripiceni",
+          "destination": "Cibulevca",
+          "fate": "deportat",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [
+          {
+            "id": "pers-035-event-1",
+            "placeId": "claude-place-ripiceni",
+            "placeName": "Ripiceni",
+            "placeNameRo": "Ripiceni",
+            "date": {
+              "raw": null,
+              "start": "1940-01-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Evacuation / deportation",
+            "description": "Evacuare: din 1940 evacuat din Ripiceni la Dorohoi",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-035-event-2",
+            "placeId": "claude-place-vatra-dornei",
+            "placeName": "Vatra Dornei",
+            "placeNameRo": "Vatra Dornei",
+            "date": {
+              "raw": null,
+              "start": "1941-01-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Forced labour",
+            "description": "Detașament de muncă: 22 Oct. 1941 Nicolina Brașov 270. zile. 22 la 9 febr 1942 Regimentul 29 Dorna Vatra 48 Zile cazarma cuconici 30 Zile",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-035-event-3",
+            "placeId": "claude-place-siret",
+            "placeName": "Siret",
+            "placeNameRo": "Siret",
+            "date": {
+              "raw": "1941 luna Octombrie Ziua 27",
+              "start": "1941-10-27",
+              "end": "1941-10-27",
+              "precision": "day"
+            },
+            "label": "Evacuation / deportation",
+            "description": "Deportat de la: Siret",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-035-event-4",
+            "placeId": "claude-place-cibulevca",
+            "placeName": "Cibulevca",
+            "placeNameRo": "Cibulevca",
+            "date": {
+              "raw": "1941 luna Octombrie Ziua 27",
+              "start": "1941-10-27",
+              "end": "1941-10-27",
+              "precision": "day"
+            },
+            "label": "Evacuation / deportation",
+            "description": "Deportat la: Cibulevca",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-035-event-5",
+            "placeId": "claude-place-dorohoi",
+            "placeName": "Dorohoi",
+            "placeNameRo": "Dorohoi",
+            "date": {
+              "raw": "1945",
+              "start": "1945-06-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Return / repatriation",
+            "description": "Repatriat — prezent la ancheta C.M.E. (1945)",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          }
+        ],
+        "materials": [
+          {
+            "id": "claude-dossier-2603",
+            "label": "Dosar 2603",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-036",
@@ -1716,7 +3814,49 @@
       "dossierId": "2603",
       "roles": [
         "Soție"
-      ]
+      ],
+      "story": {
+        "personId": "pers-036",
+        "dossierId": "2603",
+        "dossierLabel": "Dosar 2603",
+        "roles": [
+          "Soție"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1896",
+            "start": "1896-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2603",
+            "label": "Dosar 2603",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-037",
@@ -1724,7 +3864,49 @@
       "dossierId": "2603",
       "roles": [
         "Fiica"
-      ]
+      ],
+      "story": {
+        "personId": "pers-037",
+        "dossierId": "2603",
+        "dossierLabel": "Dosar 2603",
+        "roles": [
+          "Fiica"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1924",
+            "start": "1924-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2603",
+            "label": "Dosar 2603",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-038",
@@ -1732,7 +3914,49 @@
       "dossierId": "2603",
       "roles": [
         "Fiu"
-      ]
+      ],
+      "story": {
+        "personId": "pers-038",
+        "dossierId": "2603",
+        "dossierLabel": "Dosar 2603",
+        "roles": [
+          "Fiu"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1928",
+            "start": "1928-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2603",
+            "label": "Dosar 2603",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-039",
@@ -1740,7 +3964,95 @@
       "dossierId": "2604",
       "roles": [
         "cap de familie"
-      ]
+      ],
+      "story": {
+        "personId": "pers-039",
+        "dossierId": "2604",
+        "dossierLabel": "Dosar 2604",
+        "roles": [
+          "cap de familie"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1895",
+            "start": "1895-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": "F",
+          "profession": "Casnica",
+          "studies": "primare",
+          "civilStatus": "Văduva",
+          "address": "Popăuți nr. 20",
+          "origin": "Zvorâștea",
+          "destination": null,
+          "fate": "supraviețuitor",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [
+          {
+            "id": "pers-039-event-1",
+            "placeId": "claude-place-zvorastea",
+            "placeName": "Zvorâștea",
+            "placeNameRo": "Zvorâștea",
+            "date": {
+              "raw": "1895",
+              "start": "1895-01-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Birth / origin",
+            "description": "Locul nașterii",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-039-event-2",
+            "placeId": "claude-place-dorohoi",
+            "placeName": "Dorohoi",
+            "placeNameRo": "Dorohoi",
+            "date": {
+              "raw": "1945",
+              "start": "1945-06-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Return / repatriation",
+            "description": "Repatriat — prezent la ancheta C.M.E. (1945)",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-039-event-3",
+            "placeId": "claude-place-transnistria",
+            "placeName": "Transnistria",
+            "placeNameRo": "Transnistria",
+            "date": {
+              "raw": null,
+              "start": null,
+              "end": null,
+              "precision": "unknown"
+            },
+            "label": "Evacuation / deportation",
+            "description": "Evacuare: Da in Transnistria",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          }
+        ],
+        "materials": [
+          {
+            "id": "claude-dossier-2604",
+            "label": "Dosar 2604",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-040",
@@ -1748,7 +4060,49 @@
       "dossierId": "2604",
       "roles": [
         "membru"
-      ]
+      ],
+      "story": {
+        "personId": "pers-040",
+        "dossierId": "2604",
+        "dossierLabel": "Dosar 2604",
+        "roles": [
+          "membru"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1891",
+            "start": "1891-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2604",
+            "label": "Dosar 2604",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-041",
@@ -1756,7 +4110,49 @@
       "dossierId": "2604",
       "roles": [
         "membru"
-      ]
+      ],
+      "story": {
+        "personId": "pers-041",
+        "dossierId": "2604",
+        "dossierLabel": "Dosar 2604",
+        "roles": [
+          "membru"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1925",
+            "start": "1925-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2604",
+            "label": "Dosar 2604",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-042",
@@ -1764,7 +4160,49 @@
       "dossierId": "2604",
       "roles": [
         "membru"
-      ]
+      ],
+      "story": {
+        "personId": "pers-042",
+        "dossierId": "2604",
+        "dossierLabel": "Dosar 2604",
+        "roles": [
+          "membru"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1930",
+            "start": "1930-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2604",
+            "label": "Dosar 2604",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-043",
@@ -1772,7 +4210,49 @@
       "dossierId": "2610",
       "roles": [
         "cap de familie"
-      ]
+      ],
+      "story": {
+        "personId": "pers-043",
+        "dossierId": "2610",
+        "dossierLabel": "Dosar 2610",
+        "roles": [
+          "cap de familie"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1929",
+            "start": "1929-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": "M",
+          "profession": "elev",
+          "studies": "profesionale de liceu",
+          "civilStatus": null,
+          "address": "I. G. Duca nr. 86",
+          "origin": null,
+          "destination": null,
+          "fate": "supraviețuitor",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2610",
+            "label": "Dosar 2610",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-044",
@@ -1780,7 +4260,49 @@
       "dossierId": "2610",
       "roles": [
         "fiu"
-      ]
+      ],
+      "story": {
+        "personId": "pers-044",
+        "dossierId": "2610",
+        "dossierLabel": "Dosar 2610",
+        "roles": [
+          "fiu"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1929",
+            "start": "1929-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-2610",
+            "label": "Dosar 2610",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-045",
@@ -1788,7 +4310,125 @@
       "dossierId": "4030",
       "roles": [
         "cap de familie"
-      ]
+      ],
+      "story": {
+        "personId": "pers-045",
+        "dossierId": "4030",
+        "dossierLabel": "Dosar 4030",
+        "roles": [
+          "cap de familie"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1919",
+            "start": "1919-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": "M",
+          "profession": "Frizer",
+          "studies": "6 cl primare",
+          "civilStatus": "Căsătorit",
+          "address": "Traian nr. 5",
+          "origin": "Săveni",
+          "destination": "Șargorod",
+          "fate": "deportat",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [
+          {
+            "id": "pers-045-event-1",
+            "placeId": "claude-place-saveni",
+            "placeName": "Săveni",
+            "placeNameRo": "Săveni",
+            "date": {
+              "raw": "1919",
+              "start": "1919-01-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Birth / origin",
+            "description": "Locul nașterii",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-045-event-2",
+            "placeId": "claude-place-dorohoi",
+            "placeName": "Dorohoi",
+            "placeNameRo": "Dorohoi",
+            "date": {
+              "raw": "Noembrie 1941.",
+              "start": "1941-11-01",
+              "end": null,
+              "precision": "month"
+            },
+            "label": "Evacuation / deportation",
+            "description": "Deportat de la: Din Dorohoi",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-045-event-3",
+            "placeId": "claude-place-sargorod",
+            "placeName": "Șargorod",
+            "placeNameRo": "Șargorod",
+            "date": {
+              "raw": "Noembrie 1941.",
+              "start": "1941-11-01",
+              "end": null,
+              "precision": "month"
+            },
+            "label": "Evacuation / deportation",
+            "description": "Deportat la: în Șargorod",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-045-event-4",
+            "placeId": "claude-place-dorohoi",
+            "placeName": "Dorohoi",
+            "placeNameRo": "Dorohoi",
+            "date": {
+              "raw": "1945",
+              "start": "1945-06-01",
+              "end": null,
+              "precision": "year"
+            },
+            "label": "Return / repatriation",
+            "description": "Repatriat — prezent la ancheta C.M.E. (1945)",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          },
+          {
+            "id": "pers-045-event-5",
+            "placeId": "claude-place-transnistria",
+            "placeName": "Transnistria",
+            "placeNameRo": "Transnistria",
+            "date": {
+              "raw": null,
+              "start": null,
+              "end": null,
+              "precision": "unknown"
+            },
+            "label": "Evacuation / deportation",
+            "description": "Evacuare: Da in Transnistria",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+          }
+        ],
+        "materials": [
+          {
+            "id": "claude-dossier-4030",
+            "label": "Dosar 4030",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-046",
@@ -1796,7 +4436,49 @@
       "dossierId": "4030",
       "roles": [
         "soție"
-      ]
+      ],
+      "story": {
+        "personId": "pers-046",
+        "dossierId": "4030",
+        "dossierLabel": "Dosar 4030",
+        "roles": [
+          "soție"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1920",
+            "start": "1920-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-4030",
+            "label": "Dosar 4030",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     },
     {
       "id": "pers-047",
@@ -1804,7 +4486,49 @@
       "dossierId": "4030",
       "roles": [
         "fica"
-      ]
+      ],
+      "story": {
+        "personId": "pers-047",
+        "dossierId": "4030",
+        "dossierLabel": "Dosar 4030",
+        "roles": [
+          "fica"
+        ],
+        "profile": {
+          "birthDate": {
+            "raw": "1945",
+            "start": "1945-01-01",
+            "end": null,
+            "precision": "year"
+          },
+          "sex": null,
+          "profession": null,
+          "studies": null,
+          "civilStatus": null,
+          "address": null,
+          "origin": null,
+          "destination": null,
+          "fate": "membru",
+          "deathPlace": null,
+          "deathDate": {
+            "raw": null,
+            "start": null,
+            "end": null,
+            "precision": "unknown"
+          }
+        },
+        "timeline": [],
+        "materials": [
+          {
+            "id": "claude-dossier-4030",
+            "label": "Dosar 4030",
+            "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+            "pageCount": null
+          }
+        ],
+        "testimony": null,
+        "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+      }
     }
   ],
   "dossiers": [

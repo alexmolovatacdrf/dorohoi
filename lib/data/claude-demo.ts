@@ -3,6 +3,7 @@ import type {
   MapPlaceDatum,
   MapPlacePersonConnection,
   MapPlacePersonContext,
+  MapPersonStory,
   MapRouteDatum,
   MapViewModel,
 } from "@/lib/data/selectors";
@@ -25,24 +26,39 @@ const mapData: MapViewModel = {
           (route.originId === place.id || route.destinationId === place.id),
       );
       const person = claudeDemo.persons.find((candidate) => candidate.id === personId);
+      const story = person?.story as MapPersonStory | undefined;
+      const eventContexts = story?.timeline.filter((item) => item.placeId === place.id) ?? [];
       return {
         personId,
-        roles: [],
-        eventTypes: [...new Set(routeContexts.flatMap((route) => route.eventTypes))],
+        roles: person?.roles ?? [],
+        eventTypes: [...new Set([
+          ...routeContexts.flatMap((route) => route.eventTypes),
+          ...eventContexts.map((event) => event.label),
+        ])],
         dossierIds: person?.dossierId ? [person.dossierId] : [],
-        connections: routeContexts.map((route): MapPlacePersonConnection => ({
-          id: `route-${route.id}`,
-          roles: [route.originId === place.id ? "route origin" : "route destination"],
-          eventTypes: route.eventTypes,
-          date: {
-            raw: route.dateRaw,
-            start: route.dateStart,
-            end: route.dateEnd,
-            precision: route.dateStart === route.dateEnd ? "day" : "interval",
-          },
-          description: route.notes,
-          sourceLabel: route.sourceLabel,
-        })),
+        connections: [
+          ...eventContexts.map((event): MapPlacePersonConnection => ({
+            id: event.id,
+            roles: [event.label],
+            eventTypes: [event.label],
+            date: event.date,
+            description: event.description,
+            sourceLabel: event.sourceLabel,
+          })),
+          ...routeContexts.map((route): MapPlacePersonConnection => ({
+            id: `route-${route.id}`,
+            roles: [route.originId === place.id ? "route origin" : "route destination"],
+            eventTypes: route.eventTypes,
+            date: {
+              raw: route.dateRaw,
+              start: route.dateStart,
+              end: route.dateEnd,
+              precision: route.dateStart === route.dateEnd ? "day" : "interval",
+            },
+            description: route.notes,
+            sourceLabel: route.sourceLabel,
+          })),
+        ],
       };
     }),
     placeType: place.placeType as MapPlaceDatum["placeType"],
@@ -65,6 +81,7 @@ const mapData: MapViewModel = {
   persons: claudeDemo.persons.map((person) => ({
     ...person,
     dossierId: person.dossierId ? `claude-dossier-${person.dossierId}` : null,
+    story: person.story as MapPersonStory | undefined,
   })),
   groups: claudeDemo.groups.map((group) => ({
     ...group,
