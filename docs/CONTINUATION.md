@@ -7,7 +7,7 @@ Acest document păstrează punctul de continuare pentru următoarea sesiune. Con
 ## Starea Git
 
 - Branch: `feature/public-presentation-map`
-- HEAD: `f61e848` (`feat: add presentation-only deployment guard`)
+- HEAD: `da26516` (`docs: record Eugenia deployment URLs`)
 - Worktree: clean after the implementation checkpoint; nu au fost folosite reset, clean,
   checkout/restore destructiv și nu au fost șterse date existente.
 - Nu au fost folosite reset, clean, checkout/restore destructiv și nu au fost șterse date existente.
@@ -33,6 +33,8 @@ Checkpoint-urile relevante, în ordine:
 17. `abf33c6` — source-bound map person stories and richer Claude fixture
 18. `6aa9756` — map people popup actions, central story dialog and public legend
 19. `95ad1c4` — person story and Vercel access documentation
+20. `89c4341` — Eugenia export as the third Presentation Map dataset
+21. `da26516` — final Eugenia deployment URLs
 
 ## Server și URL-uri
 
@@ -156,6 +158,28 @@ Regenerarea fixture-ului, doar dacă sursa este prezentă și după o verificare
 node scripts/presentation/derive-claude-demo-map.mjs > data/demo/claude-map-demo.json
 ```
 
+## Datele din exportul Eugenia
+
+Al treilea tab din Presentation Map este `?dataset=eugenia`. Fixture-ul
+`data/demo/eugenia-map-demo.json` păstrează 52 de rânduri din foaia Excel
+`Eugenia_brut` și 16 dosare verificate din JSON, cu 65 de persoane structurate,
+27 victime și corecturile scan-check. Adaptorul nu le amestecă automat și nu
+le leagă încă de ruta `/persons/:id`.
+
+Regenerarea este documentată în `docs/PRESENTATION_MAP.md` și folosește:
+
+```bash
+python3 scripts/presentation/prepare-eugenia-demo.py \
+  --xlsx /mnt/c/Users/Alex\ Molovata/Downloads/Export_Dosare_Eugenia.xlsx \
+  --json /mnt/c/Users/Alex\ Molovata/Downloads/Export_Dosare_Eugenia.json \
+  --output data/demo/eugenia-map-demo.json
+```
+
+În hartă sunt mapate conservator doar Dorohoi și Mohyliv-Podilskyi când
+mențiunea este neambiguă; compusele rămân în layerul unresolved. Sunt desenate
+doar traseele cu ambele capete și persoana explicită în sursă. EHRI rămâne un
+overlay separat cu 385 de puncte.
+
 ## Verificări deja trecute
 
 - `npm test` — 31 teste în 5 fișiere
@@ -171,6 +195,16 @@ După adăugarea modelului Person story și a testelor pentru fixture-ul Claude:
 - `npm run lint` — trecut
 - `npm run build` — trecut
 - `npm run normalize` — trecut, fără modificări în `data/normalized/`
+
+Verificarea importului Eugenia:
+
+- `npm test` — 39 teste în 7 fișiere
+- `npm run typecheck` — trecut
+- `npm run lint` — trecut
+- `npm run build` — trecut local și pe ambele proiecte Vercel
+- `npm audit --json` — 0 vulnerabilități
+- alias Presentation Eugenia — HTTP 200
+- deployment unic Presentation — Vercel SSO redirect, conform protecției
 
 Fișa centrală a persoanei este acum implementată în ambele moduri. Popup-ul
 unei localități listează persoanele asociate și deschide această fișă la click
@@ -201,14 +235,16 @@ Observație: `npm run build` poate rescrie automat importul din `next-env.d.ts` 
 
 1. Verifică `git status`, HEAD și serverul local.
 2. Deschide ambele dataset-uri din URL-urile de mai sus.
-3. În Claude demo, extinde prima familie, selectează `Goldemberg Roza` sau `Hoisie Bercu`, verifică traseul din panoul drept și apasă `Play route`.
-4. Confirmă vizual că traseul este desenat progresiv, lent, o singură dată și că markerul de progres se deplasează.
-5. Verifică click și click dreapta pe un poligon istoric; popup-ul nu trebuie să apară la simpla trecere a mausului.
-6. Verifică lunile înainte de apariția Transnistriei, august 1941, martie 1944 și aprilie 1944.
-7. Verifică layout-ul la 1366×768, 1920×1080 și 390×844: panoul stâng nu trebuie să se suprapună cu elemente de hartă, panoul drept trebuie să rămână utilizabil, iar footer-ul nu trebuie să apară.
-8. Verifică în continuare `/map`: filtrele avansate, layer-ul regional și informațiile de proveniență trebuie să rămână funcționale.
-9. În `/map`, verifică și directorul din `Context`: deschide/închide secțiunile cu săgeata nativă, selectează un cap de familie și o persoană menționată, apoi confirmă că ruta selectată rămâne individuală și apare în lista de trasee.
-10. În ambele hărți, verifică formatul datelor după schimbarea EN/RO și al doilea click pe aceeași localitate pentru închiderea casetei.
+3. Deschide tabul `Eugenia data`, caută `Popsingher Iancu`, extinde dosarul 2526
+   și verifică diferența dintre persoanele structurate și rândul tabelului.
+4. În Claude demo, extinde prima familie, selectează `Goldemberg Roza` sau `Hoisie Bercu`, verifică traseul din panoul drept și apasă `Play route`.
+5. Confirmă vizual că traseul este desenat progresiv, lent, o singură dată și că markerul de progres se deplasează.
+6. Verifică click și click dreapta pe un poligon istoric; popup-ul nu trebuie să apară la simpla trecere a mausului.
+7. Verifică lunile înainte de apariția Transnistriei, august 1941, martie 1944 și aprilie 1944.
+8. Verifică layout-ul la 1366×768, 1920×1080 și 390×844: panoul stâng nu trebuie să se suprapună cu elemente de hartă, panoul drept trebuie să rămână utilizabil, iar footer-ul nu trebuie să apară.
+9. Verifică în continuare `/map`: filtrele avansate, layer-ul regional și informațiile de proveniență trebuie să rămână funcționale.
+10. În `/map`, verifică și directorul din `Context`: deschide/închide secțiunile cu săgeata nativă, selectează un cap de familie și o persoană menționată, apoi confirmă că ruta selectată rămâne individuală și apare în lista de trasee.
+11. În ambele hărți, verifică formatul datelor după schimbarea EN/RO și al doilea click pe aceeași localitate pentru închiderea casetei.
 
 ## Lucru rămas / atenționări
 
