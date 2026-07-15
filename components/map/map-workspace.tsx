@@ -164,6 +164,7 @@ const controlClass =
   "w-full border border-[#c8c3b8] bg-white px-2.5 py-2 text-[11px] text-[#34473f] outline-none focus:border-[#2f6658]";
 const basemapFallbackMessage =
   "OpenStreetMap tiles are unavailable. The local research grid, project places, routes, filters and layer controls remain active.";
+const ANIMATION_SEGMENT_DURATION_MS = 2800;
 
 function LayerToggle({
   label,
@@ -319,22 +320,104 @@ function routeArrow(color: string): ImageData {
   return context.getImageData(0, 0, canvas.width, canvas.height);
 }
 
-function routeCollection(routes: MapRouteDatum[]): FeatureCollection<LineString, GeoJsonProperties> {
+function curvedRouteCoordinates(route: MapRouteDatum): Array<[number, number]> {
+  const [[startLongitude, startLatitude], [endLongitude, endLatitude]] = route.coordinates;
+  const deltaLongitude = endLongitude - startLongitude;
+  const deltaLatitude = endLatitude - startLatitude;
+  const distance = Math.hypot(deltaLongitude, deltaLatitude) || 1;
+  const normalLongitude = -deltaLatitude / distance;
+  const normalLatitude = deltaLongitude / distance;
+  const bend = Math.min(2.4, Math.max(0.25, distance * 0.12)) * (route.sequence % 2 === 0 ? -1 : 1);
+  const controlLongitude = (startLongitude + endLongitude) / 2 + normalLongitude * bend;
+  const controlLatitude = (startLatitude + endLatitude) / 2 + normalLatitude * bend;
+  const points: Array<[number, number]> = [];
+
+  for (let index = 0; index <= 24; index += 1) {
+    const t = index / 24;
+    const inverse = 1 - t;
+    points.push([
+      inverse * inverse * startLongitude + 2 * inverse * t * controlLongitude + t * t * endLongitude,
+      inverse * inverse * startLatitude + 2 * inverse * t * controlLatitude + t * t * endLatitude,
+    ]);
+  }
+
+  // The curve is a presentation aid between documented endpoints, not a claim
+  // about the exact historical road or railway line.
+  points[0] = [startLongitude, startLatitude];
+  points[points.length - 1] = [endLongitude, endLatitude];
+  return points;
+}
+
+function routePointAtProgress(points: Array<[number, number]>, progress: number): [number, number] {
+  const boundedProgress = Math.max(0, Math.min(1, progress));
+  const position = boundedProgress * (points.length - 1);
+  const lowerIndex = Math.floor(position);
+  const upperIndex = Math.min(points.length - 1, lowerIndex + 1);
+  const remainder = position - lowerIndex;
+  const lower = points[lowerIndex] ?? points[0];
+  const upper = points[upperIndex] ?? lower;
+  return [
+    lower[0] + (upper[0] - lower[0]) * remainder,
+    lower[1] + (upper[1] - lower[1]) * remainder,
+  ];
+}
+
+function easeInOutCubic(progress: number): number {
+  const boundedProgress = Math.max(0, Math.min(1, progress));
+  return boundedProgress < 0.5
+    ? 4 * boundedProgress * boundedProgress * boundedProgress
+    : 1 - Math.pow(-2 * boundedProgress + 2, 3) / 2;
+}
+
+function routeCollection(
+  routes: MapRouteDatum[],
+  partialRouteId: string | null = null,
+  partialProgress = 1,
+  usePresentationCurves = true,
+): FeatureCollection<LineString, GeoJsonProperties> {
   return {
     type: "FeatureCollection",
-    features: routes.map((route) => ({
-      type: "Feature",
-      id: route.id,
-      geometry: { type: "LineString", coordinates: route.coordinates },
-      properties: {
+    features: routes.map((route) => {
+      const coordinates = usePresentationCurves ? curvedRouteCoordinates(route) : route.coordinates;
+      const visibleCoordinates = route.id === partialRouteId
+        ? coordinates.slice(0, Math.max(2, Math.ceil(easeInOutCubic(partialProgress) * (coordinates.length - 1)) + 1))
+        : coordinates;
+      return {
+        type: "Feature",
         id: route.id,
-        label: `${route.originName} → ${route.destinationName}`,
-        personId: route.personId,
-        personName: route.personName,
-        routeStatus: route.routeStatus,
-        confidence: route.confidence,
+        geometry: { type: "LineString", coordinates: visibleCoordinates },
+        properties: {
+          id: route.id,
+          label: `${route.originName} → ${route.destinationName}`,
+          personId: route.personId,
+          personName: route.personName,
+          routeStatus: route.routeStatus,
+          confidence: route.confidence,
+        },
+      };
+    }),
+  };
+}
+
+function routeProgressCollection(
+  route: MapRouteDatum | null,
+  progress: number,
+): FeatureCollection<Point, GeoJsonProperties> {
+  if (!route) return emptyPointCollection;
+  return {
+    type: "FeatureCollection",
+    features: [{
+      type: "Feature",
+      id: `progress-${route.id}`,
+      geometry: { type: "Point", coordinates: routePointAtProgress(curvedRouteCoordinates(route), easeInOutCubic(progress)) },
+      properties: {
+        color: route.routeStatus === "partial"
+          ? "#a54f32"
+          : route.routeStatus === "inferred"
+            ? "#7e6b8d"
+            : "#236353",
       },
-    })),
+    }],
   };
 }
 
@@ -404,7 +487,7 @@ export function MapWorkspace({
   const [basemapStatus, setBasemapStatus] = useState<BasemapStatus>("loading");
   const [historicalManifest, setHistoricalManifest] = useState<HistoricalManifest | null>(null);
   const [historicalYearMonth, setHistoricalYearMonth] = useState("1941-08");
-  const [historicalOpacity, setHistoricalOpacity] = useState(0.5);
+  const [historicalOpacity, setHistoricalOpacity] = useState(0.28);
   const [historicalLayerStatus, setHistoricalLayerStatus] = useState<HistoricalLayerStatus>("loading_manifest");
   const [historicalDiagnostic, setHistoricalDiagnostic] = useState<string | null>(null);
   const [historicalFeatureCount, setHistoricalFeatureCount] = useState(0);
@@ -443,6 +526,7 @@ export function MapWorkspace({
     inferred: false,
   }));
   const [timelineStep, setTimelineStep] = useState<number | null>(null);
+  const [timelineProgress, setTimelineProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
@@ -462,6 +546,12 @@ export function MapWorkspace({
 
   const selectedGroup = data.groups.find((group) => group.id === filters.group);
   const selectedPerson = data.persons.find((person) => person.id === filters.person);
+  const selectedPersonDossierMembers = useMemo(
+    () => selectedPerson
+      ? data.persons.filter((person) => person.dossierId === selectedPerson.dossierId && person.id !== selectedPerson.id)
+      : [],
+    [data.persons, selectedPerson],
+  );
   const selectedPersonRoutes = useMemo(
     () => data.routes.filter((route) => route.personId === filters.person).sort((left, right) => left.sequence - right.sequence),
     [data.routes, filters.person],
@@ -552,10 +642,21 @@ export function MapWorkspace({
     [data.routes, filters, layers.individualRoutes, layers.inferred, selectedGroup],
   );
 
+  const activePlaybackRoute = useMemo(() => {
+    if (!isPresentation || !filters.person || timelineStep === null) return null;
+    return selectedPersonRoutes[timelineStep ?? 0] ?? null;
+  }, [filters.person, isPresentation, selectedPersonRoutes, timelineStep]);
+
   const visibleRoutes = useMemo(() => {
-    if (!filters.person || timelineStep === null) return preTimelineRoutes;
-    return preTimelineRoutes.filter((route) => route.sequence <= timelineStep);
-  }, [filters.person, preTimelineRoutes, timelineStep]);
+    if (!filters.person) return preTimelineRoutes;
+    if (!isPresentation) {
+      if (timelineStep === null) return preTimelineRoutes;
+      return preTimelineRoutes.filter((route) => route.sequence <= timelineStep);
+    }
+    if (timelineStep === null && !isPlaying) return preTimelineRoutes;
+    const completedRouteIds = new Set(selectedPersonRoutes.slice(0, timelineStep ?? 0).map((route) => route.id));
+    return preTimelineRoutes.filter((route) => completedRouteIds.has(route.id) || route.id === activePlaybackRoute?.id);
+  }, [activePlaybackRoute?.id, filters.person, isPlaying, isPresentation, preTimelineRoutes, selectedPersonRoutes, timelineStep]);
 
   const familyContextPlaces = useMemo(() => {
     if (!selectedGroup || !layers.familyContext) return [];
@@ -643,7 +744,9 @@ export function MapWorkspace({
       });
       activeMap = map;
       mapRef.current = map;
-      map.addControl(new maplibregl.NavigationControl({ showCompass: true, visualizePitch: true }), "top-right");
+      // The compass/pitch button is not useful for this 2D public atlas and
+      // reads as a persistent arrow menu over the map. Keep only zoom controls.
+      map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
       map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
 
       map.on("error", (event) => {
@@ -686,6 +789,7 @@ export function MapWorkspace({
           map.addSource("ehri-places", { type: "geojson", data: emptyPointCollection });
           map.addSource("family-places", { type: "geojson", data: emptyPointCollection });
           map.addSource("research-routes", { type: "geojson", data: emptyLineCollection });
+          map.addSource("route-progress", { type: "geojson", data: emptyPointCollection });
 
           map.addLayer({
             id: HISTORICAL_FILL_LAYER_ID,
@@ -756,6 +860,28 @@ export function MapWorkspace({
               "icon-rotation-alignment": "map",
               "icon-keep-upright": false,
               "icon-allow-overlap": true,
+            },
+          });
+          map.addLayer({
+            id: "route-progress-halo",
+            type: "circle",
+            source: "route-progress",
+            paint: {
+              "circle-radius": 11,
+              "circle-color": "rgba(255,253,248,0.92)",
+              "circle-stroke-width": 1,
+              "circle-stroke-color": ["get", "color"],
+            },
+          });
+          map.addLayer({
+            id: "route-progress-core",
+            type: "circle",
+            source: "route-progress",
+            paint: {
+              "circle-radius": 6,
+              "circle-color": ["get", "color"],
+              "circle-stroke-width": 1.5,
+              "circle-stroke-color": "#ffffff",
             },
           });
 
@@ -927,8 +1053,15 @@ export function MapWorkspace({
     (map.getSource("research-places") as GeoJSONSource).setData(pointCollection(visibleCorePlaces, language));
     (map.getSource("ehri-places") as GeoJSONSource).setData(pointCollection(visibleEhriPlaces, language));
     (map.getSource("family-places") as GeoJSONSource).setData(pointCollection(familyContextPlaces, language));
-    (map.getSource("research-routes") as GeoJSONSource).setData(routeCollection(visibleRoutes));
-  }, [familyContextPlaces, language, mapReady, visibleCorePlaces, visibleEhriPlaces, visibleRoutes]);
+    (map.getSource("research-routes") as GeoJSONSource).setData(
+      routeCollection(visibleRoutes, activePlaybackRoute?.id ?? null, timelineProgress, isPresentation),
+    );
+    (map.getSource("route-progress") as GeoJSONSource).setData(
+      activePlaybackRoute
+        ? routeProgressCollection(activePlaybackRoute, timelineProgress)
+        : emptyPointCollection,
+    );
+  }, [activePlaybackRoute, familyContextPlaces, isPresentation, language, mapReady, timelineProgress, visibleCorePlaces, visibleEhriPlaces, visibleRoutes]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -1044,18 +1177,24 @@ export function MapWorkspace({
   const fitMapToBbox = useCallback((bbox: [number, number, number, number]) => {
     const map = mapRef.current;
     if (!map) return;
+    const narrowPresentation = isPresentation && typeof window !== "undefined" && window.innerWidth < 720;
+    const padding = isPresentation
+      ? narrowPresentation
+        ? { top: presentationPanelOpen ? 360 : 72, right: 28, bottom: 170, left: 28 }
+        : { top: 72, right: 72, bottom: 170, left: presentationPanelOpen ? 420 : 72 }
+      : 36;
     map.fitBounds(
       [
         [bbox[0], bbox[1]],
         [bbox[2], bbox[3]],
       ],
       {
-        padding: isPresentation ? 72 : 36,
-        duration: 0,
+        padding,
+        duration: isPresentation ? 1100 : 0,
         maxZoom: isPresentation ? 7 : 9,
       },
     );
-  }, [isPresentation]);
+  }, [isPresentation, presentationPanelOpen]);
 
   const fitPersonView = useCallback(() => {
     if (!filters.person) return;
@@ -1128,12 +1267,28 @@ export function MapWorkspace({
     if (!isPlaying || !filters.person) return;
     const step = timelineStep ?? 0;
     if (step >= selectedPersonRoutes.length) return;
-    const timer = window.setTimeout(() => {
-      const nextStep = step + 1;
-      setTimelineStep(nextStep);
-      if (nextStep >= selectedPersonRoutes.length) setIsPlaying(false);
-    }, 850);
-    return () => window.clearTimeout(timer);
+
+    const startedAt = window.performance.now();
+    let frame = 0;
+    const tick = (now: number) => {
+      const rawProgress = Math.min(1, (now - startedAt) / ANIMATION_SEGMENT_DURATION_MS);
+      setTimelineProgress(rawProgress);
+      if (rawProgress >= 1) {
+        const nextStep = step + 1;
+        setTimelineStep(nextStep);
+        if (nextStep >= selectedPersonRoutes.length) {
+          setIsPlaying(false);
+          setTimelineProgress(1);
+        } else {
+          setTimelineProgress(0);
+        }
+        return;
+      }
+      frame = window.requestAnimationFrame(tick);
+    };
+
+    frame = window.requestAnimationFrame(tick);
+    return () => window.cancelAnimationFrame(frame);
   }, [filters.person, isPlaying, selectedPersonRoutes.length, timelineStep]);
 
   const selectedPlace = selection?.kind === "place" ? data.places.find((place) => place.id === selection.id) : null;
@@ -1156,7 +1311,8 @@ export function MapWorkspace({
 
   const resetView = () => {
     setIsPlaying(false);
-    setTimelineStep(filters.person ? 0 : null);
+    setTimelineStep(null);
+    setTimelineProgress(0);
     if (!isPresentation) return;
     if (filters.person) {
       fitPersonView();
@@ -1199,6 +1355,13 @@ export function MapWorkspace({
       <p className="presentation-card__eyebrow">Person / story</p>
       <h2 className="presentation-card__title">{selectedPerson.label}</h2>
       <p className="presentation-card__body">{selectedPersonRoutes.length ? `${selectedPersonRoutes.length} documented movement segments in the current research collection.` : "No documented route segments in the current research collection."}</p>
+      {selectedPersonDossierMembers.length ? (
+        <div className="presentation-card__family-context">
+          <p className="presentation-label">Other people in this dossier</p>
+          <p className="presentation-card__body">{selectedPersonDossierMembers.map((person) => person.label).join(" · ")}</p>
+          <p className="presentation-card__meta">Each person remains an individual record; routes are not assigned to relatives without explicit evidence.</p>
+        </div>
+      ) : null}
       <p className="presentation-card__meta">The timeline below draws the route progressively and keeps the underlying evidence available in the research dossier.</p>
     </>
   ) : null;
@@ -1221,14 +1384,31 @@ export function MapWorkspace({
             value={filters.person}
             onChange={(event) => {
               updateFilter("person", event.target.value);
-              setTimelineStep(event.target.value ? 0 : null);
+              setTimelineStep(null);
+              setTimelineProgress(0);
               setIsPlaying(false);
               setSelection(null);
             }}
             aria-label="Person or story"
           >
             <option value="">All project stories</option>
-            {data.persons.map((person) => <option key={person.id} value={person.id}>{person.label}</option>)}
+            {data.dossiers.map((dossier) => {
+              const dossierPeople = data.persons.filter((person) => person.dossierId === dossier.id);
+              if (!dossierPeople.length) return null;
+              return (
+                <optgroup key={dossier.id} label={`${dossier.label} · ${dossierPeople.length} people`}>
+                  {dossierPeople.map((person) => {
+                    const isHeadOrDeclarant = person.roles.some((role) => /^declarant$|cap de familie|head/i.test(role));
+                    return <option key={person.id} value={person.id}>{person.label}{isHeadOrDeclarant ? " · head / declarant" : " · family member"}</option>;
+                  })}
+                </optgroup>
+              );
+            })}
+            {data.persons.some((person) => !person.dossierId) ? (
+              <optgroup label="Unlinked project stories">
+                {data.persons.filter((person) => !person.dossierId).map((person) => <option key={person.id} value={person.id}>{person.label}</option>)}
+              </optgroup>
+            ) : null}
           </select>
         </label>
       ) : null}
@@ -1243,6 +1423,7 @@ export function MapWorkspace({
         {presentationMapConfig.historicalAdministration ? (
           <div className="presentation-group__content">
             <LayerToggle label="Historical administration" marker="▧" checked={layers.historicalAdministration} onChange={(value) => updateLayer("historicalAdministration", value)} note={historicalLayerStatus === "ready" ? `${historicalFeatureCount} European polygons` : historicalLayerStatus === "failed" ? "Historical data unavailable" : "Monthly source snapshots"} />
+            {layers.historicalAdministration ? <label className="presentation-opacity-control"><span className="presentation-label">Historical polygon opacity <strong>{Math.round(historicalOpacity * 100)}%</strong></span><input aria-label="Presentation polygon opacity" type="range" min={0.1} max={0.65} step={0.05} value={historicalOpacity} onChange={(event) => setHistoricalOpacity(Number(event.target.value))} className="w-full accent-[#76536f]" /></label> : null}
             <LayerToggle label="Modern basemap" marker="▦" checked={layers.basemap} onChange={(value) => updateLayer("basemap", value)} note={basemapStatus === "available" ? "OpenStreetMap connected" : "Local grid remains available"} />
             {layers.historicalAdministration && historicalManifest && selectedHistoricalSnapshot ? (
               <div className="presentation-history-controls" data-testid="presentation-historical-controls">
@@ -1254,7 +1435,6 @@ export function MapWorkspace({
                 </label>
                 <input aria-label="Presentation historical timeline" type="range" min={0} max={historicalManifest.snapshots.length - 1} step={1} value={selectedHistoricalIndex} onChange={(event) => { const snapshot = historicalManifest.snapshots[Number(event.target.value)]; if (snapshot) { setHistoricalYearMonth(snapshot.yearMonth); setSelection(null); } }} className="mt-3 w-full accent-[#76536f]" data-testid="presentation-month-range" />
                 <div className="presentation-history-controls__row"><span>{selectedHistoricalSnapshot.snapshotDate}</span><span>{selectedHistoricalSnapshot.status === "primary" ? "Primary interval" : "Limited/static"}</span></div>
-                <label className="mt-3 block"><span className="presentation-label">Polygon opacity <strong>{Math.round(historicalOpacity * 100)}%</strong></span><input aria-label="Presentation polygon opacity" type="range" min={0.1} max={0.85} step={0.05} value={historicalOpacity} onChange={(event) => setHistoricalOpacity(Number(event.target.value))} className="w-full accent-[#76536f]" /></label>
                 {presentationMapConfig.legend && presentationLegend.length ? <div className="presentation-legend" aria-label="Public historical legend"><p className="presentation-label">Public legend</p>{presentationLegend.map((entry) => <div key={entry.value} className="presentation-legend__item"><span style={{ backgroundColor: entry.color }} aria-hidden="true" />{entry.label}</div>)}</div> : null}
                 {selectedHistoricalSnapshot.status === "limited_static" ? <p className="presentation-warning">October 1944–May 1945 is limited/static evidence; it is not equivalent to the primary interval.</p> : null}
                 <p className="presentation-method">{historicalManifest.methodologicalWarning}</p>
@@ -1303,10 +1483,10 @@ export function MapWorkspace({
     <section className="presentation-map__timeline absolute right-3 bottom-3 left-3 z-20 border border-[#bdb7aa] bg-[#fffdf8]/95 p-3 shadow-[0_12px_35px_rgba(22,42,35,0.18)] backdrop-blur-md sm:right-5 sm:bottom-5 sm:left-5" data-testid="presentation-timeline">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="min-w-44"><p className="presentation-card__eyebrow">Story timeline</p><p className="font-editorial text-lg font-bold text-[#173f36]">{selectedPerson?.label ?? "Select a person or story"}</p></div>
-        <div className="flex min-w-0 grow items-center gap-2 overflow-x-auto py-1">{selectedPersonRoutes.length ? selectedPersonRoutes.map((route, index) => <div key={route.id} className="flex min-w-fit items-center gap-2"><span className={`grid size-7 place-items-center rounded-full border text-sm font-bold ${timelineStep !== null && route.sequence <= timelineStep ? "border-[#173f36] bg-[#173f36] text-white" : "border-[#9fa69f] bg-white text-[#56645e]"}`}>{route.sequence}</span><span className="max-w-32 truncate text-sm text-[#5e6b65]">{route.destinationName}</span>{index < selectedPersonRoutes.length - 1 ? <span className="h-px w-8 bg-[#b9b3a7]" /> : null}</div>) : <p className="text-sm text-[#747f79]">No documented route selected.</p>}</div>
-        <div className="flex min-w-fit gap-2"><button type="button" disabled={!filters.person || !selectedPersonRoutes.length || isPlaying} onClick={() => { if (timelineStep === null || timelineStep >= selectedPersonRoutes.length) setTimelineStep(0); setIsPlaying(true); }} className="presentation-primary-button">Play once</button><button type="button" disabled={!isPlaying} onClick={() => setIsPlaying(false)} className="presentation-secondary-button">Pause</button><button type="button" disabled={!filters.person} onClick={resetView} className="presentation-secondary-button">Reset</button></div>
+        <div className="flex min-w-0 grow items-center gap-2 overflow-x-auto py-1">{selectedPersonRoutes.length ? selectedPersonRoutes.map((route, index) => <div key={route.id} className="flex min-w-fit items-center gap-2"><span className={`grid size-7 place-items-center rounded-full border text-sm font-bold ${timelineStep !== null && index < timelineStep ? "border-[#173f36] bg-[#173f36] text-white" : "border-[#9fa69f] bg-white text-[#56645e]"}`}>{route.sequence}</span><span className="max-w-32 truncate text-sm text-[#5e6b65]">{route.destinationName}</span>{index < selectedPersonRoutes.length - 1 ? <span className="h-px w-8 bg-[#b9b3a7]" /> : null}</div>) : <p className="text-sm text-[#747f79]">No documented route selected.</p>}</div>
+        <div className="flex min-w-fit gap-2"><button type="button" disabled={!filters.person || !selectedPersonRoutes.length || isPlaying} onClick={() => { if (timelineStep === null || timelineStep >= selectedPersonRoutes.length) { setTimelineStep(0); setTimelineProgress(0); } setIsPlaying(true); }} className="presentation-primary-button">Play once</button><button type="button" disabled={!isPlaying} onClick={() => setIsPlaying(false)} className="presentation-secondary-button">Pause</button><button type="button" onClick={resetView} className="presentation-secondary-button">Reset</button></div>
       </div>
-      <p className="presentation-method mt-2">Playback never starts automatically and never loops.</p>
+      <p className="presentation-method mt-2">Playback is manual, slow and one-shot. Curved lines are visual guides between documented endpoints, not exact historical roads.</p>
     </section>
   ) : null;
 
@@ -1365,7 +1545,7 @@ export function MapWorkspace({
           <p className="mt-1 text-[8px] leading-3 text-[#6f453a]">{historicalDiagnostic}</p>
         </div>
       ) : null}
-      <div className="pointer-events-none absolute top-3 left-3 border border-[#a9a397] bg-[#fffdf8]/92 px-3 py-2 shadow-md backdrop-blur-sm">
+      {!isPresentation ? <div className="pointer-events-none absolute top-3 left-3 border border-[#a9a397] bg-[#fffdf8]/92 px-3 py-2 shadow-md backdrop-blur-sm">
         <p className="text-[8px] font-black tracking-[0.13em] text-[#6f7974] uppercase">{isPresentation ? "Historical atlas" : "Visible evidence"}</p>
         <p className="mt-1 text-xs font-bold text-[#173f36]">{visibleCorePlaces.length} places · {visibleRoutes.length} routes · {visibleEhriPlaces.length} EHRI{layers.historicalAdministration ? ` · ${historicalFeatureCount} historical` : ""}</p>
         <p className="mt-1 text-[8px] text-[#707b76]" data-testid="map-service-status">
@@ -1387,7 +1567,7 @@ export function MapWorkspace({
           </p>
         ) : null}
         <p className="mt-0.5 text-[8px] text-[#707b76]">Research grid · no boundary claims</p>
-      </div>
+      </div> : null}
     </div>
     );
   }

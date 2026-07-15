@@ -17,6 +17,29 @@ local EHRI registry, exposes the resulting evidence through typed selectors,
 and presents it through searchable research pages and an interactive MapLibre
 workspace. No database or source-data write-back has been introduced.
 
+## Presentation Map feedback pass
+
+The current presentation-map refinement keeps the Claude HTML prototype as a
+visual and interaction reference only; its embedded sample data is not copied
+into the normalized research collections. The useful dossier semantics are now
+represented in the public selector and story card: a documented head/declarant
+is distinct from other people listed in the same dossier, while each person's
+routes remain individual and evidence-bound.
+
+The public playback now draws slow, smooth visual curves between documented
+endpoints, moves a progress marker along the active curve, runs once and stops.
+The MapLibre compass/pitch arrow was removed; only zoom controls remain. The
+presentation status box that had been behind the left control panel is hidden
+from the public canvas because its information is already available in the
+controls and layer status. Historical polygon opacity starts at 28% and is
+controlled directly below the historical-layer toggle so basemap detail stays
+readable. Selecting a person fits the map to all of that person's documented
+route endpoints and places with an eased camera transition.
+
+The black `N` button seen during local development is the Next.js development
+overlay (`Open Next.js Dev Tools`), not an application map control. It should
+not be treated as part of the public interface or production screenshots.
+
 The immutable boundary has been preserved: `data/source/` was inspected but not
 modified. All generated research collections are written to
 `data/normalized/`.

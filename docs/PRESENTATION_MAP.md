@@ -36,9 +36,18 @@ public category and attribution.
 Europe view fits the full historical-data extent. Project region fits the
 documented project window `[19.0, 43.3, 34.5, 52.6]`. Reset returns to the
 contextually relevant state: the selected person's route and places, or the
-full European extent when no person is selected. Selecting a person shows a
-small story card and bottom timeline. Playback is manual, progressive, runs
-once and never loops; Replay/Play once is never triggered on page load.
+full European extent when no person is selected. Selecting a person animates
+to a bounding box covering all of that person's documented route endpoints and
+places; it does not inherit relatives' routes. The person selector groups
+people under their dossier and marks the documented head/declarant separately.
+The selected-person card also lists other people in the same dossier when the
+normalized data supports that relationship.
+
+The bottom timeline uses a slow, one-shot progression. Each route is rendered
+as a smooth visual curve between its documented endpoints, with a moving
+progress marker; the curve is explicitly a presentation aid, not a claim about
+the exact historical road. Playback never starts automatically and never
+loops.
 
 The left panel collapses, the story card appears only after a selection, and
 the timeline stays along the bottom. Hide interface leaves the map, timeline
@@ -93,6 +102,15 @@ The public basemap is an external OpenStreetMap raster source. If it is
 unavailable, the locally rendered neutral grid and project evidence remain
 usable. The local EHRI extract is not a live synchronized catalog, and
 unresolved places never receive fabricated coordinates.
+
+The historical polygon opacity slider is shown directly beneath the Historical
+administration toggle. It starts at 28%, which keeps city, river and basemap
+detail legible; the public range is 10–65%.
+
+The map uses zoom controls only. The MapLibre compass/pitch arrow has been
+removed because the public map is a flat 2D atlas. A black `N` button visible
+when running `next dev` belongs to the Next.js development overlay, not to the
+map application; it is not present in a production build.
 
 ## Verification and screenshots
 

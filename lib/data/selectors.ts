@@ -255,7 +255,7 @@ export interface MapGroupDatum {
 export interface MapViewModel {
   places: MapPlaceDatum[];
   routes: MapRouteDatum[];
-  persons: Array<{ id: string; label: string; dossierId: string | null }>;
+  persons: Array<{ id: string; label: string; dossierId: string | null; roles: string[] }>;
   groups: MapGroupDatum[];
   dossiers: Array<{ id: string; label: string }>;
   eventTypes: string[];
@@ -382,6 +382,7 @@ export function getMapViewModel(data: NormalizedBundle = getResearchData()): Map
       id: person.personId,
       label: person.displayName,
       dossierId: person.dossierId,
+      roles: person.roles,
     })),
     groups,
     dossiers: data.documents.map((document) => ({ id: document.documentId, label: document.title })),
