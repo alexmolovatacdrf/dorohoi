@@ -46,6 +46,12 @@ lists families, dossiers and individual people and shows the selected story
 details. Map pages hide the global footer so it cannot remain in or consume the
 map viewport; editorial pages retain it.
 
+Historical polygon information no longer appears on hover. It opens only after
+an explicit click or right-click and the popup has a close button. The Claude
+demo adapter also normalizes its internal dossier references so the documented
+head and mentioned people appear under the same family entry and their routes
+remain selectable individually.
+
 The Presentation Map now exposes a clearly labelled test-data switcher. The
 Project data option uses the normalized collections. The Claude demo option
 uses the derived fixture at `data/demo/claude-map-demo.json`, containing 48

@@ -90,6 +90,10 @@ individual route ownership and enables that person's timeline. The global
 site footer is hidden on map workspaces so it cannot reduce the map viewport;
 it remains available on the editorial and research pages.
 
+Historical polygon details are interaction-based: they do not open on pointer
+hover. A normal click or a right-click on a polygon opens the closeable raw
+attribute popup and the selected-detail panel.
+
 ## Typed module configuration
 
 Public modules are controlled by the typed file-backed configuration in

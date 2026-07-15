@@ -178,6 +178,25 @@ summary {
   padding-top: 0.75rem;
 }
 
+.presentation-family-card {
+  margin-top: 0.7rem;
+  border: 1px solid #ded8cc;
+  background: rgb(248 243 232 / 64%);
+}
+
+.presentation-family-card__hint,
+.presentation-family-card__meta {
+  display: block;
+  color: #6d7972;
+  font-size: 0.75rem !important;
+  line-height: 1.35;
+}
+
+.presentation-family-card__meta {
+  border-top: 1px solid #ded8cc;
+  padding: 0.45rem 0.65rem;
+}
+
 .presentation-people-dossier {
   margin-top: 0.4rem;
   border: 1px solid #ded8cc;
@@ -234,6 +253,11 @@ summary {
   margin-top: 0.9rem;
   border-color: #c8c3b8;
   background: #fffdf8;
+  font-weight: 800;
+}
+
+.presentation-person-option--head {
+  border-left: 3px solid #a54f32;
   font-weight: 800;
 }
 

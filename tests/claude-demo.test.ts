@@ -18,8 +18,10 @@ describe("Claude map demo fixture", () => {
     const roza = data.persons.find((person) => person.label === "Goldemberg Roza");
 
     expect(roza?.roles).toContain("cap de familie");
+    expect(roza?.dossierId).toBe("claude-dossier-2534_2");
     expect(data.groups.find((group) => group.label.startsWith("Goldemberg Roza"))?.personIds).toContain(roza?.id);
     expect(data.routes.filter((route) => route.personId === roza?.id).length).toBeGreaterThan(0);
+    expect(data.routes.find((route) => route.personId === roza?.id)?.dossierId).toBe(roza?.dossierId);
     expect(data.routes.every((route) => route.sourceLabel.includes("Claude demo"))).toBe(true);
   });
 });

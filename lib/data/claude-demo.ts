@@ -24,6 +24,7 @@ const mapData: MapViewModel = {
   })),
   routes: claudeDemo.routes.map((route): MapRouteDatum => ({
     ...route,
+    dossierId: route.dossierId ? `claude-dossier-${route.dossierId}` : null,
     coordinates: [
       route.coordinates[0] as [number, number],
       route.coordinates[1] as [number, number],
@@ -31,7 +32,10 @@ const mapData: MapViewModel = {
     routeStatus: route.routeStatus as MapRouteDatum["routeStatus"],
     confidence: route.confidence as MapRouteDatum["confidence"],
   })),
-  persons: claudeDemo.persons,
+  persons: claudeDemo.persons.map((person) => ({
+    ...person,
+    dossierId: person.dossierId ? `claude-dossier-${person.dossierId}` : null,
+  })),
   groups: claudeDemo.groups.map((group) => ({
     ...group,
     kind: group.kind as "family" | "household",
