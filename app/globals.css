@@ -316,9 +316,9 @@ summary {
 }
 
 .presentation-people-dossier {
-  margin-top: 0.4rem;
-  border: 1px solid #ded8cc;
-  background: rgb(248 243 232 / 64%);
+  margin-top: 0;
+  border-top: 1px solid #ded8cc;
+  background: transparent;
 }
 
 .presentation-people-dossier summary {
@@ -326,9 +326,10 @@ summary {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.55rem 0.65rem;
+  padding: 0.45rem 0.65rem;
   color: #315c50;
   font-weight: 800;
+  list-style-position: inside;
 }
 
 .presentation-people-dossier summary span:last-child {
@@ -421,6 +422,29 @@ summary {
   border-color: #c8c3b8;
   background: #fffdf8;
   font-weight: 800;
+}
+
+.presentation-person-search {
+  display: block;
+  margin-top: 0.7rem;
+  border: 1px solid #ded8cc;
+  background: #fffaf0;
+  padding: 0.65rem;
+}
+
+.presentation-person-search input {
+  width: 100%;
+  margin-top: 0.4rem;
+  border: 1px solid #c8c3b8;
+  background: #fff;
+  padding: 0.55rem 0.65rem;
+  color: #34473f;
+  outline: none;
+}
+
+.presentation-person-search input:focus {
+  border-color: #2f6658;
+  box-shadow: 0 0 0 2px rgb(47 102 88 / 14%);
 }
 
 .presentation-person-option--head {

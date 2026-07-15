@@ -89,7 +89,10 @@ historical month, opacity and layers. Europe view and Project region expose an
 explicit pressed/active state. People, families and dossier members are
 selected in the separate right-side People and families panel. A family card
 shows only its documented head/declarant by default; people mentioned inside
-the dossier are in a collapsed subsection and the head is not repeated there.
+the dossier are in a collapsed subsection, visually integrated into the same
+family card, and the head is not repeated there. The panel also has a name/family
+search field so the visible list does not need to be navigated manually when
+the collection grows.
 The panel header stays visible while its list is scrolled. Selecting an
 individual fits a closer bounding box over all of that person's documented
 endpoints and places, retains individual route ownership and enables that

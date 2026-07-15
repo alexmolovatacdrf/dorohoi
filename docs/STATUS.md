@@ -293,11 +293,16 @@ data paths.
 
 The latest presentation-map refinement keeps the people list focused on the
 documented head/declarant and moves mentioned people into collapsed dossier
-subsections. Both map panels have sticky headers, camera presets expose their
-active state, and zoom controls reserve space beside the people panel. Person
-selection uses a closer local fit, repeated/reverse route segments use separate
-visual lanes, and place details can show grouped, source-bound people and
-documented context without assigning a relative's route to another person.
+subsections integrated into the same family card. A person/family search field
+supports larger collections. Both map panels have sticky headers, camera
+presets expose their active state, and zoom controls reserve space beside the
+people panel. Person selection uses a closer local fit, repeated/reverse route
+segments use separate visual lanes, and place details can show grouped,
+source-bound people and documented context without assigning a relative's route
+to another person. In the Research Map, persons are selected from Filters →
+Person or Group on the left; Individual routes must remain enabled under
+Layers → People and movement, and clicking a route opens its evidence in the
+right Context panel.
 
 ## Final handoff verification
 

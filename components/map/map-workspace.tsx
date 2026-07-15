@@ -335,10 +335,15 @@ function routeCurveOffset(route: MapRouteDatum, routes: MapRouteDatum[]): number
   const siblings = routes
     .filter((candidate) => routeEndpointPairKey(candidate) === routeEndpointPairKey(route))
     .sort((left, right) => left.sequence - right.sequence || left.id.localeCompare(right.id));
-  if (siblings.length > 1) {
-    return siblings.indexOf(route) - (siblings.length - 1) / 2;
-  }
-  return route.sequence % 2 === 0 ? -0.5 : 0.5;
+  const sameDirection = siblings.filter(
+    (candidate) => candidate.originId === route.originId && candidate.destinationId === route.destinationId,
+  );
+  const occurrence = Math.max(0, sameDirection.indexOf(route));
+  const magnitude = 0.72 + Math.floor(occurrence / 2) * 0.52;
+  // Reverse movements use the same signed offset as their corresponding
+  // forward movement. Their geometric normal is reversed, which places them
+  // on the opposite physical side of the visual corridor.
+  return occurrence % 2 === 0 ? magnitude : -magnitude;
 }
 
 function curvedRouteCoordinates(
@@ -583,6 +588,7 @@ export function MapWorkspace({
   const [presentationViewport, setPresentationViewport] = useState<"europe" | "project" | "story">(
     initialPerson ? "story" : "europe",
   );
+  const [presentationPersonQuery, setPresentationPersonQuery] = useState("");
   const [interfaceHidden, setInterfaceHidden] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selection, setSelection] = useState<Selection>(
@@ -1614,6 +1620,18 @@ export function MapWorkspace({
   ) : null;
   const groupedPresentationPersonIds = new Set(data.groups.flatMap((group) => group.personIds));
   const ungroupedPresentationPeople = data.persons.filter((person) => !groupedPresentationPersonIds.has(person.id));
+  const normalizedPresentationPersonQuery = presentationPersonQuery.trim().toLocaleLowerCase("ro");
+  const presentationGroups = data.groups.filter((group) => {
+    if (!normalizedPresentationPersonQuery) return true;
+    return group.label.toLocaleLowerCase("ro").includes(normalizedPresentationPersonQuery)
+      || data.persons.some(
+        (person) => group.personIds.includes(person.id) && person.label.toLocaleLowerCase("ro").includes(normalizedPresentationPersonQuery),
+      );
+  });
+  const filteredUngroupedPresentationPeople = ungroupedPresentationPeople.filter((person) =>
+    !normalizedPresentationPersonQuery
+      || person.label.toLocaleLowerCase("ro").includes(normalizedPresentationPersonQuery),
+  );
 
   const presentationPanel = presentationPanelOpen ? (
     <aside className="presentation-map__panel absolute top-3 left-3 z-20 w-[min(23rem,calc(100%-1.5rem))] overflow-y-auto border border-[#bdb7aa] bg-[#fffdf8]/96 p-4 shadow-[0_18px_45px_rgba(22,42,35,0.2)] backdrop-blur-md sm:top-5 sm:left-5 sm:max-h-[calc(100%-8rem)]">
@@ -1696,11 +1714,22 @@ export function MapWorkspace({
       <button type="button" className={`presentation-person-option presentation-person-option--all${!filters.person && !filters.group ? " presentation-person-option--selected" : ""}`} onClick={clearPresentationSelection} aria-pressed={!filters.person && !filters.group}>
         <span>All stories</span><span className="presentation-person-option__role">Europe view</span>
       </button>
+      <label className="presentation-person-search">
+        <span className="presentation-label">Find a person or family</span>
+        <input
+          type="search"
+          value={presentationPersonQuery}
+          onChange={(event) => setPresentationPersonQuery(event.target.value)}
+          placeholder="Type a name…"
+          aria-label="Find a person or family"
+          data-testid="presentation-person-search"
+        />
+      </label>
 
       <div className="presentation-people-list">
         <p className="presentation-label">Families and mentioned people</p>
         <p className="presentation-card__meta">Each family starts with its documented head/declarant. People mentioned in the same file remain selectable individual records.</p>
-        {data.groups.map((group) => {
+        {presentationGroups.map((group) => {
           const groupPeople = data.persons
             .filter((person) => group.personIds.includes(person.id))
             .sort((left, right) => {
@@ -1733,7 +1762,8 @@ export function MapWorkspace({
             </div>
           );
         })}
-        {ungroupedPresentationPeople.length ? <div className="presentation-family-card"><p className="presentation-label">Other individual records</p>{ungroupedPresentationPeople.map((person) => <button key={person.id} type="button" className={`presentation-person-option${filters.person === person.id ? " presentation-person-option--selected" : ""}`} onClick={() => selectPresentationPerson(person.id)} aria-pressed={filters.person === person.id}><span>{person.label}</span><span className="presentation-person-option__role">{person.roles[0] ?? "mentioned person"}</span></button>)}</div> : null}
+        {filteredUngroupedPresentationPeople.length ? <div className="presentation-family-card"><p className="presentation-label">Other individual records</p>{filteredUngroupedPresentationPeople.map((person) => <button key={person.id} type="button" className={`presentation-person-option${filters.person === person.id ? " presentation-person-option--selected" : ""}`} onClick={() => selectPresentationPerson(person.id)} aria-pressed={filters.person === person.id}><span>{person.label}</span><span className="presentation-person-option__role">{person.roles[0] ?? "mentioned person"}</span></button>)}</div> : null}
+        {!presentationGroups.length && !filteredUngroupedPresentationPeople.length ? <p className="presentation-card__meta">No matching people or families.</p> : null}
       </div>
 
       {(presentationDetails || presentationGroupDetails) ? (
@@ -2233,6 +2263,10 @@ export function MapWorkspace({
         ) : (
           <div>
             <p className="text-sm leading-6 text-[#65716b]">{t("map.noSelection")}</p>
+            <div className="mt-5 border-t border-[#ddd7cb] pt-4">
+              <p className="text-[9px] font-black tracking-[0.13em] text-[#756347] uppercase">People and routes</p>
+              <p className="mt-2 text-[10px] leading-4 text-[#65716b]">Choose a person or family in the Filters panel on the left. Keep Individual routes enabled under Layers → People and movement. The person’s documented routes then remain on the map; click a line to inspect its evidence here.</p>
+            </div>
             <div className="mt-5 space-y-3 border-t border-[#ddd7cb] pt-4">
               <p className="text-[9px] font-black tracking-[0.13em] text-[#756347] uppercase">Route grammar</p>
               <div className="flex items-center gap-3 text-[10px]"><span className="h-1 w-12 bg-[#236353]" /> Explicit movement</div>
