@@ -61,6 +61,11 @@ persons, 11 dossiers, 15 places and 26 route segments from the embedded
 `Platforma_WJC (10).html` sample. This fixture is isolated from normalized
 research data and retains the source filename and SHA-256 for traceability.
 
+The Research Map now exposes the same Project data / Claude demo switcher. Its
+default remains the normalized regional project data; `/map?dataset=claude-demo`
+loads the isolated Claude fixture into the advanced research interface for
+testing person selection and route playback.
+
 The Research Map Context panel now contains the same searchable, collapsible
 `Families and mentioned people` directory as Presentation Map. The left side
 continues to hold the advanced research filters and collapsible layer groups;
@@ -78,6 +83,13 @@ clicked map point as well as in the expanded detail panel. Route endpoints are
 shown as route endpoints and are not silently reclassified as birth, death or
 another event. Left-side map controls use tighter vertical spacing while
 retaining their controls and readable target sizes.
+
+Map dates use the shared localized formatter: English and Romanian interfaces
+display parsed dates in their respective calendar conventions. A second click
+on the same place, route or historical polygon clears its selection and closes
+the synthesized map detail state. Research playback now uses the same slow
+curved, arrowed, progressive route animation as Presentation Map; each segment
+lasts 4.6 seconds and playback is manual, one-shot and non-looping.
 
 The immutable boundary has been preserved: `data/source/` was inspected but not
 modified. All generated research collections are written to
@@ -206,7 +218,7 @@ npm run lint
 npm run build
 ```
 
-All commands pass. The test suite contains 29 deterministic, map-style,
+All commands pass. The test suite contains 31 deterministic, map-style,
 research-rule, conversion, date-selection and historical-distinction tests.
 The production build generates the overview, indexes, both document pages and
 all four person pages, with dynamic filtered map, place and review views.

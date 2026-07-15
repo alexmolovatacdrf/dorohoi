@@ -1,25 +1,25 @@
 import type { DateRange, SourceReference } from "@/lib/domain/schemas";
 
-const DATE_FORMATTER = new Intl.DateTimeFormat("en-GB", {
-  day: "numeric",
-  month: "short",
-  year: "numeric",
-  timeZone: "UTC",
-});
+export type DateLanguage = "en" | "ro";
 
-export function formatIsoDate(value: string): string {
+export function formatIsoDate(value: string, language: DateLanguage = "en"): string {
   const [year, month, day] = value.split("-").map(Number);
-  return DATE_FORMATTER.format(new Date(Date.UTC(year, month - 1, day)));
+  return new Intl.DateTimeFormat(language === "ro" ? "ro-RO" : "en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(year, month - 1, day)));
 }
 
-export function formatDateRange(date: DateRange): string {
+export function formatDateRange(date: DateRange, language: DateLanguage = "en"): string {
   if (!date.start && !date.end) {
     return typeof date.raw === "string" ? date.raw : "Date unresolved";
   }
-  if (date.start === date.end && date.start) return formatIsoDate(date.start);
+  if (date.start === date.end && date.start) return formatIsoDate(date.start, language);
   if (date.precision === "year" && date.start) return date.start.slice(0, 4);
-  const start = date.start ? formatIsoDate(date.start) : "?";
-  const end = date.end ? formatIsoDate(date.end) : "?";
+  const start = date.start ? formatIsoDate(date.start, language) : "?";
+  const end = date.end ? formatIsoDate(date.end, language) : "?";
   return `${start} – ${end}`;
 }
 

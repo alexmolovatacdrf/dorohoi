@@ -10,6 +10,7 @@ import type {
   Relationship,
   ReviewTask,
   RouteSegment,
+  DateRange,
 } from "@/lib/domain/schemas";
 import { getResearchData } from "./repository";
 
@@ -236,7 +237,7 @@ export interface MapPlacePersonConnection {
   id: string;
   roles: string[];
   eventTypes: string[];
-  dateLabel: string | null;
+  date: DateRange | null;
   description: string | null;
   sourceLabel: string;
 }
@@ -256,6 +257,7 @@ export interface MapRouteDatum {
   dateStart: string | null;
   dateEnd: string | null;
   dateRaw: unknown;
+  datePrecision: DateRange["precision"] | null;
   transportRaw: string | null;
   sequence: number;
   sourceLabel: string;
@@ -329,20 +331,16 @@ export function getMapViewModel(data: NormalizedBundle = getResearchData()): Map
         if (event) current.eventTypes = [...new Set([...current.eventTypes, event.eventType])];
         current.dossierIds = [...new Set([...current.dossierIds, ...mention.documentIds])];
         const birthDate = peopleById.get(personId)?.birthDate;
-        const dateLabel = event
-          ? typeof event.date.raw === "string"
-            ? event.date.raw
-            : event.date.start ?? event.date.end
+        const date = event
+          ? event.date
           : mention.ownerType === "person" && birthDate
-            ? typeof birthDate.raw === "string"
-              ? birthDate.raw
-              : birthDate.start ?? birthDate.end
+            ? birthDate
             : null;
         current.connections.push({
           id: mention.placeMentionId,
           roles: [mention.role],
           eventTypes: event ? [event.eventType] : [],
-          dateLabel,
+          date,
           description: event?.descriptionRaw ?? null,
           sourceLabel: event?.sourceRefs[0]?.sourceFile ?? mention.sourceRefs[0]?.sourceFile ?? "Source unavailable",
         });
@@ -408,6 +406,7 @@ export function getMapViewModel(data: NormalizedBundle = getResearchData()): Map
         dateStart: route.date.start,
         dateEnd: route.date.end,
         dateRaw: route.date.raw,
+        datePrecision: route.date.precision,
         transportRaw: route.transportRaw,
         sequence: route.sequence,
         sourceLabel: route.sourceRefs.map((source) => source.field).filter(Boolean).join("; "),

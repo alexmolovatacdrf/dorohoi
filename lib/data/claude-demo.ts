@@ -34,7 +34,12 @@ const mapData: MapViewModel = {
           id: `route-${route.id}`,
           roles: [route.originId === place.id ? "route origin" : "route destination"],
           eventTypes: route.eventTypes,
-          dateLabel: route.dateRaw,
+          date: {
+            raw: route.dateRaw,
+            start: route.dateStart,
+            end: route.dateEnd,
+            precision: route.dateStart === route.dateEnd ? "day" : "interval",
+          },
           description: route.notes,
           sourceLabel: route.sourceLabel,
         })),
@@ -55,6 +60,7 @@ const mapData: MapViewModel = {
     ],
     routeStatus: route.routeStatus as MapRouteDatum["routeStatus"],
     confidence: route.confidence as MapRouteDatum["confidence"],
+    datePrecision: route.dateStart === route.dateEnd ? "day" : "interval",
   })),
   persons: claudeDemo.persons.map((person) => ({
     ...person,

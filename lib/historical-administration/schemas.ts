@@ -687,11 +687,11 @@ export function historicalSnapshotIndex(
   return index;
 }
 
-export function formatYearMonth(yearMonth: string): string {
+export function formatYearMonth(yearMonth: string, language: "en" | "ro" = "en"): string {
   const match = /^(\d{4})-(\d{2})$/.exec(yearMonth);
   if (!match) return yearMonth;
   const [, year, month] = match;
-  return new Intl.DateTimeFormat("en", {
+  return new Intl.DateTimeFormat(language === "ro" ? "ro-RO" : "en-GB", {
     month: "long",
     timeZone: "UTC",
     year: "numeric",

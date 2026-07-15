@@ -7,8 +7,9 @@ Acest document păstrează punctul de continuare pentru următoarea sesiune. Con
 ## Starea Git
 
 - Branch: `feature/public-presentation-map`
-- HEAD: `24893f1 feat: add anchored person place map popup`
-- Worktree: curat la momentul salvării
+- HEAD: current checkpoint commit `fix: unify map dates and route playback`
+- Worktree: curat după checkpoint; nu au fost folosite reset, clean,
+  checkout/restore destructiv și nu au fost șterse date existente.
 - Nu au fost folosite reset, clean, checkout/restore destructiv și nu au fost șterse date existente.
 
 Checkpoint-urile relevante, în ordine:
@@ -65,7 +66,7 @@ URL-uri:
 - Zoom-ul este mutat în afara panoului drept pe desktop și deasupra timeline-ului pe mobil.
 - Lista familiei afișează capul/declarantul o singură dată; persoanele menționate sunt într-un `<details>` închis implicit.
 - Antetul sticky al ambelor panouri păstrează butonul de închidere accesibil în timpul scroll-ului.
-- Traseele inverse/repetate între aceleași localități primesc benzi vizuale diferite. Animația are acum 3,6 secunde per segment.
+- Traseele inverse/repetate între aceleași localități primesc benzi vizuale diferite. Animația are acum 4,6 secunde per segment.
 - Pentru o listă mare, panoul drept are căutare după nume de persoană sau familie; secțiunile menționate rămân închise până la deschidere.
 - Click pe o localitate poate afișa persoanele asociate, grupate după contextul explicit documentat; în timpul animației este afișat locul curent și nota traseului.
 - Când o persoană este selectată, click pe un punct/localitate arată în panoul de detalii conexiunile persoană-loc documentate: categorie publică, data disponibilă, descriere, rolul sursă și sursa. Capetele de rută sunt marcate ca atare și nu sunt transformate în evenimente.
@@ -77,6 +78,16 @@ URL-uri:
 - Panoul `Context` din Research Map include acum directorul comun `Families and mentioned people`, cu căutare și secțiuni dropdown pentru persoanele menționate. Capul/declarantul nu este repetat în lista de membri.
 - Directorul `Families and mentioned people` este acum el însuși un dropdown vizibil în ambele hărți: triunghiul `▸` închide lista, iar `▾` o extinde. Listele interne ale persoanelor menționate folosesc aceeași convenție.
 - Cardul fiecărei familii nu mai repetă rândul `People mentioned in this dossier`. Numărul și triunghiul sunt pe rândul capului/declarantului; la extindere apar numele individuale și linia `Internal record`. Cardul de detalii al persoanei selectate folosește aceeași structură compactă.
+- Datele afișate în hartă folosesc `formatIsoDate`, `formatDateRange` și
+  `formatYearMonth` cu limba activă: engleză în `en-GB`, română în `ro-RO`.
+- Un al doilea click pe aceeași localitate, rută sau zonă istorică elimină
+  selecția și caseta sintetică; butonul nativ de închidere al popup-ului rămâne
+  disponibil.
+- Research Map acceptă acum `?dataset=claude-demo`, păstrând `/map` fără
+  parametri pe datele normalizate ale proiectului.
+- Animația comună are 4,6 secunde pe segment și este activă în ambele moduri;
+  Research Map folosește aceeași curbă, săgeată și bilă de progres ca
+  Presentation Map.
 
 ## Datele din varianta Claude
 
@@ -105,11 +116,17 @@ node scripts/presentation/derive-claude-demo-map.mjs > data/demo/claude-map-demo
 
 ## Verificări deja trecute
 
-- `npm test` — 29 teste în 4 fișiere
+- `npm test` — 31 teste în 5 fișiere
 - `npm run typecheck` — trecut
 - `npm run lint` — trecut
 - `npm run build` — trecut după ultimele modificări
 - `npm audit --json` — fără vulnerabilități raportate în verificarea anterioară
+
+Verificarea curentă suplimentară:
+
+- `curl -I http://127.0.0.1:3000/presentation/map?dataset=claude-demo` — HTTP 200
+- `curl -I http://127.0.0.1:3000/map?dataset=claude-demo` — HTTP 200
+- `npm audit --json` — 0 vulnerabilități
 
 După orice modificare nouă, prima verificare trebuie să fie:
 
@@ -133,12 +150,13 @@ Observație: `npm run build` poate rescrie automat importul din `next-env.d.ts` 
 7. Verifică layout-ul la 1366×768, 1920×1080 și 390×844: panoul stâng nu trebuie să se suprapună cu elemente de hartă, panoul drept trebuie să rămână utilizabil, iar footer-ul nu trebuie să apară.
 8. Verifică în continuare `/map`: filtrele avansate, layer-ul regional și informațiile de proveniență trebuie să rămână funcționale.
 9. În `/map`, verifică și directorul din `Context`: deschide/închide secțiunile cu săgeata nativă, selectează un cap de familie și o persoană menționată, apoi confirmă că ruta selectată rămâne individuală și apare în lista de trasee.
+10. În ambele hărți, verifică formatul datelor după schimbarea EN/RO și al doilea click pe aceeași localitate pentru închiderea casetei.
 
 ## Lucru rămas / atenționări
 
 - Mai trebuie făcută verificarea vizuală completă în browser după ultimele modificări de panou și interacțiuni. Playwright este instalat ca CLI, dar mediul actual nu are Chrome/Chromium disponibil (`/opt/google/chrome/chrome`); instalarea automată a Chrome a eșuat deoarece cere sudo.
 - Trebuie salvate/confirmate screenshot-urile finale pentru Presentation Map Europe view, persoană selectată, interfață ascunsă, Research Map și mobil.
-- Trebuie confirmat în browser că toate layerele Presentation Map (basemap, persoane, trasee, locuri, EHRI și unresolved) se afișează corect cu ambele surse de date.
+- Trebuie confirmat în browser că toate layerele Presentation Map și Research Map (basemap, persoane, trasee, locuri, EHRI și unresolved) se afișează corect cu ambele surse de date.
 - Trebuie verificat vizual un caz real cu două mișcări inverse între aceleași localități pentru a confirma că benzile nu se suprapun în MapLibre.
 - Integrarea viitoare a unei persoane menționate în mai multe dosare trebuie să folosească un identificator stabil și legături documentate între apariții/dosare; nu trebuie făcută deduplicare automată pe nume.
 - Orice optimizare a dataset-ului istoric full trebuie validată înainte de înlocuirea celor 91 de fișiere existente.

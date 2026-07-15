@@ -32,6 +32,11 @@ The command expects the source at
 is written back. This is an explicitly isolated demo fixture, not part of the
 normalized research bundle.
 
+The Research Map also exposes the same switcher at `/map`. Its default remains
+the normalized project collection; `/map?dataset=claude-demo` loads the isolated
+Claude fixture into the advanced research interface without mixing it into
+`data/normalized/`.
+
 ## Public experience
 
 The presentation mode uses
@@ -69,7 +74,8 @@ people under their dossier and marks the documented head/declarant separately.
 The selected-person card also lists other people in the same dossier when the
 normalized data supports that relationship.
 
-The bottom timeline uses a slow, one-shot progression. In both Presentation Map
+The bottom timeline uses a slow, one-shot progression of 4.6 seconds per
+documented route segment. In both Presentation Map
 and Research Map, each route is rendered as a smooth visual curve between its
 documented endpoints, with directional arrow symbols and a moving progress
 marker. Reverse or repeated movements between the same two places are assigned
@@ -116,8 +122,16 @@ route connection rather than being upgraded to an event. The same summary is
 also shown in a small MapLibre popup anchored beside the clicked place, so the
 connection can be read without leaving the map; the detailed panel remains
 available for provenance and the complete context. The Research Map uses the
-same popup and detail summary. Map controls keep their readable targets but use
-tighter row spacing so the left panel requires less scrolling.
+same popup and detail summary. A second click on the same place, route or
+historical polygon clears the selection and closes the synthesized detail
+state; the popup close button remains available as well. Map controls keep
+their readable targets but use tighter row spacing so the left panel requires
+less scrolling.
+
+Map route dates and historical snapshot dates are formatted through the shared
+date formatter: English uses the English calendar convention and Romanian uses
+the Romanian calendar convention. Unresolved raw date wording remains visible
+when no parsed date is available.
 
 The map zoom controls are positioned outside the open people panel on desktop
 and above the bottom timeline on mobile. Layer symbols use a consistent visual

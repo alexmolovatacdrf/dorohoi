@@ -20,7 +20,7 @@ import maplibregl, {
 import { presentationMapConfig } from "@/config/presentation-map";
 import { useLanguage } from "@/components/shell/language-provider";
 import { StatusBadge, confidenceTone } from "@/components/ui/status-badge";
-import { humanizeSlug, rawValueLabel } from "@/lib/data/format";
+import { formatDateRange, formatIsoDate, humanizeSlug } from "@/lib/data/format";
 import type {
   MapPlaceDatum,
   MapPlacePersonConnection,
@@ -171,7 +171,7 @@ const controlClass =
   "w-full border border-[#c8c3b8] bg-white px-2.5 py-2 text-[11px] text-[#34473f] outline-none focus:border-[#2f6658]";
 const basemapFallbackMessage =
   "OpenStreetMap tiles are unavailable. The local research grid, project places, routes, filters and layer controls remain active.";
-const ANIMATION_SEGMENT_DURATION_MS = 3600;
+const ANIMATION_SEGMENT_DURATION_MS = 4600;
 
 function LayerToggle({
   label,
@@ -213,13 +213,14 @@ function errorDetails(error: unknown): string {
 
 function historicalPopupContent(
   properties: HistoricalFeatureProperties,
+  language: "en" | "ro",
 ): HTMLDivElement {
   const root = document.createElement("div");
   root.className = "historical-map-popup";
 
   const dateLabel = document.createElement("p");
   dateLabel.className = "historical-map-popup__date";
-  dateLabel.textContent = `${formatYearMonth(properties.yearMonth)} · supplied ${properties.snapshotDate}`;
+  dateLabel.textContent = `${formatYearMonth(properties.yearMonth, language)} · supplied ${formatIsoDate(properties.snapshotDate, language)}`;
 
   const name = document.createElement("p");
   name.className = "historical-map-popup__name";
@@ -557,6 +558,15 @@ function publicPlaceConnectionLabel(connection: MapPlacePersonConnection): strin
   return publicPlaceContextLabelForValues(connection.roles, connection.eventTypes);
 }
 
+function mapRouteDateLabel(route: MapRouteDatum, language: "en" | "ro"): string {
+  return formatDateRange({
+    raw: route.dateRaw,
+    start: route.dateStart,
+    end: route.dateEnd,
+    precision: route.datePrecision ?? "unknown",
+  }, language);
+}
+
 function popupTextElement<K extends keyof HTMLElementTagNameMap>(
   tagName: K,
   text: string,
@@ -593,7 +603,7 @@ function personPlacePopupContent(
         heading.className = "map-place-popup__connection-heading";
         heading.append(
           popupTextElement("strong", publicPlaceConnectionLabel(connection)),
-          popupTextElement("span", connection.dateLabel ?? "Date not supplied"),
+          popupTextElement("span", connection.date ? formatDateRange(connection.date, language) : "Date not supplied"),
         );
         item.append(heading);
         if (connection.description) item.append(popupTextElement("p", connection.description));
@@ -643,6 +653,8 @@ export function MapWorkspace({
   const coreMarkersRef = useRef<Marker[]>([]);
   const historicalPopupRef = useRef<maplibregl.Popup | null>(null);
   const placePopupRef = useRef<maplibregl.Popup | null>(null);
+  const languageRef = useRef(language);
+  const selectionRef = useRef<Selection>(null);
   const [mapReady, setMapReady] = useState(false);
   const [mapLifecycle, setMapLifecycle] = useState<MapLifecycle>("initializing");
   const [mapDiagnostic, setMapDiagnostic] = useState<string | null>(null);
@@ -695,6 +707,14 @@ export function MapWorkspace({
   const [timelineStep, setTimelineStep] = useState<number | null>(null);
   const [timelineProgress, setTimelineProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    languageRef.current = language;
+  }, [language]);
+
+  useEffect(() => {
+    selectionRef.current = selection;
+  }, [selection]);
 
   useEffect(() => {
     if (!isPresentation) return;
@@ -828,20 +848,15 @@ export function MapWorkspace({
   );
 
   const activePlaybackRoute = useMemo(() => {
-    if (!isPresentation || !filters.person || timelineStep === null) return null;
+    if (!filters.person || timelineStep === null) return null;
     return selectedPersonRoutes[timelineStep ?? 0] ?? null;
-  }, [filters.person, isPresentation, selectedPersonRoutes, timelineStep]);
+  }, [filters.person, selectedPersonRoutes, timelineStep]);
 
   const visibleRoutes = useMemo(() => {
-    if (!filters.person) return preTimelineRoutes;
-    if (!isPresentation) {
-      if (timelineStep === null) return preTimelineRoutes;
-      return preTimelineRoutes.filter((route) => route.sequence <= timelineStep);
-    }
-    if (timelineStep === null && !isPlaying) return preTimelineRoutes;
+    if (!filters.person || timelineStep === null) return preTimelineRoutes;
     const completedRouteIds = new Set(selectedPersonRoutes.slice(0, timelineStep ?? 0).map((route) => route.id));
     return preTimelineRoutes.filter((route) => completedRouteIds.has(route.id) || route.id === activePlaybackRoute?.id);
-  }, [activePlaybackRoute?.id, filters.person, isPlaying, isPresentation, preTimelineRoutes, selectedPersonRoutes, timelineStep]);
+  }, [activePlaybackRoute?.id, filters.person, preTimelineRoutes, selectedPersonRoutes, timelineStep]);
 
   const familyContextPlaces = useMemo(() => {
     if (!selectedGroup || !layers.familyContext) return [];
@@ -1120,7 +1135,12 @@ export function MapWorkspace({
             map.on("mouseleave", layerId, () => { map.getCanvas().style.cursor = ""; });
             map.on("click", layerId, (event) => {
               const id = event.features?.[0]?.properties?.id;
-              if (typeof id === "string") setSelection({ kind: "place", id });
+              if (typeof id !== "string") return;
+              if (selectionRef.current?.kind === "place" && selectionRef.current.id === id) {
+                setSelection(null);
+              } else {
+                setSelection({ kind: "place", id });
+              }
             });
           }
           const routeLayers = ["routes-explicit", "routes-partial", "routes-inferred", "route-direction"];
@@ -1130,7 +1150,12 @@ export function MapWorkspace({
             map.on("click", layerId, (event) => {
               if (map.queryRenderedFeatures(event.point, { layers: placeLayers }).length) return;
               const id = event.features?.[0]?.properties?.id;
-              if (typeof id === "string") setSelection({ kind: "route", id });
+              if (typeof id !== "string") return;
+              if (selectionRef.current?.kind === "route" && selectionRef.current.id === id) {
+                setSelection(null);
+              } else {
+                setSelection({ kind: "route", id });
+              }
             });
           }
           const projectInteractiveLayers = [...placeLayers, ...routeLayers];
@@ -1157,7 +1182,7 @@ export function MapWorkspace({
               offset: 12,
             })
               .setLngLat(event.lngLat)
-              .setDOMContent(historicalPopupContent(properties))
+              .setDOMContent(historicalPopupContent(properties, languageRef.current))
               .addTo(map);
           };
           map.on("mouseenter", HISTORICAL_FILL_LAYER_ID, () => { map.getCanvas().style.cursor = "pointer"; });
@@ -1174,6 +1199,16 @@ export function MapWorkspace({
               event.features?.[0]?.properties ?? null,
             );
             if (properties) {
+              const currentSelection = selectionRef.current;
+              const sameHistoricalFeature = currentSelection?.kind === "historical"
+                && currentSelection.properties.yearMonth === properties.yearMonth
+                && currentSelection.properties.sourceFeatureIndex === properties.sourceFeatureIndex;
+              if (sameHistoricalFeature) {
+                setSelection(null);
+                historicalPopupRef.current?.remove();
+                historicalPopupRef.current = null;
+                return;
+              }
               setSelection({ kind: "historical", properties });
               openHistoricalPopup(event);
             }
@@ -1251,7 +1286,7 @@ export function MapWorkspace({
         activePlaybackRoute?.id ?? null,
         timelineProgress,
         true,
-        isPresentation ? selectedPersonRoutes : visibleRoutes,
+        filters.person ? selectedPersonRoutes : visibleRoutes,
       ),
     );
     (map.getSource("route-progress") as GeoJSONSource).setData(
@@ -1259,11 +1294,11 @@ export function MapWorkspace({
         ? routeProgressCollection(
             activePlaybackRoute,
             timelineProgress,
-            isPresentation ? selectedPersonRoutes : visibleRoutes,
+            filters.person ? selectedPersonRoutes : visibleRoutes,
           )
         : emptyPointCollection,
     );
-  }, [activePlaybackRoute, familyContextPlaces, isPresentation, language, mapReady, selectedPersonRoutes, timelineProgress, visibleCorePlaces, visibleEhriPlaces, visibleRoutes]);
+  }, [activePlaybackRoute, familyContextPlaces, filters.person, language, mapReady, selectedPersonRoutes, timelineProgress, visibleCorePlaces, visibleEhriPlaces, visibleRoutes]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -1392,7 +1427,7 @@ export function MapWorkspace({
       ],
       {
         padding,
-        duration: isPresentation ? 1100 : 0,
+        duration: isPresentation ? 1100 : 700,
         maxZoom: maxZoom ?? (isPresentation ? 7 : 9),
       },
     );
@@ -1436,9 +1471,9 @@ export function MapWorkspace({
   }, [filters.person, historicalManifest, isPresentation, layers.historicalAdministration, mapReady, fitMapToBbox]);
 
   useEffect(() => {
-    if (!isPresentation || !mapReady || !filters.person) return;
+    if (!mapReady || !filters.person) return;
     fitPersonView();
-  }, [filters.person, isPresentation, mapReady, fitPersonView]);
+  }, [filters.person, mapReady, fitPersonView]);
 
   useEffect(() => {
     if (!isPresentation || !mapReady || filters.person || !filters.group) return;
@@ -1469,7 +1504,11 @@ export function MapWorkspace({
       element.append(label, pin);
       element.addEventListener("click", (event) => {
         event.stopPropagation();
-        setSelection({ kind: "place", id: place.id });
+        if (selectionRef.current?.kind === "place" && selectionRef.current.id === place.id) {
+          setSelection(null);
+        } else {
+          setSelection({ kind: "place", id: place.id });
+        }
       });
 
       return [
@@ -1554,11 +1593,12 @@ export function MapWorkspace({
         id: `route-${route.id}`,
         roles: [route.originId === selectedPlace.id ? "route origin" : "route destination"],
         eventTypes: route.eventTypes,
-        dateLabel: typeof route.dateRaw === "string"
-          ? route.dateRaw
-          : route.dateRaw === null || route.dateRaw === undefined
-            ? null
-            : rawValueLabel(route.dateRaw),
+        date: {
+          raw: route.dateRaw,
+          start: route.dateStart,
+          end: route.dateEnd,
+          precision: route.datePrecision ?? "unknown",
+        },
         description: route.notes,
         sourceLabel: route.sourceLabel,
       }));
@@ -1638,7 +1678,7 @@ export function MapWorkspace({
     }
   };
 
-  const startPresentationPlayback = () => {
+  const startRoutePlayback = () => {
     if (!filters.person || !selectedPersonRoutes.length) return;
     if (timelineStep === null || timelineStep >= selectedPersonRoutes.length) {
       setTimelineStep(0);
@@ -1686,7 +1726,7 @@ export function MapWorkspace({
             <div key={connection.id} className="presentation-place-person-context__item">
               <div className="flex items-start justify-between gap-2">
                 <strong>{publicPlaceConnectionLabel(connection)}</strong>
-                <span>{connection.dateLabel ?? "Date not supplied"}</span>
+                <span>{connection.date ? formatDateRange(connection.date, language) : "Date not supplied"}</span>
               </div>
               {connection.roles.length ? <p>Documented as: {connection.roles.join(" · ")}</p> : null}
               {connection.description ? <p>{connection.description}</p> : null}
@@ -1734,12 +1774,12 @@ export function MapWorkspace({
     <>
       <p className="presentation-card__eyebrow">Documented movement</p>
       <h2 className="presentation-card__title">{selectedRoute.originName} <span aria-hidden="true">→</span> {selectedRoute.destinationName}</h2>
-      <p className="presentation-card__body">{selectedRoute.personName} · {rawValueLabel(selectedRoute.dateRaw)}</p>
+      <p className="presentation-card__body">{selectedRoute.personName} · {mapRouteDateLabel(selectedRoute, language)}</p>
       {selectedRoute.notes ? <p className="presentation-card__body">{selectedRoute.notes}</p> : null}
     </>
   ) : selectedHistorical ? (
     <>
-      <p className="presentation-card__eyebrow">{formatYearMonth(selectedHistorical.yearMonth)} · {selectedHistorical.snapshotDate}</p>
+      <p className="presentation-card__eyebrow">{formatYearMonth(selectedHistorical.yearMonth, language)} · {formatIsoDate(selectedHistorical.snapshotDate, language)}</p>
       <h2 className="presentation-card__title">{displayRawHistoricalValue(selectedHistorical.Name)}</h2>
       <dl className="presentation-card__details">
         <div><dt>Public category</dt><dd>{selectedHistorical.presentationCategory?.replaceAll("_", " ") ?? "Unresolved or other"}</dd></div>
@@ -1909,11 +1949,11 @@ export function MapWorkspace({
                 <label className="block">
                   <span className="presentation-label">Month and year</span>
                   <select aria-label="Presentation historical month" className={controlClass} value={historicalYearMonth} onChange={(event) => { setHistoricalYearMonth(event.target.value); setSelection(null); }} data-testid="presentation-month-select">
-                    {historicalManifest.snapshots.map((snapshot) => <option key={snapshot.yearMonth} value={snapshot.yearMonth}>{formatYearMonth(snapshot.yearMonth)}{snapshot.status === "limited_static" ? " — limited/static" : ""}</option>)}
+                    {historicalManifest.snapshots.map((snapshot) => <option key={snapshot.yearMonth} value={snapshot.yearMonth}>{formatYearMonth(snapshot.yearMonth, language)}{snapshot.status === "limited_static" ? " — limited/static" : ""}</option>)}
                   </select>
                 </label>
                 <input aria-label="Presentation historical timeline" type="range" min={0} max={historicalManifest.snapshots.length - 1} step={1} value={selectedHistoricalIndex} onChange={(event) => { const snapshot = historicalManifest.snapshots[Number(event.target.value)]; if (snapshot) { setHistoricalYearMonth(snapshot.yearMonth); setSelection(null); } }} className="mt-3 w-full accent-[#76536f]" data-testid="presentation-month-range" />
-                <div className="presentation-history-controls__row"><span>{selectedHistoricalSnapshot.snapshotDate}</span><span>{selectedHistoricalSnapshot.status === "primary" ? "Primary interval" : "Limited/static"}</span></div>
+                <div className="presentation-history-controls__row"><span>{formatIsoDate(selectedHistoricalSnapshot.snapshotDate, language)}</span><span>{selectedHistoricalSnapshot.status === "primary" ? "Primary interval" : "Limited/static"}</span></div>
                 {presentationMapConfig.legend && presentationLegend.length ? <div className="presentation-legend" aria-label="Public historical legend"><p className="presentation-label">Public legend</p>{presentationLegend.map((entry) => <div key={entry.value} className="presentation-legend__item"><span style={{ backgroundColor: entry.color }} aria-hidden="true" />{entry.label}</div>)}</div> : null}
                 {selectedHistoricalSnapshot.status === "limited_static" ? <p className="presentation-warning">October 1944–May 1945 is limited/static evidence; it is not equivalent to the primary interval.</p> : null}
                 <p className="presentation-method">{historicalManifest.methodologicalWarning}</p>
@@ -1968,7 +2008,7 @@ export function MapWorkspace({
         <div className="presentation-people-detail" data-testid="presentation-story-card">
           <div className="mb-3 flex items-center justify-between gap-2"><p className="presentation-label">Selected detail</p><button type="button" className="presentation-icon-button" onClick={clearPresentationSelection} aria-label="Clear selected person or family">×</button></div>
           {presentationDetails ?? presentationGroupDetails}
-          {selectedPerson ? <button type="button" disabled={!selectedPersonRoutes.length || isPlaying} className="presentation-primary-button mt-3" onClick={startPresentationPlayback}>{isPlaying ? "Playing route…" : selectedPersonRoutes.length ? "Play route" : "No documented route"}</button> : null}
+          {selectedPerson ? <button type="button" disabled={!selectedPersonRoutes.length || isPlaying} className="presentation-primary-button mt-3" onClick={startRoutePlayback}>{isPlaying ? "Playing route…" : selectedPersonRoutes.length ? "Play route" : "No documented route"}</button> : null}
           {selectedPlace ? <Link className="presentation-link-button" href={`/places/${selectedPlace.id}`}>Open place record</Link> : null}
           {selectedRoute ? <Link className="presentation-link-button" href={`/persons/${selectedRoute.personId}`}>Open person dossier</Link> : null}
           {selectedPerson && !selection ? <Link className="presentation-link-button" href={`/persons/${selectedPerson.id}`}>Open person dossier</Link> : null}
@@ -1982,7 +2022,7 @@ export function MapWorkspace({
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="min-w-44"><p className="presentation-card__eyebrow">Story timeline</p><p className="font-editorial text-lg font-bold text-[#173f36]">{selectedPerson?.label ?? "Select a person or story"}</p></div>
         <div className="flex min-w-0 grow items-center gap-2 overflow-x-auto py-1">{selectedPersonRoutes.length ? selectedPersonRoutes.map((route, index) => <div key={route.id} className="flex min-w-fit items-center gap-2"><span className={`grid size-7 place-items-center rounded-full border text-sm font-bold ${timelineStep !== null && index < timelineStep ? "border-[#173f36] bg-[#173f36] text-white" : "border-[#9fa69f] bg-white text-[#56645e]"}`}>{route.sequence}</span><span className="max-w-32 truncate text-sm text-[#5e6b65]">{route.destinationName}</span>{index < selectedPersonRoutes.length - 1 ? <span className="h-px w-8 bg-[#b9b3a7]" /> : null}</div>) : <p className="text-sm text-[#747f79]">No documented route selected.</p>}</div>
-        <div className="flex min-w-fit gap-2"><button type="button" disabled={!filters.person || !selectedPersonRoutes.length || isPlaying} onClick={startPresentationPlayback} className="presentation-primary-button">Play once</button><button type="button" disabled={!isPlaying} onClick={() => setIsPlaying(false)} className="presentation-secondary-button">Pause</button><button type="button" onClick={resetView} className="presentation-secondary-button">Reset</button></div>
+        <div className="flex min-w-fit gap-2"><button type="button" disabled={!filters.person || !selectedPersonRoutes.length || isPlaying} onClick={startRoutePlayback} className="presentation-primary-button">Play once</button><button type="button" disabled={!isPlaying} onClick={() => setIsPlaying(false)} className="presentation-secondary-button">Pause</button><button type="button" onClick={resetView} className="presentation-secondary-button">Reset</button></div>
       </div>
       <p className="presentation-method mt-2">Playback is manual, slow and one-shot. Curved lines are visual guides between documented endpoints, not exact historical roads.</p>
       {activePlaybackWaypoint ? <div className="presentation-waypoint"><span className="presentation-label">Current documented place</span><strong>{language === "ro" ? activePlaybackWaypoint.labelRo : activePlaybackWaypoint.label}</strong>{activePlaybackRoute?.notes ? <span>{activePlaybackRoute.notes}</span> : null}</div> : null}
@@ -2215,7 +2255,7 @@ export function MapWorkspace({
                         Monthly snapshot
                       </p>
                       <p className="font-editorial mt-0.5 text-base font-bold text-[#173f36]" data-testid="historical-snapshot-label">
-                        {formatYearMonth(historicalYearMonth)}
+                        {formatYearMonth(historicalYearMonth, language)}
                       </p>
                     </div>
                     <StatusBadge tone={selectedHistoricalSnapshot.status === "primary" ? "green" : "rust"}>
@@ -2234,7 +2274,7 @@ export function MapWorkspace({
                   >
                     {historicalManifest.snapshots.map((snapshot) => (
                       <option key={snapshot.yearMonth} value={snapshot.yearMonth}>
-                        {formatYearMonth(snapshot.yearMonth)}{snapshot.status === "limited_static" ? " — limited/static" : ""}
+                        {formatYearMonth(snapshot.yearMonth, language)}{snapshot.status === "limited_static" ? " — limited/static" : ""}
                       </option>
                     ))}
                   </select>
@@ -2268,7 +2308,7 @@ export function MapWorkspace({
                       Previous
                     </button>
                     <span className="text-center text-[8px] text-[#717a75]">
-                      Supplied {selectedHistoricalSnapshot.snapshotDate}
+                      Supplied {formatIsoDate(selectedHistoricalSnapshot.snapshotDate, language)}
                     </span>
                     <button
                       type="button"
@@ -2411,7 +2451,7 @@ export function MapWorkspace({
             <p className="mt-3 text-[9px] font-black tracking-[0.12em] text-[#9c5a3d] uppercase">{selectedRoute.personName}</p>
             <h3 className="font-editorial mt-1 text-2xl leading-7 font-bold text-[#173f36]">{selectedRoute.originName} <span className="text-[#a54f32]">→</span> {selectedRoute.destinationName}</h3>
             <dl className="mt-4 space-y-2 border-y border-[#ded8cc] py-3 text-xs leading-5">
-              <div><dt className="inline font-bold">Date: </dt><dd className="inline">{rawValueLabel(selectedRoute.dateRaw)}</dd></div>
+              <div><dt className="inline font-bold">Date: </dt><dd className="inline">{mapRouteDateLabel(selectedRoute, language)}</dd></div>
               <div><dt className="inline font-bold">Transport: </dt><dd className="inline">{selectedRoute.transportRaw ?? "Not supplied"}</dd></div>
               <div><dt className="inline font-bold">Line style: </dt><dd className="inline">{selectedRoute.routeStatus === "explicit" ? "solid" : "dashed"}</dd></div>
             </dl>
@@ -2428,7 +2468,7 @@ export function MapWorkspace({
               </StatusBadge>
             </div>
             <p className="mt-3 text-[9px] font-black tracking-[0.12em] text-[#76536f] uppercase">
-              {formatYearMonth(selectedHistorical.yearMonth)} · supplied {selectedHistorical.snapshotDate}
+              {formatYearMonth(selectedHistorical.yearMonth, language)} · supplied {formatIsoDate(selectedHistorical.snapshotDate, language)}
             </p>
             <h3 className="font-editorial mt-1 text-2xl leading-7 font-bold text-[#173f36]">
               {displayRawHistoricalValue(selectedHistorical.Name)}
@@ -2521,19 +2561,20 @@ export function MapWorkspace({
           <div className="flex min-w-0 grow items-center gap-2 overflow-x-auto py-1">
             {selectedPersonRoutes.length ? selectedPersonRoutes.map((route, index) => (
               <div key={route.id} className="flex min-w-fit items-center gap-2">
-                <span className={`grid size-6 place-items-center rounded-full border text-[9px] font-bold ${timelineStep !== null && route.sequence <= timelineStep ? "border-[#173f36] bg-[#173f36] text-white" : "border-[#9fa69f] bg-white text-[#56645e]"}`}>{route.sequence}</span>
+                <span className={`grid size-6 place-items-center rounded-full border text-[9px] font-bold ${timelineStep !== null && index < timelineStep ? "border-[#173f36] bg-[#173f36] text-white" : "border-[#9fa69f] bg-white text-[#56645e]"}`}>{route.sequence}</span>
                 <span className="max-w-28 truncate text-[9px] text-[#5e6b65]">{route.destinationName}</span>
                 {index < selectedPersonRoutes.length - 1 ? <span className="h-px w-8 bg-[#b9b3a7]" /> : null}
               </div>
             )) : <p className="text-[10px] text-[#747f79]">No person-specific route to play.</p>}
           </div>
           <div className="flex min-w-fit gap-1.5">
-            <button type="button" disabled={!filters.person || !selectedPersonRoutes.length || isPlaying} onClick={() => { if (timelineStep === null || timelineStep >= selectedPersonRoutes.length) setTimelineStep(0); setIsPlaying(true); }} className="bg-[#173f36] px-3 py-2 text-[9px] font-black tracking-[0.08em] text-white uppercase disabled:cursor-not-allowed disabled:opacity-35">{t("map.play")}</button>
+            <button type="button" disabled={!filters.person || !selectedPersonRoutes.length || isPlaying} onClick={startRoutePlayback} className="bg-[#173f36] px-3 py-2 text-[9px] font-black tracking-[0.08em] text-white uppercase disabled:cursor-not-allowed disabled:opacity-35">{t("map.play")}</button>
             <button type="button" disabled={!isPlaying} onClick={() => setIsPlaying(false)} className="border border-[#9fa49e] px-3 py-2 text-[9px] font-black tracking-[0.08em] uppercase disabled:opacity-35">{t("map.pause")}</button>
-            <button type="button" disabled={!filters.person} onClick={() => { setIsPlaying(false); setTimelineStep(0); }} className="border border-[#9fa49e] px-3 py-2 text-[9px] font-black tracking-[0.08em] uppercase disabled:opacity-35">{t("map.reset")}</button>
+            <button type="button" disabled={!filters.person} onClick={resetView} className="border border-[#9fa49e] px-3 py-2 text-[9px] font-black tracking-[0.08em] uppercase disabled:opacity-35">{t("map.reset")}</button>
           </div>
         </div>
-        <p className="mt-2 text-[8px] text-[#838b87]">{t("map.noAnimation")}</p>
+        <p className="mt-2 text-[8px] text-[#838b87]">Playback is manual, slow and one-shot. Curved lines are visual guides between documented endpoints, not exact historical roads.</p>
+        {activePlaybackWaypoint ? <div className="presentation-waypoint mt-2"><span className="presentation-label">Current documented place</span><strong>{language === "ro" ? activePlaybackWaypoint.labelRo : activePlaybackWaypoint.label}</strong>{activePlaybackRoute?.notes ? <span>{activePlaybackRoute.notes}</span> : null}</div> : null}
       </section>
     </div>
   );
