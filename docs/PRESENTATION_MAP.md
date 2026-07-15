@@ -51,6 +51,15 @@ This is route-level product separation, not a data-secrecy boundary: the
 historical GeoJSON files needed by the browser remain directly requestable as
 public assets. Sensitive material must not be placed in this static deployment.
 
+The current protected review deployment is:
+
+`https://dosare-dorohoi-presentation-pr504kmki.vercel.app/presentation/map?dataset=project`
+
+On the Hobby plan, share the unique deployment URL above rather than the
+stable `*.vercel.app` project alias. The unique URL is the one covered by
+Vercel Authentication and requires Eugenia to sign in with the invited Vercel
+account.
+
 ## Public experience
 
 The presentation mode uses

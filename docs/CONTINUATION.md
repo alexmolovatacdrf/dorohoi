@@ -7,7 +7,7 @@ Acest document păstrează punctul de continuare pentru următoarea sesiune. Con
 ## Starea Git
 
 - Branch: `feature/public-presentation-map`
-- HEAD: `95ad1c4` (`docs: record person story and Vercel access`)
+- HEAD: `f61e848` (`feat: add presentation-only deployment guard`)
 - Worktree: clean after the implementation checkpoint; nu au fost folosite reset, clean,
   checkout/restore destructiv și nu au fost șterse date existente.
 - Nu au fost folosite reset, clean, checkout/restore destructiv și nu au fost șterse date existente.
@@ -54,6 +54,19 @@ Vercel Production după ultimul deploy:
 - Presentation Map project: `https://dosare-dorohoi-platform-chatgpt-kgytv82kx.vercel.app/presentation/map?dataset=project`
 - Presentation Map Claude: `https://dosare-dorohoi-platform-chatgpt-kgytv82kx.vercel.app/presentation/map?dataset=claude-demo`
 - Research Map Claude: `https://dosare-dorohoi-platform-chatgpt-kgytv82kx.vercel.app/map?dataset=claude-demo`
+
+Separate gradual-review deployment for Eugenia:
+
+- Vercel project: `dosare-dorohoi-presentation`
+- protected unique URL: `https://dosare-dorohoi-presentation-pr504kmki.vercel.app/presentation/map?dataset=project`
+- Claude demo variant on the same protected deployment: `https://dosare-dorohoi-presentation-pr504kmki.vercel.app/presentation/map?dataset=claude-demo`
+- stable alias (do not share as the private link on Hobby): `https://dosare-dorohoi-presentation.vercel.app`
+
+The separate project has `PRESENTATION_ONLY=true` and Vercel Authentication
+for production deployment URLs and previews. Its `/`, `/map`, `/persons`,
+`/documents` and `/review` requests redirect to Presentation Map; only the
+Presentation Map, Next static assets and full-Europe historical assets are
+allowed through the request proxy.
 
 Deployment Protection is Vercel Authentication. Without a Vercel session the
 unique deployment returns a redirect to Vercel SSO; the stable project alias is

@@ -17,6 +17,20 @@ local EHRI registry, exposes the resulting evidence through typed selectors,
 and presents it through searchable research pages and an interactive MapLibre
 workspace. No database or source-data write-back has been introduced.
 
+## Presentation-only collaboration deployment
+
+A separate Vercel project, `dosare-dorohoi-presentation`, now provides a
+gradual-review deployment for non-technical collaborators. It sets
+`PRESENTATION_ONLY=true`, exposes only the Presentation Map route and required
+full-Europe historical assets, redirects other application routes back to
+Presentation Map, and hides the advanced global navigation. The current unique
+deployment URL is protected by Vercel Authentication:
+
+`https://dosare-dorohoi-presentation-pr504kmki.vercel.app/presentation/map?dataset=project`
+
+The stable project alias is not the private sharing URL on Hobby; use the
+unique deployment URL and the collaborator's invited Vercel account.
+
 ## Presentation Map feedback pass
 
 The current presentation-map refinement keeps the Claude HTML prototype as a
