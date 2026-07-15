@@ -112,9 +112,12 @@ documented birth/origin, death/loss, camp or ghetto, forced labour,
 deportation/evacuation, return and route-endpoint connections where the source
 supports them, and retains the available source date, description and source
 label. A route endpoint without a direct person-place mention is labelled as a
-route connection rather than being upgraded to an event. The Research Map uses
-the same summary. Map controls keep their readable targets but use tighter row
-spacing so the left panel requires less scrolling.
+route connection rather than being upgraded to an event. The same summary is
+also shown in a small MapLibre popup anchored beside the clicked place, so the
+connection can be read without leaving the map; the detailed panel remains
+available for provenance and the complete context. The Research Map uses the
+same popup and detail summary. Map controls keep their readable targets but use
+tighter row spacing so the left panel requires less scrolling.
 
 The map zoom controls are positioned outside the open people panel on desktop
 and above the bottom timeline on mobile. Layer symbols use a consistent visual

@@ -557,6 +557,67 @@ function publicPlaceConnectionLabel(connection: MapPlacePersonConnection): strin
   return publicPlaceContextLabelForValues(connection.roles, connection.eventTypes);
 }
 
+function popupTextElement<K extends keyof HTMLElementTagNameMap>(
+  tagName: K,
+  text: string,
+  className?: string,
+): HTMLElementTagNameMap[K] {
+  const element = document.createElement(tagName);
+  element.textContent = text;
+  if (className) element.className = className;
+  return element;
+}
+
+function personPlacePopupContent(
+  place: MapPlaceDatum,
+  language: "en" | "ro",
+  selectedPerson: { label: string } | null,
+  context: MapPlacePersonContext | null,
+): HTMLElement {
+  const root = document.createElement("div");
+  root.className = "map-place-popup";
+  root.append(
+    popupTextElement("p", "Place context", "map-place-popup__eyebrow"),
+    popupTextElement("h3", language === "ro" ? place.labelRo : place.label, "map-place-popup__title"),
+  );
+
+  if (selectedPerson) {
+    root.append(popupTextElement("p", selectedPerson.label, "map-place-popup__person"));
+    if (context?.connections.length) {
+      const connections = document.createElement("div");
+      connections.className = "map-place-popup__connections";
+      for (const connection of context.connections) {
+        const item = document.createElement("div");
+        item.className = "map-place-popup__connection";
+        const heading = document.createElement("div");
+        heading.className = "map-place-popup__connection-heading";
+        heading.append(
+          popupTextElement("strong", publicPlaceConnectionLabel(connection)),
+          popupTextElement("span", connection.dateLabel ?? "Date not supplied"),
+        );
+        item.append(heading);
+        if (connection.description) item.append(popupTextElement("p", connection.description));
+        connections.append(item);
+      }
+      root.append(connections);
+    } else {
+      root.append(popupTextElement("p", "No direct documented person-place connection in the current evidence.", "map-place-popup__muted"));
+    }
+  } else {
+    root.append(
+      popupTextElement(
+        "p",
+        place.categories.length
+          ? place.categories.map(publicPlaceCategoryLabel).join(" · ")
+          : "Documented place in the current collection",
+        "map-place-popup__muted",
+      ),
+    );
+  }
+
+  return root;
+}
+
 export function MapWorkspace({
   data,
   mode = "research",
@@ -581,6 +642,7 @@ export function MapWorkspace({
   const mapRef = useRef<MapLibreMap | null>(null);
   const coreMarkersRef = useRef<Marker[]>([]);
   const historicalPopupRef = useRef<maplibregl.Popup | null>(null);
+  const placePopupRef = useRef<maplibregl.Popup | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [mapLifecycle, setMapLifecycle] = useState<MapLifecycle>("initializing");
   const [mapDiagnostic, setMapDiagnostic] = useState<string | null>(null);
@@ -1510,6 +1572,28 @@ export function MapWorkspace({
       connections: uniqueConnections,
     };
   }, [data.routes, selectedPerson, selectedPlace]);
+  useEffect(() => {
+    const map = mapRef.current;
+    placePopupRef.current?.remove();
+    placePopupRef.current = null;
+    if (!map || !mapReady || !selectedPlace?.coordinates) return;
+
+    const popup = new maplibregl.Popup({
+      closeButton: true,
+      closeOnClick: false,
+      maxWidth: "290px",
+      offset: 16,
+    })
+      .setLngLat([selectedPlace.coordinates.longitude, selectedPlace.coordinates.latitude])
+      .setDOMContent(personPlacePopupContent(selectedPlace, language, selectedPerson ? { label: selectedPerson.label } : null, selectedPersonPlaceContext))
+      .addTo(map);
+    placePopupRef.current = popup;
+
+    return () => {
+      popup.remove();
+      if (placePopupRef.current === popup) placePopupRef.current = null;
+    };
+  }, [language, mapReady, selectedPerson, selectedPersonPlaceContext, selectedPlace]);
   const activePlaybackWaypoint = useMemo(() => {
     if (!activePlaybackRoute) return null;
     const placeId = timelineProgress >= 1 ? activePlaybackRoute.destinationId : activePlaybackRoute.originId;

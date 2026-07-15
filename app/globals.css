@@ -132,6 +132,85 @@ summary {
   box-shadow: 0 4px 16px rgb(17 38 31 / 12%) !important;
 }
 
+.maplibregl-popup-content {
+  border: 1px solid #bdb7aa;
+  border-radius: 0;
+  background: #fffdf8;
+  padding: 0.8rem;
+  box-shadow: 0 12px 30px rgb(22 42 35 / 20%);
+}
+
+.map-place-popup {
+  min-width: 13rem;
+  color: #52645c;
+}
+
+.map-place-popup__eyebrow {
+  color: #76536f;
+  font-size: 0.65rem !important;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  line-height: 1.2 !important;
+  text-transform: uppercase;
+}
+
+.map-place-popup__title {
+  margin-top: 0.2rem;
+  color: #173f36;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.15rem !important;
+  font-weight: 700;
+  line-height: 1.15 !important;
+}
+
+.map-place-popup__person {
+  margin-top: 0.35rem;
+  color: #9c5a3d;
+  font-size: 0.75rem !important;
+  font-weight: 800;
+}
+
+.map-place-popup__connections {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.55rem;
+  border-top: 1px solid #ded8cc;
+  padding-top: 0.5rem;
+}
+
+.map-place-popup__connection {
+  border-left: 2px solid #6d9486;
+  background: #f4f1e8;
+  padding: 0.35rem 0.45rem;
+}
+
+.map-place-popup__connection-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.map-place-popup__connection-heading strong {
+  color: #173f36;
+  font-size: 0.75rem !important;
+}
+
+.map-place-popup__connection-heading span {
+  color: #76536f;
+  font-size: 0.65rem !important;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.map-place-popup__connection p,
+.map-place-popup__muted {
+  margin-top: 0.2rem;
+  color: #68766e;
+  font-size: 0.7rem !important;
+  line-height: 1.35 !important;
+}
+
 /* Map controls are research/presentation interfaces, not annotation-sized UI. */
 .map-workspace button,
 .map-workspace input,
