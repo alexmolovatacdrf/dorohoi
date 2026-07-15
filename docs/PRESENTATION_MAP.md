@@ -6,6 +6,32 @@ Both use the shared `MapWorkspace` MapLibre component; the explicit
 `mode="presentation"` selects the public dataset, controls, layout and camera
 defaults without duplicating the map renderer.
 
+## Test datasets
+
+The presentation page has a visible test-data switcher:
+
+- `/presentation/map?dataset=project` uses the current normalized, evidence-bound
+  project collections;
+- `/presentation/map?dataset=claude-demo` uses the separate map fixture derived
+  from the embedded data in `Platforma_WJC (10).html`.
+
+The Claude fixture contains 48 persons, 11 dossiers, 15 places and 26 route
+segments. It is deliberately kept under `data/demo/`, outside
+`data/normalized/`; it is suitable for testing person selection, dossier
+context, camera fitting and playback, but it is not a normalized research
+dataset. Its source SHA-256 is recorded in
+`data/demo/claude-map-demo.json`. The fixture can be regenerated from the
+downloaded HTML with:
+
+```bash
+node scripts/presentation/derive-claude-demo-map.mjs > data/demo/claude-map-demo.json
+```
+
+The command expects the source at
+`/mnt/c/Users/Alex Molovata/Downloads/Platforma_WJC (10).html`; no source data
+is written back. This is an explicitly isolated demo fixture, not part of the
+normalized research bundle.
+
 ## Public experience
 
 The presentation mode uses

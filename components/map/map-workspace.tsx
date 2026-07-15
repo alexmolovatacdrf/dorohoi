@@ -466,11 +466,17 @@ function boundsFromCoordinates(
 export function MapWorkspace({
   data,
   mode = "research",
+  dataSource,
   initialPerson = "",
   initialPlace = "",
 }: {
   data: MapViewModel;
   mode?: MapWorkspaceMode;
+  dataSource?: {
+    label: string;
+    description: string;
+    sourceFile: string | null;
+  };
   initialPerson?: string;
   initialPlace?: string;
 }) {
@@ -1411,6 +1417,15 @@ export function MapWorkspace({
             ) : null}
           </select>
         </label>
+      ) : null}
+
+      {isPresentation && dataSource ? (
+        <div className="presentation-dataset-card" data-testid="presentation-data-source">
+          <p className="presentation-label">Test dataset</p>
+          <p className="presentation-dataset-card__title">{dataSource.label}</p>
+          <p className="presentation-card__meta">{dataSource.description}</p>
+          {dataSource.sourceFile ? <p className="presentation-card__meta">Source: {dataSource.sourceFile}</p> : null}
+        </div>
       ) : null}
 
       <div className="mt-3 grid grid-cols-2 gap-2">

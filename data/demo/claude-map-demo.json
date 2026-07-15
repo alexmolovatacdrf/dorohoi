@@ -1,0 +1,1994 @@
+{
+  "metadata": {
+    "sourceFile": "Platforma_WJC (10).html",
+    "sourceSha256": "2dd8b2facb3e4ae2b214736d85d3dfd3449d73d942a1a49f8fbf3b0409273522",
+    "generatedAt": "2026-07-15",
+    "description": "Derived map-demo fixture from the embedded Claude prototype. Not normalized research data."
+  },
+  "places": [
+    {
+      "id": "claude-place-zvorastea",
+      "label": "Zvorâștea",
+      "labelRo": "Zvorâștea",
+      "coordinates": {
+        "latitude": 47.8833,
+        "longitude": 26.2
+      },
+      "placeType": "settlement",
+      "layer": "core",
+      "confidence": "unknown",
+      "resolutionStatus": "resolved",
+      "personIds": [
+        "pers-000",
+        "pers-007",
+        "pers-039"
+      ],
+      "eventTypes": [
+        "nastere",
+        "evacuare"
+      ],
+      "years": [
+        1894,
+        1941,
+        1902,
+        1895
+      ],
+      "dossierIds": [
+        "2534_2",
+        "2540",
+        "2604"
+      ],
+      "roles": [
+        "nastere",
+        "evacuare"
+      ],
+      "categories": [
+        "origin",
+        "evacuation_deportation"
+      ],
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+    },
+    {
+      "id": "claude-place-dorohoi",
+      "label": "Dorohoi",
+      "labelRo": "Dorohoi",
+      "coordinates": {
+        "latitude": 47.9533,
+        "longitude": 26.4008
+      },
+      "placeType": "settlement",
+      "layer": "core",
+      "confidence": "unknown",
+      "resolutionStatus": "resolved",
+      "personIds": [
+        "pers-000",
+        "pers-007",
+        "pers-010",
+        "pers-015",
+        "pers-023",
+        "pers-031",
+        "pers-034",
+        "pers-035",
+        "pers-039",
+        "pers-045"
+      ],
+      "eventTypes": [
+        "deportare_origine",
+        "intoarcere",
+        "munca_fortata",
+        "nastere"
+      ],
+      "years": [
+        1941,
+        1945,
+        0,
+        1898,
+        1890
+      ],
+      "dossierIds": [
+        "2534_2",
+        "2540",
+        "2543",
+        "2550",
+        "2591",
+        "2592",
+        "2601",
+        "2603",
+        "2604",
+        "4030"
+      ],
+      "roles": [
+        "deportare_origine",
+        "intoarcere",
+        "munca_fortata",
+        "nastere"
+      ],
+      "categories": [
+        "evacuation_deportation",
+        "return",
+        "forced_labour",
+        "origin"
+      ],
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+    },
+    {
+      "id": "claude-place-sargorod",
+      "label": "Șargorod",
+      "labelRo": "Șargorod",
+      "coordinates": {
+        "latitude": 48.75,
+        "longitude": 28.0833
+      },
+      "placeType": "historical_region",
+      "layer": "core",
+      "confidence": "unknown",
+      "resolutionStatus": "resolved",
+      "personIds": [
+        "pers-000",
+        "pers-006",
+        "pers-045"
+      ],
+      "eventTypes": [
+        "deportare",
+        "deces"
+      ],
+      "years": [
+        1941,
+        1942
+      ],
+      "dossierIds": [
+        "2534_2",
+        "4030"
+      ],
+      "roles": [
+        "deportare",
+        "deces"
+      ],
+      "categories": [
+        "evacuation_deportation",
+        "death"
+      ],
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+    },
+    {
+      "id": "claude-place-mogilev-podolsk",
+      "label": "Mogilev-Podolsk",
+      "labelRo": "Mogilev-Podolsk",
+      "coordinates": {
+        "latitude": 48.45,
+        "longitude": 27.8
+      },
+      "placeType": "historical_region",
+      "layer": "core",
+      "confidence": "unknown",
+      "resolutionStatus": "resolved",
+      "personIds": [
+        "pers-007",
+        "pers-010",
+        "pers-013",
+        "pers-014",
+        "pers-021",
+        "pers-022",
+        "pers-023",
+        "pers-025",
+        "pers-027"
+      ],
+      "eventTypes": [
+        "deportare",
+        "deces"
+      ],
+      "years": [
+        1941,
+        0,
+        1942
+      ],
+      "dossierIds": [
+        "2540",
+        "2543",
+        "2550",
+        "2591"
+      ],
+      "roles": [
+        "deportare",
+        "deces"
+      ],
+      "categories": [
+        "evacuation_deportation",
+        "death"
+      ],
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+    },
+    {
+      "id": "claude-place-stefanesti",
+      "label": "Ștefănești",
+      "labelRo": "Ștefănești",
+      "coordinates": {
+        "latitude": 47.8,
+        "longitude": 27.2167
+      },
+      "placeType": "settlement",
+      "layer": "core",
+      "confidence": "unknown",
+      "resolutionStatus": "resolved",
+      "personIds": [
+        "pers-015"
+      ],
+      "eventTypes": [
+        "nastere"
+      ],
+      "years": [
+        1907
+      ],
+      "dossierIds": [
+        "2550"
+      ],
+      "roles": [
+        "nastere"
+      ],
+      "categories": [
+        "origin"
+      ],
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+    },
+    {
+      "id": "claude-place-saveni",
+      "label": "Săveni",
+      "labelRo": "Săveni",
+      "coordinates": {
+        "latitude": 47.95,
+        "longitude": 26.8667
+      },
+      "placeType": "settlement",
+      "layer": "core",
+      "confidence": "unknown",
+      "resolutionStatus": "resolved",
+      "personIds": [
+        "pers-015",
+        "pers-045"
+      ],
+      "eventTypes": [
+        "evacuare",
+        "nastere"
+      ],
+      "years": [
+        0,
+        1919
+      ],
+      "dossierIds": [
+        "2550",
+        "4030"
+      ],
+      "roles": [
+        "evacuare",
+        "nastere"
+      ],
+      "categories": [
+        "evacuation_deportation",
+        "origin"
+      ],
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+    },
+    {
+      "id": "claude-place-targu-jiu",
+      "label": "Târgu Jiu",
+      "labelRo": "Târgu Jiu",
+      "coordinates": {
+        "latitude": 45.0342,
+        "longitude": 23.2747
+      },
+      "placeType": "camp",
+      "layer": "core",
+      "confidence": "unknown",
+      "resolutionStatus": "resolved",
+      "personIds": [
+        "pers-015"
+      ],
+      "eventTypes": [
+        "lagar"
+      ],
+      "years": [
+        1941
+      ],
+      "dossierIds": [
+        "2550"
+      ],
+      "roles": [
+        "lagar"
+      ],
+      "categories": [],
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+    },
+    {
+      "id": "claude-place-sadagura",
+      "label": "Sadagura",
+      "labelRo": "Sadagura",
+      "coordinates": {
+        "latitude": 48.35,
+        "longitude": 25.9667
+      },
+      "placeType": "settlement",
+      "layer": "core",
+      "confidence": "unknown",
+      "resolutionStatus": "resolved",
+      "personIds": [
+        "pers-023"
+      ],
+      "eventTypes": [
+        "nastere"
+      ],
+      "years": [
+        1883
+      ],
+      "dossierIds": [
+        "2591"
+      ],
+      "roles": [
+        "nastere"
+      ],
+      "categories": [
+        "origin"
+      ],
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+    },
+    {
+      "id": "claude-place-transnistria",
+      "label": "Transnistria",
+      "labelRo": "Transnistria",
+      "coordinates": {
+        "latitude": 48.4,
+        "longitude": 28.5
+      },
+      "placeType": "historical_region",
+      "layer": "core",
+      "confidence": "unknown",
+      "resolutionStatus": "resolved",
+      "personIds": [
+        "pers-023",
+        "pers-031",
+        "pers-039",
+        "pers-045"
+      ],
+      "eventTypes": [
+        "evacuare"
+      ],
+      "years": [
+        0
+      ],
+      "dossierIds": [
+        "2591",
+        "2592",
+        "2604",
+        "4030"
+      ],
+      "roles": [
+        "evacuare"
+      ],
+      "categories": [
+        "evacuation_deportation"
+      ],
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+    },
+    {
+      "id": "claude-place-cernauti",
+      "label": "Cernăuți",
+      "labelRo": "Cernăuți",
+      "coordinates": {
+        "latitude": 48.3,
+        "longitude": 25.9333
+      },
+      "placeType": "settlement",
+      "layer": "core",
+      "confidence": "unknown",
+      "resolutionStatus": "resolved",
+      "personIds": [
+        "pers-023"
+      ],
+      "eventTypes": [
+        "deportare_origine"
+      ],
+      "years": [
+        1941
+      ],
+      "dossierIds": [
+        "2591"
+      ],
+      "roles": [
+        "deportare_origine"
+      ],
+      "categories": [
+        "evacuation_deportation"
+      ],
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+    },
+    {
+      "id": "claude-place-obodovca",
+      "label": "Obodovca",
+      "labelRo": "Obodovca",
+      "coordinates": {
+        "latitude": 48.405,
+        "longitude": 29.2475
+      },
+      "placeType": "historical_region",
+      "layer": "core",
+      "confidence": "unknown",
+      "resolutionStatus": "resolved",
+      "personIds": [
+        "pers-026"
+      ],
+      "eventTypes": [
+        "deces"
+      ],
+      "years": [
+        0
+      ],
+      "dossierIds": [
+        "2591"
+      ],
+      "roles": [
+        "deces"
+      ],
+      "categories": [
+        "death"
+      ],
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+    },
+    {
+      "id": "claude-place-ripiceni",
+      "label": "Ripiceni",
+      "labelRo": "Ripiceni",
+      "coordinates": {
+        "latitude": 47.9833,
+        "longitude": 27.1333
+      },
+      "placeType": "institution",
+      "layer": "core",
+      "confidence": "unknown",
+      "resolutionStatus": "resolved",
+      "personIds": [
+        "pers-035"
+      ],
+      "eventTypes": [
+        "evacuare"
+      ],
+      "years": [
+        1940
+      ],
+      "dossierIds": [
+        "2603"
+      ],
+      "roles": [
+        "evacuare"
+      ],
+      "categories": [
+        "evacuation_deportation"
+      ],
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+    },
+    {
+      "id": "claude-place-vatra-dornei",
+      "label": "Vatra Dornei",
+      "labelRo": "Vatra Dornei",
+      "coordinates": {
+        "latitude": 47.35,
+        "longitude": 25.3667
+      },
+      "placeType": "institution",
+      "layer": "core",
+      "confidence": "unknown",
+      "resolutionStatus": "resolved",
+      "personIds": [
+        "pers-035"
+      ],
+      "eventTypes": [
+        "munca_fortata"
+      ],
+      "years": [
+        1941
+      ],
+      "dossierIds": [
+        "2603"
+      ],
+      "roles": [
+        "munca_fortata"
+      ],
+      "categories": [
+        "forced_labour"
+      ],
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+    },
+    {
+      "id": "claude-place-siret",
+      "label": "Siret",
+      "labelRo": "Siret",
+      "coordinates": {
+        "latitude": 47.955,
+        "longitude": 26.067
+      },
+      "placeType": "settlement",
+      "layer": "core",
+      "confidence": "unknown",
+      "resolutionStatus": "resolved",
+      "personIds": [
+        "pers-035"
+      ],
+      "eventTypes": [
+        "deportare_origine"
+      ],
+      "years": [
+        1941
+      ],
+      "dossierIds": [
+        "2603"
+      ],
+      "roles": [
+        "deportare_origine"
+      ],
+      "categories": [
+        "evacuation_deportation"
+      ],
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+    },
+    {
+      "id": "claude-place-cibulevca",
+      "label": "Cibulevca",
+      "labelRo": "Cibulevca",
+      "coordinates": {
+        "latitude": 47.9,
+        "longitude": 29.05
+      },
+      "placeType": "historical_region",
+      "layer": "core",
+      "confidence": "unknown",
+      "resolutionStatus": "resolved",
+      "personIds": [
+        "pers-035"
+      ],
+      "eventTypes": [
+        "deportare"
+      ],
+      "years": [
+        1941
+      ],
+      "dossierIds": [
+        "2603"
+      ],
+      "roles": [
+        "deportare"
+      ],
+      "categories": [
+        "evacuation_deportation"
+      ],
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo"
+    }
+  ],
+  "routes": [
+    {
+      "id": "pers-000-route-2",
+      "personId": "pers-000",
+      "personName": "Goldemberg Roza",
+      "dossierId": "2534_2",
+      "originId": "claude-place-zvorastea",
+      "originName": "Zvorâștea",
+      "destinationId": "claude-place-dorohoi",
+      "destinationName": "Dorohoi",
+      "coordinates": [
+        [
+          26.2,
+          47.8833
+        ],
+        [
+          26.4008,
+          47.9533
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1941-06-01",
+      "dateEnd": "1941-11-12",
+      "dateRaw": "1941. Noembrie 12",
+      "transportRaw": null,
+      "sequence": 2,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Deportat de la: Dorohoi",
+      "eventTypes": [
+        "evacuare",
+        "deportare_origine"
+      ]
+    },
+    {
+      "id": "pers-000-route-3",
+      "personId": "pers-000",
+      "personName": "Goldemberg Roza",
+      "dossierId": "2534_2",
+      "originId": "claude-place-dorohoi",
+      "originName": "Dorohoi",
+      "destinationId": "claude-place-sargorod",
+      "destinationName": "Șargorod",
+      "coordinates": [
+        [
+          26.4008,
+          47.9533
+        ],
+        [
+          28.0833,
+          48.75
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1941-11-12",
+      "dateEnd": "1941-11-12",
+      "dateRaw": "1941. Noembrie 12",
+      "transportRaw": null,
+      "sequence": 3,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Deportat la: Șargorod Jud. Moghileu",
+      "eventTypes": [
+        "deportare_origine",
+        "deportare"
+      ]
+    },
+    {
+      "id": "pers-000-route-4",
+      "personId": "pers-000",
+      "personName": "Goldemberg Roza",
+      "dossierId": "2534_2",
+      "originId": "claude-place-sargorod",
+      "originName": "Șargorod",
+      "destinationId": "claude-place-dorohoi",
+      "destinationName": "Dorohoi",
+      "coordinates": [
+        [
+          28.0833,
+          48.75
+        ],
+        [
+          26.4008,
+          47.9533
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1941-11-12",
+      "dateEnd": "1945-06-01",
+      "dateRaw": "1945",
+      "transportRaw": null,
+      "sequence": 4,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Repatriat — prezent la ancheta C.M.E. (1945)",
+      "eventTypes": [
+        "deportare",
+        "intoarcere"
+      ]
+    },
+    {
+      "id": "pers-007-route-1",
+      "personId": "pers-007",
+      "personName": "Hoisie Bercu",
+      "dossierId": "2540",
+      "originId": "claude-place-zvorastea",
+      "originName": "Zvorâștea",
+      "destinationId": "claude-place-dorohoi",
+      "destinationName": "Dorohoi",
+      "coordinates": [
+        [
+          26.2,
+          47.8833
+        ],
+        [
+          26.4008,
+          47.9533
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1902-01-01",
+      "dateEnd": "1941-11-13",
+      "dateRaw": "1941 noembrie 13",
+      "transportRaw": null,
+      "sequence": 1,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Deportat de la: Dorohoi",
+      "eventTypes": [
+        "nastere",
+        "deportare_origine"
+      ]
+    },
+    {
+      "id": "pers-007-route-2",
+      "personId": "pers-007",
+      "personName": "Hoisie Bercu",
+      "dossierId": "2540",
+      "originId": "claude-place-dorohoi",
+      "originName": "Dorohoi",
+      "destinationId": "claude-place-mogilev-podolsk",
+      "destinationName": "Mogilev-Podolsk",
+      "coordinates": [
+        [
+          26.4008,
+          47.9533
+        ],
+        [
+          27.8,
+          48.45
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1941-11-13",
+      "dateEnd": "1941-11-13",
+      "dateRaw": "1941 noembrie 13",
+      "transportRaw": null,
+      "sequence": 2,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Deportat la: Moghilau",
+      "eventTypes": [
+        "deportare_origine",
+        "deportare"
+      ]
+    },
+    {
+      "id": "pers-007-route-3",
+      "personId": "pers-007",
+      "personName": "Hoisie Bercu",
+      "dossierId": "2540",
+      "originId": "claude-place-mogilev-podolsk",
+      "originName": "Mogilev-Podolsk",
+      "destinationId": "claude-place-dorohoi",
+      "destinationName": "Dorohoi",
+      "coordinates": [
+        [
+          27.8,
+          48.45
+        ],
+        [
+          26.4008,
+          47.9533
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1941-11-13",
+      "dateEnd": "1945-06-01",
+      "dateRaw": "1945",
+      "transportRaw": null,
+      "sequence": 3,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Repatriat — prezent la ancheta C.M.E. (1945)",
+      "eventTypes": [
+        "deportare",
+        "intoarcere"
+      ]
+    },
+    {
+      "id": "pers-010-route-1",
+      "personId": "pers-010",
+      "personName": "Hularu Strul",
+      "dossierId": "2543",
+      "originId": "claude-place-dorohoi",
+      "originName": "Dorohoi",
+      "destinationId": "claude-place-mogilev-podolsk",
+      "destinationName": "Mogilev-Podolsk",
+      "coordinates": [
+        [
+          26.4008,
+          47.9533
+        ],
+        [
+          27.8,
+          48.45
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1898-01-01",
+      "dateEnd": "1941-11-01",
+      "dateRaw": "Noiembrie 1941",
+      "transportRaw": null,
+      "sequence": 1,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Deportat la: in Transnistria La Moghilev",
+      "eventTypes": [
+        "nastere",
+        "deportare"
+      ]
+    },
+    {
+      "id": "pers-010-route-2",
+      "personId": "pers-010",
+      "personName": "Hularu Strul",
+      "dossierId": "2543",
+      "originId": "claude-place-mogilev-podolsk",
+      "originName": "Mogilev-Podolsk",
+      "destinationId": "claude-place-dorohoi",
+      "destinationName": "Dorohoi",
+      "coordinates": [
+        [
+          27.8,
+          48.45
+        ],
+        [
+          26.4008,
+          47.9533
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1941-11-01",
+      "dateEnd": "1945-06-01",
+      "dateRaw": "1945",
+      "transportRaw": null,
+      "sequence": 2,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Repatriat — prezent la ancheta C.M.E. (1945)",
+      "eventTypes": [
+        "deportare",
+        "intoarcere"
+      ]
+    },
+    {
+      "id": "pers-015-route-1",
+      "personId": "pers-015",
+      "personName": "Croitoru Smil",
+      "dossierId": "2550",
+      "originId": "claude-place-stefanesti",
+      "originName": "Ștefănești",
+      "destinationId": "claude-place-targu-jiu",
+      "destinationName": "Târgu Jiu",
+      "coordinates": [
+        [
+          27.2167,
+          47.8
+        ],
+        [
+          23.2747,
+          45.0342
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1907-01-01",
+      "dateEnd": "1941-06-01",
+      "dateRaw": null,
+      "transportRaw": null,
+      "sequence": 1,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Internare în lagăr: Iunie 1941 - Decemvrie 1941 - Lg Tg-Jiu - ridicarea tuturor Evreilor din Săveni",
+      "eventTypes": [
+        "nastere",
+        "lagar"
+      ]
+    },
+    {
+      "id": "pers-015-route-2",
+      "personId": "pers-015",
+      "personName": "Croitoru Smil",
+      "dossierId": "2550",
+      "originId": "claude-place-targu-jiu",
+      "originName": "Târgu Jiu",
+      "destinationId": "claude-place-dorohoi",
+      "destinationName": "Dorohoi",
+      "coordinates": [
+        [
+          23.2747,
+          45.0342
+        ],
+        [
+          26.4008,
+          47.9533
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1941-06-01",
+      "dateEnd": "1945-06-01",
+      "dateRaw": "1945",
+      "transportRaw": null,
+      "sequence": 2,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Repatriat — prezent la ancheta C.M.E. (1945)",
+      "eventTypes": [
+        "lagar",
+        "intoarcere"
+      ]
+    },
+    {
+      "id": "pers-015-route-3",
+      "personId": "pers-015",
+      "personName": "Croitoru Smil",
+      "dossierId": "2550",
+      "originId": "claude-place-dorohoi",
+      "originName": "Dorohoi",
+      "destinationId": "claude-place-saveni",
+      "destinationName": "Săveni",
+      "coordinates": [
+        [
+          26.4008,
+          47.9533
+        ],
+        [
+          26.8667,
+          47.95
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1945-06-01",
+      "dateEnd": null,
+      "dateRaw": null,
+      "transportRaw": null,
+      "sequence": 3,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Evacuare: 24 Iulie Săveni Dorohoi.",
+      "eventTypes": [
+        "intoarcere",
+        "evacuare"
+      ]
+    },
+    {
+      "id": "pers-023-route-1",
+      "personId": "pers-023",
+      "personName": "Isser Jeruchim",
+      "dossierId": "2591",
+      "originId": "claude-place-sadagura",
+      "originName": "Sadagura",
+      "destinationId": "claude-place-cernauti",
+      "destinationName": "Cernăuți",
+      "coordinates": [
+        [
+          25.9667,
+          48.35
+        ],
+        [
+          25.9333,
+          48.3
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1883-01-01",
+      "dateEnd": "1941-10-15",
+      "dateRaw": "1941 Octombrie 15",
+      "transportRaw": null,
+      "sequence": 1,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Deportat de la: Cernăuți",
+      "eventTypes": [
+        "nastere",
+        "deportare_origine"
+      ]
+    },
+    {
+      "id": "pers-023-route-2",
+      "personId": "pers-023",
+      "personName": "Isser Jeruchim",
+      "dossierId": "2591",
+      "originId": "claude-place-cernauti",
+      "originName": "Cernăuți",
+      "destinationId": "claude-place-mogilev-podolsk",
+      "destinationName": "Mogilev-Podolsk",
+      "coordinates": [
+        [
+          25.9333,
+          48.3
+        ],
+        [
+          27.8,
+          48.45
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1941-10-15",
+      "dateEnd": "1941-10-15",
+      "dateRaw": "1941 Octombrie 15",
+      "transportRaw": null,
+      "sequence": 2,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Deportat la: Moghilev",
+      "eventTypes": [
+        "deportare_origine",
+        "deportare"
+      ]
+    },
+    {
+      "id": "pers-023-route-3",
+      "personId": "pers-023",
+      "personName": "Isser Jeruchim",
+      "dossierId": "2591",
+      "originId": "claude-place-mogilev-podolsk",
+      "originName": "Mogilev-Podolsk",
+      "destinationId": "claude-place-dorohoi",
+      "destinationName": "Dorohoi",
+      "coordinates": [
+        [
+          27.8,
+          48.45
+        ],
+        [
+          26.4008,
+          47.9533
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1941-10-15",
+      "dateEnd": "1945-06-01",
+      "dateRaw": "1945",
+      "transportRaw": null,
+      "sequence": 3,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Repatriat — prezent la ancheta C.M.E. (1945)",
+      "eventTypes": [
+        "deportare",
+        "intoarcere"
+      ]
+    },
+    {
+      "id": "pers-023-route-4",
+      "personId": "pers-023",
+      "personName": "Isser Jeruchim",
+      "dossierId": "2591",
+      "originId": "claude-place-dorohoi",
+      "originName": "Dorohoi",
+      "destinationId": "claude-place-transnistria",
+      "destinationName": "Transnistria",
+      "coordinates": [
+        [
+          26.4008,
+          47.9533
+        ],
+        [
+          28.5,
+          48.4
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1945-06-01",
+      "dateEnd": null,
+      "dateRaw": null,
+      "transportRaw": null,
+      "sequence": 4,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Evacuare: Transnistria",
+      "eventTypes": [
+        "intoarcere",
+        "evacuare"
+      ]
+    },
+    {
+      "id": "pers-031-route-1",
+      "personId": "pers-031",
+      "personName": "Mamo Liza",
+      "dossierId": "2592",
+      "originId": "claude-place-dorohoi",
+      "originName": "Dorohoi",
+      "destinationId": "claude-place-transnistria",
+      "destinationName": "Transnistria",
+      "coordinates": [
+        [
+          26.4008,
+          47.9533
+        ],
+        [
+          28.5,
+          48.4
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1945-06-01",
+      "dateEnd": null,
+      "dateRaw": null,
+      "transportRaw": null,
+      "sequence": 1,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Evacuare: Da in Transnistria",
+      "eventTypes": [
+        "intoarcere",
+        "evacuare"
+      ]
+    },
+    {
+      "id": "pers-035-route-1",
+      "personId": "pers-035",
+      "personName": "Casapu Haim",
+      "dossierId": "2603",
+      "originId": "claude-place-ripiceni",
+      "originName": "Ripiceni",
+      "destinationId": "claude-place-vatra-dornei",
+      "destinationName": "Vatra Dornei",
+      "coordinates": [
+        [
+          27.1333,
+          47.9833
+        ],
+        [
+          25.3667,
+          47.35
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1940-01-01",
+      "dateEnd": "1941-01-01",
+      "dateRaw": null,
+      "transportRaw": null,
+      "sequence": 1,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Detașament de muncă: 22 Oct. 1941 Nicolina Brașov 270. zile. 22 la 9 febr 1942 Regimentul 29 Dorna Vatra 48 Zile cazarma cuconici 30 Zile",
+      "eventTypes": [
+        "evacuare",
+        "munca_fortata"
+      ]
+    },
+    {
+      "id": "pers-035-route-2",
+      "personId": "pers-035",
+      "personName": "Casapu Haim",
+      "dossierId": "2603",
+      "originId": "claude-place-vatra-dornei",
+      "originName": "Vatra Dornei",
+      "destinationId": "claude-place-siret",
+      "destinationName": "Siret",
+      "coordinates": [
+        [
+          25.3667,
+          47.35
+        ],
+        [
+          26.067,
+          47.955
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1941-01-01",
+      "dateEnd": "1941-10-27",
+      "dateRaw": "1941 luna Octombrie Ziua 27",
+      "transportRaw": null,
+      "sequence": 2,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Deportat de la: Siret",
+      "eventTypes": [
+        "munca_fortata",
+        "deportare_origine"
+      ]
+    },
+    {
+      "id": "pers-035-route-3",
+      "personId": "pers-035",
+      "personName": "Casapu Haim",
+      "dossierId": "2603",
+      "originId": "claude-place-siret",
+      "originName": "Siret",
+      "destinationId": "claude-place-cibulevca",
+      "destinationName": "Cibulevca",
+      "coordinates": [
+        [
+          26.067,
+          47.955
+        ],
+        [
+          29.05,
+          47.9
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1941-10-27",
+      "dateEnd": "1941-10-27",
+      "dateRaw": "1941 luna Octombrie Ziua 27",
+      "transportRaw": null,
+      "sequence": 3,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Deportat la: Cibulevca",
+      "eventTypes": [
+        "deportare_origine",
+        "deportare"
+      ]
+    },
+    {
+      "id": "pers-035-route-4",
+      "personId": "pers-035",
+      "personName": "Casapu Haim",
+      "dossierId": "2603",
+      "originId": "claude-place-cibulevca",
+      "originName": "Cibulevca",
+      "destinationId": "claude-place-dorohoi",
+      "destinationName": "Dorohoi",
+      "coordinates": [
+        [
+          29.05,
+          47.9
+        ],
+        [
+          26.4008,
+          47.9533
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1941-10-27",
+      "dateEnd": "1945-06-01",
+      "dateRaw": "1945",
+      "transportRaw": null,
+      "sequence": 4,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Repatriat — prezent la ancheta C.M.E. (1945)",
+      "eventTypes": [
+        "deportare",
+        "intoarcere"
+      ]
+    },
+    {
+      "id": "pers-039-route-1",
+      "personId": "pers-039",
+      "personName": "Catz Sura",
+      "dossierId": "2604",
+      "originId": "claude-place-zvorastea",
+      "originName": "Zvorâștea",
+      "destinationId": "claude-place-dorohoi",
+      "destinationName": "Dorohoi",
+      "coordinates": [
+        [
+          26.2,
+          47.8833
+        ],
+        [
+          26.4008,
+          47.9533
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1895-01-01",
+      "dateEnd": "1945-06-01",
+      "dateRaw": "1945",
+      "transportRaw": null,
+      "sequence": 1,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Repatriat — prezent la ancheta C.M.E. (1945)",
+      "eventTypes": [
+        "nastere",
+        "intoarcere"
+      ]
+    },
+    {
+      "id": "pers-039-route-2",
+      "personId": "pers-039",
+      "personName": "Catz Sura",
+      "dossierId": "2604",
+      "originId": "claude-place-dorohoi",
+      "originName": "Dorohoi",
+      "destinationId": "claude-place-transnistria",
+      "destinationName": "Transnistria",
+      "coordinates": [
+        [
+          26.4008,
+          47.9533
+        ],
+        [
+          28.5,
+          48.4
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1945-06-01",
+      "dateEnd": null,
+      "dateRaw": null,
+      "transportRaw": null,
+      "sequence": 2,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Evacuare: Da in Transnistria",
+      "eventTypes": [
+        "intoarcere",
+        "evacuare"
+      ]
+    },
+    {
+      "id": "pers-045-route-1",
+      "personId": "pers-045",
+      "personName": "Sacagiu Copel",
+      "dossierId": "4030",
+      "originId": "claude-place-saveni",
+      "originName": "Săveni",
+      "destinationId": "claude-place-dorohoi",
+      "destinationName": "Dorohoi",
+      "coordinates": [
+        [
+          26.8667,
+          47.95
+        ],
+        [
+          26.4008,
+          47.9533
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1919-01-01",
+      "dateEnd": "1941-11-01",
+      "dateRaw": "Noembrie 1941.",
+      "transportRaw": null,
+      "sequence": 1,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Deportat de la: Din Dorohoi",
+      "eventTypes": [
+        "nastere",
+        "deportare_origine"
+      ]
+    },
+    {
+      "id": "pers-045-route-2",
+      "personId": "pers-045",
+      "personName": "Sacagiu Copel",
+      "dossierId": "4030",
+      "originId": "claude-place-dorohoi",
+      "originName": "Dorohoi",
+      "destinationId": "claude-place-sargorod",
+      "destinationName": "Șargorod",
+      "coordinates": [
+        [
+          26.4008,
+          47.9533
+        ],
+        [
+          28.0833,
+          48.75
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1941-11-01",
+      "dateEnd": "1941-11-01",
+      "dateRaw": "Noembrie 1941.",
+      "transportRaw": null,
+      "sequence": 2,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Deportat la: în Șargorod",
+      "eventTypes": [
+        "deportare_origine",
+        "deportare"
+      ]
+    },
+    {
+      "id": "pers-045-route-3",
+      "personId": "pers-045",
+      "personName": "Sacagiu Copel",
+      "dossierId": "4030",
+      "originId": "claude-place-sargorod",
+      "originName": "Șargorod",
+      "destinationId": "claude-place-dorohoi",
+      "destinationName": "Dorohoi",
+      "coordinates": [
+        [
+          28.0833,
+          48.75
+        ],
+        [
+          26.4008,
+          47.9533
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1941-11-01",
+      "dateEnd": "1945-06-01",
+      "dateRaw": "1945",
+      "transportRaw": null,
+      "sequence": 3,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Repatriat — prezent la ancheta C.M.E. (1945)",
+      "eventTypes": [
+        "deportare",
+        "intoarcere"
+      ]
+    },
+    {
+      "id": "pers-045-route-4",
+      "personId": "pers-045",
+      "personName": "Sacagiu Copel",
+      "dossierId": "4030",
+      "originId": "claude-place-dorohoi",
+      "originName": "Dorohoi",
+      "destinationId": "claude-place-transnistria",
+      "destinationName": "Transnistria",
+      "coordinates": [
+        [
+          26.4008,
+          47.9533
+        ],
+        [
+          28.5,
+          48.4
+        ]
+      ],
+      "routeStatus": "explicit",
+      "confidence": "unknown",
+      "dateStart": "1945-06-01",
+      "dateEnd": null,
+      "dateRaw": null,
+      "transportRaw": null,
+      "sequence": 4,
+      "sourceLabel": "Platforma_WJC (10).html · embedded Claude demo",
+      "notes": "Evacuare: Da in Transnistria",
+      "eventTypes": [
+        "intoarcere",
+        "evacuare"
+      ]
+    }
+  ],
+  "persons": [
+    {
+      "id": "pers-000",
+      "label": "Goldemberg Roza",
+      "dossierId": "2534_2",
+      "roles": [
+        "cap de familie"
+      ]
+    },
+    {
+      "id": "pers-001",
+      "label": "Goldemberg Sali",
+      "dossierId": "2534_2",
+      "roles": [
+        "fiică"
+      ]
+    },
+    {
+      "id": "pers-002",
+      "label": "Goldemberg Froim",
+      "dossierId": "2534_2",
+      "roles": [
+        "fiu"
+      ]
+    },
+    {
+      "id": "pers-003",
+      "label": "Goldemberg Ric[...]",
+      "dossierId": "2534_2",
+      "roles": [
+        "fiu"
+      ]
+    },
+    {
+      "id": "pers-004",
+      "label": "Goldemberg Beti",
+      "dossierId": "2534_2",
+      "roles": [
+        "fiică"
+      ]
+    },
+    {
+      "id": "pers-005",
+      "label": "Goldemberg [ilizibil]",
+      "dossierId": "2534_2",
+      "roles": [
+        "fiu"
+      ]
+    },
+    {
+      "id": "pers-006",
+      "label": "Hersch Goldenberg",
+      "dossierId": "2534_2",
+      "roles": [
+        "victimă (soț)"
+      ]
+    },
+    {
+      "id": "pers-007",
+      "label": "Hoisie Bercu",
+      "dossierId": "2540",
+      "roles": [
+        "cap de familie"
+      ]
+    },
+    {
+      "id": "pers-008",
+      "label": "Hoisie Sofia",
+      "dossierId": "2540",
+      "roles": [
+        "sotie"
+      ]
+    },
+    {
+      "id": "pers-009",
+      "label": "Hoisie Burach",
+      "dossierId": "2540",
+      "roles": [
+        "fiu"
+      ]
+    },
+    {
+      "id": "pers-010",
+      "label": "Hularu Strul",
+      "dossierId": "2543",
+      "roles": [
+        "cap de familie"
+      ]
+    },
+    {
+      "id": "pers-011",
+      "label": "Hularu Henta",
+      "dossierId": "2543",
+      "roles": [
+        "Sotie"
+      ]
+    },
+    {
+      "id": "pers-012",
+      "label": "Hularu Reiza",
+      "dossierId": "2543",
+      "roles": [
+        "Copil"
+      ]
+    },
+    {
+      "id": "pers-013",
+      "label": "Hularu Sura",
+      "dossierId": "2543",
+      "roles": [
+        "victimă (Mama)"
+      ]
+    },
+    {
+      "id": "pers-014",
+      "label": "Helman Ghitla",
+      "dossierId": "2543",
+      "roles": [
+        "victimă (Soacra)"
+      ]
+    },
+    {
+      "id": "pers-015",
+      "label": "Croitoru Smil",
+      "dossierId": "2550",
+      "roles": [
+        "cap de familie"
+      ]
+    },
+    {
+      "id": "pers-016",
+      "label": "Croitoru Ester",
+      "dossierId": "2550",
+      "roles": [
+        "soție"
+      ]
+    },
+    {
+      "id": "pers-017",
+      "label": "Haia",
+      "dossierId": "2550",
+      "roles": [
+        "fiică"
+      ]
+    },
+    {
+      "id": "pers-018",
+      "label": "Simon",
+      "dossierId": "2550",
+      "roles": [
+        "fiu"
+      ]
+    },
+    {
+      "id": "pers-019",
+      "label": "Șurica",
+      "dossierId": "2550",
+      "roles": [
+        "fiică"
+      ]
+    },
+    {
+      "id": "pers-020",
+      "label": "Ghedalie",
+      "dossierId": "2550",
+      "roles": [
+        "fiu"
+      ]
+    },
+    {
+      "id": "pers-021",
+      "label": "Ciobotaru Ita",
+      "dossierId": "2550",
+      "roles": [
+        "victimă (soacră)"
+      ]
+    },
+    {
+      "id": "pers-022",
+      "label": "Ciobotaru Eli",
+      "dossierId": "2550",
+      "roles": [
+        "victimă (cumnat)"
+      ]
+    },
+    {
+      "id": "pers-023",
+      "label": "Isser Jeruchim",
+      "dossierId": "2591",
+      "roles": [
+        "cap de familie"
+      ]
+    },
+    {
+      "id": "pers-024",
+      "label": "Isser Erna",
+      "dossierId": "2591",
+      "roles": [
+        "fica"
+      ]
+    },
+    {
+      "id": "pers-025",
+      "label": "Isser Dora",
+      "dossierId": "2591",
+      "roles": [
+        "victimă (soție)"
+      ]
+    },
+    {
+      "id": "pers-026",
+      "label": "Ellenberg Karl",
+      "dossierId": "2591",
+      "roles": [
+        "victimă (cumnat)"
+      ]
+    },
+    {
+      "id": "pers-027",
+      "label": "Mende [ilizibil]",
+      "dossierId": "2591",
+      "roles": [
+        "victimă (socru)"
+      ]
+    },
+    {
+      "id": "pers-028",
+      "label": "Eva [ilizibil]",
+      "dossierId": "2591",
+      "roles": [
+        "victimă (soacra)"
+      ]
+    },
+    {
+      "id": "pers-029",
+      "label": "Sali [ilizibil]",
+      "dossierId": "2591",
+      "roles": [
+        "victimă (cumnată)"
+      ]
+    },
+    {
+      "id": "pers-030",
+      "label": "Hema [ilizibil]",
+      "dossierId": "2591",
+      "roles": [
+        "victimă (nepot)"
+      ]
+    },
+    {
+      "id": "pers-031",
+      "label": "Mamo Liza",
+      "dossierId": "2592",
+      "roles": [
+        "cap de familie"
+      ]
+    },
+    {
+      "id": "pers-032",
+      "label": "Liza",
+      "dossierId": "2592",
+      "roles": [
+        "fiică"
+      ]
+    },
+    {
+      "id": "pers-033",
+      "label": "B[ilizibil]",
+      "dossierId": "2592",
+      "roles": [
+        "fiu"
+      ]
+    },
+    {
+      "id": "pers-034",
+      "label": "Olam Estera",
+      "dossierId": "2601",
+      "roles": [
+        "cap de familie"
+      ]
+    },
+    {
+      "id": "pers-035",
+      "label": "Casapu Haim",
+      "dossierId": "2603",
+      "roles": [
+        "cap de familie"
+      ]
+    },
+    {
+      "id": "pers-036",
+      "label": "Casapu Fani",
+      "dossierId": "2603",
+      "roles": [
+        "Soție"
+      ]
+    },
+    {
+      "id": "pers-037",
+      "label": "Casapu Roza",
+      "dossierId": "2603",
+      "roles": [
+        "Fiica"
+      ]
+    },
+    {
+      "id": "pers-038",
+      "label": "Casapu Marcel",
+      "dossierId": "2603",
+      "roles": [
+        "Fiu"
+      ]
+    },
+    {
+      "id": "pers-039",
+      "label": "Catz Sura",
+      "dossierId": "2604",
+      "roles": [
+        "cap de familie"
+      ]
+    },
+    {
+      "id": "pers-040",
+      "label": "Sura Catz",
+      "dossierId": "2604",
+      "roles": [
+        "membru"
+      ]
+    },
+    {
+      "id": "pers-041",
+      "label": "Beila Catz",
+      "dossierId": "2604",
+      "roles": [
+        "membru"
+      ]
+    },
+    {
+      "id": "pers-042",
+      "label": "Rifca Catz",
+      "dossierId": "2604",
+      "roles": [
+        "membru"
+      ]
+    },
+    {
+      "id": "pers-043",
+      "label": "Schiicht Izic",
+      "dossierId": "2610",
+      "roles": [
+        "cap de familie"
+      ]
+    },
+    {
+      "id": "pers-044",
+      "label": "Sch[i]icht Ițic",
+      "dossierId": "2610",
+      "roles": [
+        "fiu"
+      ]
+    },
+    {
+      "id": "pers-045",
+      "label": "Sacagiu Copel",
+      "dossierId": "4030",
+      "roles": [
+        "cap de familie"
+      ]
+    },
+    {
+      "id": "pers-046",
+      "label": "Sacagiu Maria",
+      "dossierId": "4030",
+      "roles": [
+        "soție"
+      ]
+    },
+    {
+      "id": "pers-047",
+      "label": "Sacagiu Sura",
+      "dossierId": "4030",
+      "roles": [
+        "fica"
+      ]
+    }
+  ],
+  "dossiers": [
+    {
+      "id": "claude-dossier-2534_2",
+      "label": "Dosar 2534_2 · Dorohoi"
+    },
+    {
+      "id": "claude-dossier-2540",
+      "label": "Dosar 2540 · Dorohoi"
+    },
+    {
+      "id": "claude-dossier-2543",
+      "label": "Dosar 2543 · Dorohoi"
+    },
+    {
+      "id": "claude-dossier-2550",
+      "label": "Dosar 2550 · Dorohoi"
+    },
+    {
+      "id": "claude-dossier-2591",
+      "label": "Dosar 2591 · Dorohoi"
+    },
+    {
+      "id": "claude-dossier-2592",
+      "label": "Dosar 2592 · Dorohoi"
+    },
+    {
+      "id": "claude-dossier-2601",
+      "label": "Dosar 2601 · Dorohoi"
+    },
+    {
+      "id": "claude-dossier-2603",
+      "label": "Dosar 2603 · Dorohoi"
+    },
+    {
+      "id": "claude-dossier-2604",
+      "label": "Dosar 2604 · Dorohoi"
+    },
+    {
+      "id": "claude-dossier-2610",
+      "label": "Dosar 2610 · Dorohoi"
+    },
+    {
+      "id": "claude-dossier-4030",
+      "label": "Dosar 4030 · Dorohoi"
+    }
+  ],
+  "groups": [
+    {
+      "id": "claude-family-2534_2",
+      "label": "Goldemberg Roza · dosar 2534_2",
+      "personIds": [
+        "pers-000",
+        "pers-001",
+        "pers-002",
+        "pers-003",
+        "pers-004",
+        "pers-005",
+        "pers-006"
+      ],
+      "kind": "family"
+    },
+    {
+      "id": "claude-family-2540",
+      "label": "Hoisie Bercu · dosar 2540",
+      "personIds": [
+        "pers-007",
+        "pers-008",
+        "pers-009"
+      ],
+      "kind": "family"
+    },
+    {
+      "id": "claude-family-2543",
+      "label": "Hularu Strul · dosar 2543",
+      "personIds": [
+        "pers-010",
+        "pers-011",
+        "pers-012",
+        "pers-013",
+        "pers-014"
+      ],
+      "kind": "family"
+    },
+    {
+      "id": "claude-family-2550",
+      "label": "Croitoru Smil · dosar 2550",
+      "personIds": [
+        "pers-015",
+        "pers-016",
+        "pers-017",
+        "pers-018",
+        "pers-019",
+        "pers-020",
+        "pers-021",
+        "pers-022"
+      ],
+      "kind": "family"
+    },
+    {
+      "id": "claude-family-2591",
+      "label": "Isser Jeruchim · dosar 2591",
+      "personIds": [
+        "pers-023",
+        "pers-024",
+        "pers-025",
+        "pers-026",
+        "pers-027",
+        "pers-028",
+        "pers-029",
+        "pers-030"
+      ],
+      "kind": "family"
+    },
+    {
+      "id": "claude-family-2592",
+      "label": "Mamo Liza · dosar 2592",
+      "personIds": [
+        "pers-031",
+        "pers-032",
+        "pers-033"
+      ],
+      "kind": "family"
+    },
+    {
+      "id": "claude-family-2601",
+      "label": "Olam Estera · dosar 2601",
+      "personIds": [
+        "pers-034"
+      ],
+      "kind": "family"
+    },
+    {
+      "id": "claude-family-2603",
+      "label": "Casapu Haim · dosar 2603",
+      "personIds": [
+        "pers-035",
+        "pers-036",
+        "pers-037",
+        "pers-038"
+      ],
+      "kind": "family"
+    },
+    {
+      "id": "claude-family-2604",
+      "label": "Catz Sura · dosar 2604",
+      "personIds": [
+        "pers-039",
+        "pers-040",
+        "pers-041",
+        "pers-042"
+      ],
+      "kind": "family"
+    },
+    {
+      "id": "claude-family-2610",
+      "label": "Schiicht Izic · dosar 2610",
+      "personIds": [
+        "pers-043",
+        "pers-044"
+      ],
+      "kind": "family"
+    },
+    {
+      "id": "claude-family-4030",
+      "label": "Sacagiu Copel · dosar 4030",
+      "personIds": [
+        "pers-045",
+        "pers-046",
+        "pers-047"
+      ],
+      "kind": "family"
+    }
+  ],
+  "eventTypes": [
+    "deces",
+    "deportare",
+    "deportare_origine",
+    "evacuare",
+    "intoarcere",
+    "lagar",
+    "munca_fortata",
+    "nastere"
+  ],
+  "unresolvedMentions": []
+}

@@ -40,6 +40,13 @@ The black `N` button seen during local development is the Next.js development
 overlay (`Open Next.js Dev Tools`), not an application map control. It should
 not be treated as part of the public interface or production screenshots.
 
+The Presentation Map now exposes a clearly labelled test-data switcher. The
+Project data option uses the normalized collections. The Claude demo option
+uses the derived fixture at `data/demo/claude-map-demo.json`, containing 48
+persons, 11 dossiers, 15 places and 26 route segments from the embedded
+`Platforma_WJC (10).html` sample. This fixture is isolated from normalized
+research data and retains the source filename and SHA-256 for traceability.
+
 The immutable boundary has been preserved: `data/source/` was inspected but not
 modified. All generated research collections are written to
 `data/normalized/`.
