@@ -108,7 +108,14 @@ The panel header stays visible while its list is scrolled. Selecting an
 individual fits a closer bounding box over all of that person's documented
 endpoints and places, retains individual route ownership and enables that
 person's timeline. Clicking a place opens grouped, source-bound person
-connections when the normalized data supports them. The global site footer is
+connections when the normalized data supports them. The small anchored place
+popup now lists those people as buttons; selecting a name opens a centered,
+scrollable Person story dialog with source-bound profile fields, a chronological
+life route, materials and testimony when the dataset supplies them. The same
+dialog is available from the selected-person detail in both map modes. The
+right panel also contains the compact public legend for historical territory,
+movement, important-place categories, EHRI and unresolved records; the left
+panel remains reserved for map settings. The global site footer is
 hidden on map workspaces so it cannot reduce the map viewport; it remains
 available on the editorial and research pages.
 
@@ -208,6 +215,16 @@ The map uses zoom controls only. The MapLibre compass/pitch arrow has been
 removed because the public map is a flat 2D atlas. A black `N` button visible
 when running `next dev` belongs to the Next.js development overlay, not to the
 map application; it is not present in a production build.
+
+The compact MapLibre attribution hover control is not used in Presentation Map:
+the full source attribution remains in the historical settings and public
+legend context. Research Map keeps ordinary, always-visible attribution text.
+
+The Claude-derived person stories are generated from the embedded prototype
+fields without inventing values. A profile field is omitted when the source is
+empty; dates retain their source precision and use the shared English/Romanian
+formatter. The normalized project selector produces the same typed story model
+from person, event, place, route and document provenance.
 
 ## Verification and screenshots
 

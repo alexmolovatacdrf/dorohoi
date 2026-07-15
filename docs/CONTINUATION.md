@@ -130,6 +130,22 @@ node scripts/presentation/derive-claude-demo-map.mjs > data/demo/claude-map-demo
 - `npm run build` — trecut după ultimele modificări
 - `npm audit --json` — fără vulnerabilități raportate în verificarea anterioară
 
+După adăugarea modelului Person story și a testelor pentru fixture-ul Claude:
+
+- `npm test` — 33 teste în 5 fișiere
+- `npm run typecheck` — trecut
+- `npm run lint` — trecut
+- `npm run build` — trecut
+- `npm run normalize` — trecut, fără modificări în `data/normalized/`
+
+Fișa centrală a persoanei este acum implementată în ambele moduri. Popup-ul
+unei localități listează persoanele asociate și deschide această fișă la click
+pe nume. Fixture-ul Claude păstrează profilul și cronologia din
+`Platforma_WJC (10).html`; câmpurile goale nu sunt completate artificial. În
+panoul din dreapta al Presentation Map se află și legenda publică compactă.
+Playwright nu a putut porni în mediul ultimei sesiuni deoarece Chrome/Chromium
+nu este instalat; build-ul și verificarea HTTP locală au trecut.
+
 Verificarea curentă suplimentară:
 
 - `curl -I http://127.0.0.1:3000/presentation/map?dataset=claude-demo` — HTTP 200

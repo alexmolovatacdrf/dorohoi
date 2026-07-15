@@ -336,6 +336,15 @@ Person or Group on the left; Individual routes must remain enabled under
 Layers → People and movement, and clicking a route opens its evidence in the
 right Context panel.
 
+The current refinement adds a typed, source-bound Person story dialog to both
+map modes. It is opened from a map-place person button or from the selected
+person detail. The dialog keeps the useful Claude prototype structure—compact
+profile fields, status and dossier context, a chronological life route,
+materials and testimony—while omitting fields absent from the source. The
+Claude fixture now carries those profile and event records rather than only
+names and routes. Its right-hand Presentation Map panel also has the compact
+public legend; the left panel remains reserved for view settings.
+
 ## Final handoff verification
 
 On 14 July 2026 the full historical output was verified again: both regional
@@ -367,3 +376,17 @@ Current screenshots:
 
 The development server is intentionally left running at
 `http://127.0.0.1:3000`.
+
+## Vercel access
+
+The linked Vercel project is `dosare-dorohoi-platform-chatgpt` under the
+`alexmolovatacdrfs-projects` scope. Vercel Deployment Protection currently
+reports SSO/Vercel Authentication protection for non-custom deployment URLs.
+For a private review, Eugenia should access the deployment through her own
+Vercel account after being added as a viewer/member to the Vercel team; a shared
+password is not stored in this repository. On Hobby, Vercel Authentication is
+available, while production-domain protection and password protection have plan
+limits. The exact setting is in Vercel Dashboard → Project → Settings →
+Deployment Protection. See the official [Deployment Protection
+documentation](https://vercel.com/docs/deployment-protection) and [Vercel
+Authentication documentation](https://vercel.com/docs/deployment-protection/methods-to-protect-deployments/vercel-authentication).
