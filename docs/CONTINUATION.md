@@ -58,8 +58,8 @@ Vercel Production după ultimul deploy:
 Separate gradual-review deployment for Eugenia:
 
 - Vercel project: `dosare-dorohoi-presentation`
-- protected unique URL: `https://dosare-dorohoi-presentation-pr504kmki.vercel.app/presentation/map?dataset=project`
-- Claude demo variant on the same protected deployment: `https://dosare-dorohoi-presentation-pr504kmki.vercel.app/presentation/map?dataset=claude-demo`
+- protected unique URL: `https://dosare-dorohoi-presentation-o20jihmr1.vercel.app/presentation/map?dataset=project`
+- Claude demo variant on the same protected deployment: `https://dosare-dorohoi-presentation-o20jihmr1.vercel.app/presentation/map?dataset=claude-demo`
 - stable alias (do not share as the private link on Hobby): `https://dosare-dorohoi-presentation.vercel.app`
 
 The separate project has `PRESENTATION_ONLY=true` and Vercel Authentication

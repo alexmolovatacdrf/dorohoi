@@ -26,7 +26,7 @@ full-Europe historical assets, redirects other application routes back to
 Presentation Map, and hides the advanced global navigation. The current unique
 deployment URL is protected by Vercel Authentication:
 
-`https://dosare-dorohoi-presentation-pr504kmki.vercel.app/presentation/map?dataset=project`
+`https://dosare-dorohoi-presentation-o20jihmr1.vercel.app/presentation/map?dataset=project`
 
 The stable project alias is not the private sharing URL on Hobby; use the
 unique deployment URL and the collaborator's invited Vercel account.
