@@ -144,7 +144,7 @@ npm run lint
 npm run build
 ```
 
-All commands pass. The test suite contains 23 deterministic, map-style,
+All commands pass. The test suite contains 27 deterministic, map-style,
 research-rule, conversion, date-selection and historical-distinction tests.
 The production build generates the overview, indexes, both document pages and
 all four person pages, with dynamic filtered map, place and review views.
@@ -248,3 +248,35 @@ data or MapLibre source is configured for it in V1, so it is omitted from the
 Presentation Map and retained only as a disabled, explanatory Research Map
 placeholder. The local EHRI and historical layers are separate, valid local
 data paths.
+
+## Final handoff verification
+
+On 14 July 2026 the full historical output was verified again: both regional
+and full derivatives passed checksum validation for 88 monthly files and
+`Territorial_Changes`. `npm run normalize` completed without changing the
+normalized collections. The final checks passed:
+
+- `npm test`: 27 tests passed;
+- `npm run typecheck`: passed;
+- `npm run lint`: passed;
+- `npm run build`: passed, including `/presentation/map` and `/map` routes;
+- `npm audit --json`: 0 vulnerabilities.
+
+Playwright/Chromium verification covered 1366×768, 1920×1080 and 390×844.
+Presentation checks included full-Europe August 1941, pre-Transnistria and
+March/April 1944 data checks, selected-person fitting, one-shot playback,
+EHRI, reset, Europe/Project region views, fullscreen, hide/show interface and
+no horizontal mobile overflow. The observed network log requested the full
+manifest and only the selected `1941-08.geojson` snapshot, alongside map tiles.
+The Research Map retained the regional layer and its advanced controls.
+
+Current screenshots:
+
+- [`presentation-europe.png`](../output/playwright/presentation-europe.png)
+- [`presentation-person.png`](../output/playwright/presentation-person.png)
+- [`presentation-hidden-final.png`](../output/playwright/presentation-hidden-final.png)
+- [`presentation-mobile.png`](../output/playwright/presentation-mobile.png)
+- [`research-map-final.png`](../output/playwright/research-map-final.png)
+
+The development server is intentionally left running at
+`http://127.0.0.1:3000`.
