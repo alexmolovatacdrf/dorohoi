@@ -1634,21 +1634,22 @@ export function MapWorkspace({
   );
 
   const peopleDirectory = (
-    <div className="presentation-people-list" data-testid="people-directory">
-      <label className="presentation-person-search">
-        <span className="presentation-label">Find a person or family</span>
-        <input
-          type="search"
-          value={presentationPersonQuery}
-          onChange={(event) => setPresentationPersonQuery(event.target.value)}
-          placeholder="Type a name…"
-          aria-label="Find a person or family"
-          data-testid="presentation-person-search"
-        />
-      </label>
-      <p className="presentation-label">Families and mentioned people</p>
-      <p className="presentation-card__meta">Each family starts with its documented head/declarant. People mentioned in the same file remain selectable individual records.</p>
-      {presentationGroups.map((group) => {
+    <details className="presentation-group presentation-people-directory" open data-testid="people-directory">
+      <summary>Families and mentioned people</summary>
+      <div className="presentation-group__content presentation-people-list">
+        <label className="presentation-person-search">
+          <span className="presentation-label">Find a person or family</span>
+          <input
+            type="search"
+            value={presentationPersonQuery}
+            onChange={(event) => setPresentationPersonQuery(event.target.value)}
+            placeholder="Type a name…"
+            aria-label="Find a person or family"
+            data-testid="presentation-person-search"
+          />
+        </label>
+        <p className="presentation-card__meta">Each family starts with its documented head/declarant. People mentioned in the same file remain selectable individual records.</p>
+        {presentationGroups.map((group) => {
         const groupPeople = data.persons
           .filter((person) => group.personIds.includes(person.id))
           .sort((left, right) => {
@@ -1680,10 +1681,11 @@ export function MapWorkspace({
             {dossier ? <p className="presentation-family-card__meta">Internal record: {dossier.label}</p> : null}
           </div>
         );
-      })}
-      {filteredUngroupedPresentationPeople.length ? <div className="presentation-family-card"><p className="presentation-label">Other individual records</p>{filteredUngroupedPresentationPeople.map((person) => <button key={person.id} type="button" className={`presentation-person-option${filters.person === person.id ? " presentation-person-option--selected" : ""}`} onClick={() => selectPresentationPerson(person.id)} aria-pressed={filters.person === person.id}><span>{person.label}</span><span className="presentation-person-option__role">{person.roles[0] ?? "mentioned person"}</span></button>)}</div> : null}
-      {!presentationGroups.length && !filteredUngroupedPresentationPeople.length ? <p className="presentation-card__meta">No matching people or families.</p> : null}
-    </div>
+        })}
+        {filteredUngroupedPresentationPeople.length ? <div className="presentation-family-card"><p className="presentation-label">Other individual records</p>{filteredUngroupedPresentationPeople.map((person) => <button key={person.id} type="button" className={`presentation-person-option${filters.person === person.id ? " presentation-person-option--selected" : ""}`} onClick={() => selectPresentationPerson(person.id)} aria-pressed={filters.person === person.id}><span>{person.label}</span><span className="presentation-person-option__role">{person.roles[0] ?? "mentioned person"}</span></button>)}</div> : null}
+        {!presentationGroups.length && !filteredUngroupedPresentationPeople.length ? <p className="presentation-card__meta">No matching people or families.</p> : null}
+      </div>
+    </details>
   );
 
   const presentationPanel = presentationPanelOpen ? (
@@ -2189,10 +2191,7 @@ export function MapWorkspace({
           <h2 className="font-editorial text-xl font-bold text-[#173f36]">{t("map.context")}</h2>
           {selection ? <button type="button" onClick={() => setSelection(null)} className="text-[9px] font-black tracking-[0.1em] text-[#a54f32] uppercase">{t("common.clear")}</button> : null}
         </div>
-        <details className="research-control-group research-people-directory" open>
-          <summary>Families and mentioned people</summary>
-          <div className="mt-2">{peopleDirectory}</div>
-        </details>
+        {peopleDirectory}
         {selectedPlace ? (
           <div>
             <div className="flex flex-wrap gap-1.5">
