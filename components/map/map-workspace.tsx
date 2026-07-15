@@ -2260,6 +2260,22 @@ export function MapWorkspace({
               </>
             ) : null}
           </div>
+        ) : !isPresentation && selectedPerson ? (
+          <div>
+            <p className="text-[9px] font-black tracking-[0.12em] text-[#9c5a3d] uppercase">Selected person</p>
+            <h3 className="font-editorial mt-2 text-2xl leading-7 font-bold text-[#173f36]">{selectedPerson.label}</h3>
+            <p className="mt-2 text-xs leading-5 text-[#61706a]">{selectedPersonRoutes.length ? `${selectedPersonRoutes.length} documented route segments are filtered on the map.` : "No documented route segments are associated with this person."}</p>
+            <div className="mt-4 border-y border-[#ded8cc] py-2">
+              <p className="text-[9px] font-black tracking-[0.12em] text-[#756347] uppercase">Person routes</p>
+              {selectedPersonRoutes.length ? selectedPersonRoutes.map((route) => (
+                <button key={route.id} type="button" className="mt-2 flex w-full items-center justify-between gap-2 border border-transparent bg-[#f6f2e9] px-2.5 py-2 text-left text-xs text-[#34473f] hover:border-[#8ba399] hover:bg-[#e9f0eb]" onClick={() => setSelection({ kind: "route", id: route.id })}>
+                  <span>{route.originName} <span aria-hidden="true">→</span> {route.destinationName}</span>
+                  <span className="shrink-0 text-[9px] text-[#68766e]">{route.routeStatus}</span>
+                </button>
+              )) : <p className="mt-2 text-xs text-[#68766e]">The person record remains available for provenance in the dossier.</p>}
+            </div>
+            <Link href={`/persons/${selectedPerson.id}`} className="mt-4 flex justify-center bg-[#173f36] px-4 py-2.5 text-[9px] font-black tracking-[0.11em] text-white uppercase">Open person dossier</Link>
+          </div>
         ) : (
           <div>
             <p className="text-sm leading-6 text-[#65716b]">{t("map.noSelection")}</p>
