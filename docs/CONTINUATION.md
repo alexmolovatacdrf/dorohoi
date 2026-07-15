@@ -7,7 +7,7 @@ Acest document păstrează punctul de continuare pentru următoarea sesiune. Con
 ## Starea Git
 
 - Branch: `feature/public-presentation-map`
-- HEAD: `57c5249 feat: expose research person routes`
+- HEAD: `c807fae feat: share route and people visuals across maps`
 - Worktree: curat la momentul salvării
 - Nu au fost folosite reset, clean, checkout/restore destructiv și nu au fost șterse date existente.
 
@@ -24,6 +24,7 @@ Checkpoint-urile relevante, în ordine:
 9. `fc7549a` — compact people sections, active camera states, place context and route lanes
 10. `ca343ab` — separate reverse route lanes, compact family card and person search
 11. `57c5249` — visible selected-person route list in Research Map context panel
+12. `c807fae` — shared curved route geometry and family/person directory in both maps
 
 ## Server și URL-uri
 
@@ -65,6 +66,8 @@ URL-uri:
 - Click pe o localitate poate afișa persoanele asociate, grupate după contextul explicit documentat; în timpul animației este afișat locul curent și nota traseului.
 - În Research Map, persoanele se selectează în `Filters → Person` sau `Filters → Group` din panoul stâng. Traseele apar când `Layers → People and movement → Individual routes` rămâne activ; click pe un traseu deschide detaliile în panoul `Context` din dreapta.
 - După selectarea unei persoane în Research Map, panoul `Context` din dreapta afișează acum numele persoanei, numărul de segmente și lista traseelor selectabile; un click pe un segment deschide detaliile sale de proveniență.
+- Research Map folosește acum aceeași geometrie de prezentare pentru trasee ca Presentation Map: curbe Bézier, săgeți direcționale și benzi separate pentru mișcări inverse sau repetate între aceleași localități.
+- Panoul `Context` din Research Map include acum directorul comun `Families and mentioned people`, cu căutare și secțiuni dropdown pentru persoanele menționate. Capul/declarantul nu este repetat în lista de membri.
 
 ## Datele din varianta Claude
 
@@ -120,6 +123,7 @@ Observație: `npm run build` poate rescrie automat importul din `next-env.d.ts` 
 6. Verifică lunile înainte de apariția Transnistriei, august 1941, martie 1944 și aprilie 1944.
 7. Verifică layout-ul la 1366×768, 1920×1080 și 390×844: panoul stâng nu trebuie să se suprapună cu elemente de hartă, panoul drept trebuie să rămână utilizabil, iar footer-ul nu trebuie să apară.
 8. Verifică în continuare `/map`: filtrele avansate, layer-ul regional și informațiile de proveniență trebuie să rămână funcționale.
+9. În `/map`, verifică și directorul din `Context`: deschide/închide secțiunile cu săgeata nativă, selectează un cap de familie și o persoană menționată, apoi confirmă că ruta selectată rămâne individuală și apare în lista de trasee.
 
 ## Lucru rămas / atenționări
 
