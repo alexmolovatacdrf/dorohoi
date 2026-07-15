@@ -1,6 +1,6 @@
 export function SiteFooter() {
   return (
-    <footer className="border-t border-[#cec8ba] bg-[#e8e3d7]/70">
+    <footer className="site-footer border-t border-[#cec8ba] bg-[#e8e3d7]/70">
       <div className="mx-auto grid max-w-[1440px] gap-4 px-5 py-8 text-xs text-[#596760] sm:grid-cols-2 sm:px-8 lg:px-12">
         <div>
           <p className="font-editorial text-base font-bold text-[#173f36]">Dosare Dorohoi</p>

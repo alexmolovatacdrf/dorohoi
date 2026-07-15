@@ -15,10 +15,10 @@ export default async function MapPage({
     <div>
       <div className="mx-auto flex max-w-[1440px] flex-col gap-3 px-4 py-4 sm:flex-row sm:items-end sm:justify-between sm:px-7 lg:px-12">
         <div>
-          <p className="text-[9px] font-black tracking-[0.17em] text-[#a54f32] uppercase">Main visualization</p>
+          <p className="text-sm font-black tracking-[0.17em] text-[#a54f32] uppercase">Main visualization</p>
           <h1 className="font-editorial mt-1 text-3xl font-bold text-[#173f36]">Evidence map</h1>
         </div>
-        <p className="max-w-2xl text-[10px] leading-4 text-[#66736d] sm:text-right">
+        <p className="max-w-2xl text-sm leading-5 text-[#52645c] sm:text-right">
           Points show places and mentions. Lines show only person-specific movement evidence. The local EHRI overlay and inferred-route registry are off by default.
         </p>
       </div>

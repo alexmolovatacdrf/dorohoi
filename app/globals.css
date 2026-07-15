@@ -132,6 +132,274 @@ summary {
   box-shadow: 0 4px 16px rgb(17 38 31 / 12%) !important;
 }
 
+/* Map controls are research/presentation interfaces, not annotation-sized UI. */
+.map-workspace button,
+.map-workspace input,
+.map-workspace select,
+.map-workspace summary {
+  min-height: 2.5rem;
+  font-size: 0.875rem !important;
+  line-height: 1.4;
+}
+
+.map-workspace p,
+.map-workspace label,
+.map-workspace li,
+.map-workspace dt,
+.map-workspace dd,
+.map-workspace span {
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.map-workspace h2 {
+  line-height: 1.2;
+}
+
+.presentation-map__panel,
+.presentation-map__story,
+.presentation-map__timeline {
+  font-size: 0.9375rem;
+}
+
+.presentation-card__eyebrow,
+.presentation-label {
+  display: block;
+  color: #76536f;
+  font-size: 0.75rem !important;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  line-height: 1.35 !important;
+  text-transform: uppercase;
+}
+
+.presentation-card__title {
+  color: #173f36;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.5rem !important;
+  font-weight: 700;
+  line-height: 1.15 !important;
+}
+
+.presentation-card__body {
+  margin-top: 0.65rem;
+  color: #52645c;
+  font-size: 0.9375rem !important;
+  line-height: 1.5 !important;
+}
+
+.presentation-card__meta,
+.presentation-method,
+.presentation-attribution {
+  margin-top: 0.65rem;
+  color: #68766e;
+  font-size: 0.8125rem !important;
+  line-height: 1.45 !important;
+}
+
+.presentation-card__details {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1rem;
+  border-block: 1px solid #ded8cc;
+  padding-block: 0.85rem;
+}
+
+.presentation-card__details dt {
+  color: #52645c;
+  font-size: 0.75rem !important;
+  font-weight: 800;
+}
+
+.presentation-card__details dd {
+  margin-top: 0.15rem;
+  overflow-wrap: anywhere;
+  color: #243a32;
+  font-size: 0.9375rem !important;
+}
+
+.presentation-icon-button {
+  display: grid;
+  min-height: 2.5rem !important;
+  width: 2.5rem;
+  place-items: center;
+  border: 1px solid #b9ad9b;
+  background: #fff;
+  color: #173f36;
+  font-size: 1.25rem !important;
+  font-weight: 800;
+}
+
+.presentation-secondary-button,
+.presentation-primary-button,
+.presentation-link-button {
+  display: inline-flex;
+  min-height: 2.5rem !important;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #9fa49e;
+  background: #fff;
+  padding: 0.55rem 0.8rem;
+  color: #173f36;
+  font-size: 0.875rem !important;
+  font-weight: 800;
+  line-height: 1.2 !important;
+}
+
+.presentation-primary-button,
+.presentation-link-button {
+  border-color: #173f36;
+  background: #173f36;
+  color: #fff;
+}
+
+.presentation-link-button {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.presentation-secondary-button:disabled,
+.presentation-primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.presentation-group {
+  margin-top: 1rem;
+  border-top: 1px solid #d6d0c4;
+  padding-top: 0.85rem;
+}
+
+.presentation-group summary {
+  cursor: pointer;
+  color: #173f36;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.125rem !important;
+  font-weight: 700;
+  list-style-position: inside;
+}
+
+.presentation-group__content {
+  padding-top: 0.45rem;
+}
+
+.presentation-group__content > label {
+  padding-block: 0.55rem;
+}
+
+.presentation-history-controls {
+  margin-top: 0.75rem;
+  border: 1px solid #d2c7b4;
+  background: #fffaf0;
+  padding: 0.8rem;
+}
+
+.presentation-history-controls__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: #68766e;
+  font-size: 0.8125rem !important;
+}
+
+.presentation-history-controls__row span {
+  font-size: 0.8125rem !important;
+}
+
+.presentation-label strong {
+  float: right;
+  color: #243a32;
+  font-size: 0.875rem !important;
+  letter-spacing: 0;
+}
+
+.presentation-legend {
+  margin-top: 1rem;
+  border-top: 1px solid #ddd0bc;
+  padding-top: 0.75rem;
+}
+
+.presentation-legend__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin-top: 0.45rem;
+  color: #52645c;
+  font-size: 0.875rem !important;
+  line-height: 1.35 !important;
+}
+
+.presentation-legend__item span {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  margin-top: 0.15rem;
+  border: 1px solid rgb(0 0 0 / 20%);
+}
+
+.presentation-warning {
+  margin-top: 0.8rem;
+  border: 1px solid #c9967e;
+  background: #fff2eb;
+  padding: 0.7rem;
+  color: #7d3e2f;
+  font-size: 0.8125rem !important;
+  line-height: 1.45 !important;
+}
+
+.presentation-map__reopen {
+  min-height: 2.5rem;
+  border: 1px solid #bdb7aa;
+  background: rgb(255 253 248 / 95%);
+  padding: 0.6rem 0.8rem;
+  color: #173f36;
+  font-size: 0.875rem !important;
+  font-weight: 800;
+  box-shadow: 0 8px 22px rgb(22 42 35 / 16%);
+}
+
+.presentation-compact-legend {
+  display: flex;
+  gap: 0.25rem;
+  border: 1px solid #bdb7aa;
+  background: rgb(255 253 248 / 95%);
+  padding: 0.55rem;
+  box-shadow: 0 8px 22px rgb(22 42 35 / 16%);
+}
+
+.presentation-compact-legend span {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid rgb(0 0 0 / 20%);
+}
+
+body.presentation-interface-hidden .site-header,
+body.presentation-interface-hidden .site-footer,
+body.presentation-interface-hidden .presentation-page__intro {
+  display: none;
+}
+
+body.presentation-interface-hidden .presentation-map-workspace {
+  height: 100vh;
+  min-height: 100vh;
+  border-top: 0;
+}
+
+@media (max-width: 720px) {
+  .presentation-map-workspace {
+    min-height: 760px;
+    height: calc(100vh - 12rem);
+  }
+
+  .presentation-map__timeline {
+    right: 0.75rem;
+    bottom: 0.75rem;
+    left: 0.75rem;
+  }
+}
+
 .research-map-marker {
   display: flex;
   cursor: pointer;

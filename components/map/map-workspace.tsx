@@ -9,13 +9,14 @@ import type {
   Polygon,
 } from "geojson";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import maplibregl, {
   type ExpressionSpecification,
   type GeoJSONSource,
   type Map as MapLibreMap,
   type Marker,
 } from "maplibre-gl";
+import { presentationMapConfig } from "@/config/presentation-map";
 import { useLanguage } from "@/components/shell/language-provider";
 import { StatusBadge, confidenceTone } from "@/components/ui/status-badge";
 import { humanizeSlug, rawValueLabel } from "@/lib/data/format";
@@ -23,7 +24,9 @@ import type { MapPlaceDatum, MapRouteDatum, MapViewModel } from "@/lib/data/sele
 import {
   HISTORICAL_CATEGORY_COLORS,
   HISTORICAL_FILL_LAYER_ID,
+  HISTORICAL_PRESENTATION_CATEGORY_COLORS,
   HISTORICAL_LINE_LAYER_ID,
+  FULL_HISTORICAL_MANIFEST_URL,
   HISTORICAL_MANIFEST_URL,
   HISTORICAL_SOURCE_ID,
   defaultHistoricalSnapshot,
@@ -32,6 +35,7 @@ import {
   historicalFeatureCollectionSchema,
   historicalFeaturePropertiesSchema,
   historicalManifestSchema,
+  historicalManifestExtent,
   historicalSnapshotFeatureCount,
   historicalSnapshotIndex,
   selectHistoricalSnapshot,
@@ -74,6 +78,8 @@ interface Layers {
   inferred: boolean;
 }
 
+export type MapWorkspaceMode = "research" | "presentation";
+
 type Selection =
   | { kind: "place" | "route"; id: string }
   | { kind: "historical"; properties: HistoricalFeatureProperties }
@@ -98,32 +104,60 @@ const emptyHistoricalCollection: FeatureCollection<
   features: [],
 };
 
-const historicalFillColorExpression: ExpressionSpecification = [
-  "match",
-  ["get", "foreignPowerCategory"],
-  "unclassified",
-  HISTORICAL_CATEGORY_COLORS.unclassified,
-  "neutral",
-  HISTORICAL_CATEGORY_COLORS.neutral,
-  "allied",
-  HISTORICAL_CATEGORY_COLORS.allied,
-  "axis",
-  HISTORICAL_CATEGORY_COLORS.axis,
-  "axis_aligned",
-  HISTORICAL_CATEGORY_COLORS.axis_aligned,
-  "belligerent",
-  HISTORICAL_CATEGORY_COLORS.belligerent,
-  "german_occupied",
-  HISTORICAL_CATEGORY_COLORS.german_occupied,
-  "italian_occupied",
-  HISTORICAL_CATEGORY_COLORS.italian_occupied,
-  "romanian_occupied",
-  HISTORICAL_CATEGORY_COLORS.romanian_occupied,
-  "multinational_axis_occupied",
-  HISTORICAL_CATEGORY_COLORS.multinational_axis_occupied,
-  "german_soviet_occupied",
-  HISTORICAL_CATEGORY_COLORS.german_soviet_occupied,
-  "#aea99e",
+function historicalFillColorExpression(
+  mode: MapWorkspaceMode,
+): ExpressionSpecification {
+  if (mode === "presentation") {
+    return [
+      "match",
+      ["get", "presentationCategory"],
+      "sovereign_state",
+      HISTORICAL_PRESENTATION_CATEGORY_COLORS.sovereign_state,
+      "romanian_occupied",
+      HISTORICAL_PRESENTATION_CATEGORY_COLORS.romanian_occupied,
+      "german_occupied",
+      HISTORICAL_PRESENTATION_CATEGORY_COLORS.german_occupied,
+      "soviet_controlled",
+      HISTORICAL_PRESENTATION_CATEGORY_COLORS.soviet_controlled,
+      "unresolved_other",
+      HISTORICAL_PRESENTATION_CATEGORY_COLORS.unresolved_other,
+      HISTORICAL_PRESENTATION_CATEGORY_COLORS.unresolved_other,
+    ];
+  }
+  return [
+    "match",
+    ["get", "foreignPowerCategory"],
+    "unclassified",
+    HISTORICAL_CATEGORY_COLORS.unclassified,
+    "neutral",
+    HISTORICAL_CATEGORY_COLORS.neutral,
+    "allied",
+    HISTORICAL_CATEGORY_COLORS.allied,
+    "axis",
+    HISTORICAL_CATEGORY_COLORS.axis,
+    "axis_aligned",
+    HISTORICAL_CATEGORY_COLORS.axis_aligned,
+    "belligerent",
+    HISTORICAL_CATEGORY_COLORS.belligerent,
+    "german_occupied",
+    HISTORICAL_CATEGORY_COLORS.german_occupied,
+    "italian_occupied",
+    HISTORICAL_CATEGORY_COLORS.italian_occupied,
+    "romanian_occupied",
+    HISTORICAL_CATEGORY_COLORS.romanian_occupied,
+    "multinational_axis_occupied",
+    HISTORICAL_CATEGORY_COLORS.multinational_axis_occupied,
+    "german_soviet_occupied",
+    HISTORICAL_CATEGORY_COLORS.german_soviet_occupied,
+    "#aea99e",
+  ];
+}
+
+const PROJECT_REGION_BBOX: [number, number, number, number] = [
+  19.0,
+  43.3,
+  34.5,
+  52.6,
 ];
 
 const controlClass =
@@ -185,6 +219,13 @@ function historicalPopupContent(
   const foreignPower = document.createElement("p");
   foreignPower.className = "historical-map-popup__detail";
   foreignPower.textContent = `Foreign_Po: ${displayRawHistoricalValue(properties.Foreign_Po)}`;
+
+  if (properties.presentationCategory) {
+    const presentationCategory = document.createElement("p");
+    presentationCategory.className = "historical-map-popup__detail";
+    presentationCategory.textContent = `Public category: ${properties.presentationCategory.replaceAll("_", " ")}`;
+    root.append(presentationCategory);
+  }
 
   const headOfState = document.createElement("p");
   headOfState.className = "historical-map-popup__detail";
@@ -325,17 +366,35 @@ function pointCollection(places: MapPlaceDatum[], language: "en" | "ro"): Featur
   };
 }
 
+function boundsFromCoordinates(
+  coordinates: Array<[number, number]>,
+): [number, number, number, number] | null {
+  if (!coordinates.length) return null;
+  const longitudes = coordinates.map(([longitude]) => longitude);
+  const latitudes = coordinates.map(([, latitude]) => latitude);
+  return [
+    Math.min(...longitudes),
+    Math.min(...latitudes),
+    Math.max(...longitudes),
+    Math.max(...latitudes),
+  ];
+}
+
 export function MapWorkspace({
   data,
+  mode = "research",
   initialPerson = "",
   initialPlace = "",
 }: {
   data: MapViewModel;
+  mode?: MapWorkspaceMode;
   initialPerson?: string;
   initialPlace?: string;
 }) {
   const { language, t } = useLanguage();
+  const isPresentation = mode === "presentation";
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const workspaceRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const coreMarkersRef = useRef<Marker[]>([]);
   const historicalPopupRef = useRef<maplibregl.Popup | null>(null);
@@ -351,6 +410,9 @@ export function MapWorkspace({
   const [historicalFeatureCount, setHistoricalFeatureCount] = useState(0);
   const [historicalReloadToken, setHistoricalReloadToken] = useState(0);
   const [historicalSnapshotReloadToken, setHistoricalSnapshotReloadToken] = useState(0);
+  const [presentationPanelOpen, setPresentationPanelOpen] = useState(true);
+  const [interfaceHidden, setInterfaceHidden] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [selection, setSelection] = useState<Selection>(
     initialPlace ? { kind: "place", id: initialPlace } : null,
   );
@@ -364,24 +426,39 @@ export function MapWorkspace({
     fromYear: "",
     toYear: "",
   });
-  const [layers, setLayers] = useState<Layers>({
+  const [layers, setLayers] = useState<Layers>(() => ({
     basemap: true,
-    historicalAdministration: false,
+    historicalAdministration: isPresentation,
     locations: true,
     individualRoutes: true,
-    familyContext: true,
+    familyContext: !isPresentation,
     origin: true,
     evacuationDeportation: true,
     campsGhettos: true,
     forcedLabour: true,
     death: true,
     return: true,
-    unresolved: true,
+    unresolved: !isPresentation,
     localEhri: false,
     inferred: false,
-  });
+  }));
   const [timelineStep, setTimelineStep] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    if (!isPresentation) return;
+    const onFullscreenChange = () => {
+      setIsFullscreen(document.fullscreenElement === workspaceRef.current);
+    };
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", onFullscreenChange);
+  }, [isPresentation]);
+
+  useEffect(() => {
+    if (!isPresentation) return;
+    document.body.classList.toggle("presentation-interface-hidden", interfaceHidden);
+    return () => document.body.classList.remove("presentation-interface-hidden");
+  }, [interfaceHidden, isPresentation]);
 
   const selectedGroup = data.groups.find((group) => group.id === filters.group);
   const selectedPerson = data.persons.find((person) => person.id === filters.person);
@@ -513,9 +590,12 @@ export function MapWorkspace({
 
     const loadManifest = async () => {
       try {
-        const response = await fetch(HISTORICAL_MANIFEST_URL, {
+        const response = await fetch(
+          isPresentation ? FULL_HISTORICAL_MANIFEST_URL : HISTORICAL_MANIFEST_URL,
+          {
           signal: controller.signal,
-        });
+          },
+        );
         if (!response.ok) {
           throw new Error(`Manifest request failed with HTTP ${response.status}`);
         }
@@ -537,7 +617,7 @@ export function MapWorkspace({
 
     void loadManifest();
     return () => controller.abort();
-  }, [historicalReloadToken]);
+  }, [historicalReloadToken, isPresentation]);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -556,8 +636,8 @@ export function MapWorkspace({
       const map = new maplibregl.Map({
         container: containerRef.current,
         style: createResearchMapStyle(),
-        center: [27.25, 48.08],
-        zoom: 6.1,
+        center: isPresentation ? [18, 54] : [27.25, 48.08],
+        zoom: isPresentation ? 3.2 : 6.1,
         attributionControl: false,
         fadeDuration: 0,
       });
@@ -613,7 +693,7 @@ export function MapWorkspace({
             source: HISTORICAL_SOURCE_ID,
             layout: { visibility: "none" },
             paint: {
-              "fill-color": historicalFillColorExpression,
+              "fill-color": historicalFillColorExpression(mode),
               "fill-opacity": 0.48,
             },
           });
@@ -839,7 +919,7 @@ export function MapWorkspace({
       activeMap?.remove();
       if (mapRef.current === activeMap) mapRef.current = null;
     };
-  }, []);
+  }, [isPresentation, mode]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -961,6 +1041,49 @@ export function MapWorkspace({
     );
   }, [historicalOpacity, mapReady]);
 
+  const fitMapToBbox = useCallback((bbox: [number, number, number, number]) => {
+    const map = mapRef.current;
+    if (!map) return;
+    map.fitBounds(
+      [
+        [bbox[0], bbox[1]],
+        [bbox[2], bbox[3]],
+      ],
+      {
+        padding: isPresentation ? 72 : 36,
+        duration: 0,
+        maxZoom: isPresentation ? 7 : 9,
+      },
+    );
+  }, [isPresentation]);
+
+  const fitPersonView = useCallback(() => {
+    if (!filters.person) return;
+    const coordinates: Array<[number, number]> = [];
+    for (const route of data.routes.filter((candidate) => candidate.personId === filters.person)) {
+      coordinates.push(...route.coordinates);
+    }
+    for (const place of data.places) {
+      if (place.personIds.includes(filters.person) && place.coordinates) {
+        coordinates.push([place.coordinates.longitude, place.coordinates.latitude]);
+      }
+    }
+    const bbox = boundsFromCoordinates(coordinates);
+    if (!bbox) return;
+    fitMapToBbox(bbox);
+  }, [data.places, data.routes, filters.person, fitMapToBbox]);
+
+  useEffect(() => {
+    if (!isPresentation || !mapReady || !historicalManifest || filters.person) return;
+    if (!layers.historicalAdministration) return;
+    fitMapToBbox(historicalManifestExtent(historicalManifest));
+  }, [filters.person, historicalManifest, isPresentation, layers.historicalAdministration, mapReady, fitMapToBbox]);
+
+  useEffect(() => {
+    if (!isPresentation || !mapReady || !filters.person) return;
+    fitPersonView();
+  }, [filters.person, isPresentation, mapReady, fitPersonView]);
+
   useEffect(() => {
     const map = mapRef.current;
     if (!mapReady || !map) return;
@@ -1022,8 +1145,255 @@ export function MapWorkspace({
   const updateLayer = <K extends keyof Layers>(key: K, value: Layers[K]) =>
     setLayers((current) => ({ ...current, [key]: value }));
 
+  const toggleFullscreen = async () => {
+    if (!workspaceRef.current) return;
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+      return;
+    }
+    await workspaceRef.current.requestFullscreen();
+  };
+
+  const resetView = () => {
+    setIsPlaying(false);
+    setTimelineStep(filters.person ? 0 : null);
+    if (!isPresentation) return;
+    if (filters.person) {
+      fitPersonView();
+      return;
+    }
+    if (historicalManifest) fitMapToBbox(historicalManifestExtent(historicalManifest));
+  };
+
+  const presentationLegend = historicalManifest?.presentationVocabulary?.legend ?? [];
+
+  const presentationDetails = selectedPlace ? (
+    <>
+      <p className="presentation-card__eyebrow">Important place</p>
+      <h2 className="presentation-card__title">{language === "ro" ? selectedPlace.labelRo : selectedPlace.label}</h2>
+      <p className="presentation-card__body">{selectedPlace.roles.length ? selectedPlace.roles.join(" · ") : "Project location in the current research collection."}</p>
+      {selectedPlace.coordinates ? (
+        <p className="presentation-card__meta">{selectedPlace.coordinates.latitude.toFixed(4)}, {selectedPlace.coordinates.longitude.toFixed(4)}</p>
+      ) : null}
+    </>
+  ) : selectedRoute ? (
+    <>
+      <p className="presentation-card__eyebrow">Documented movement</p>
+      <h2 className="presentation-card__title">{selectedRoute.originName} <span aria-hidden="true">→</span> {selectedRoute.destinationName}</h2>
+      <p className="presentation-card__body">{selectedRoute.personName} · {rawValueLabel(selectedRoute.dateRaw)}</p>
+      {selectedRoute.notes ? <p className="presentation-card__body">{selectedRoute.notes}</p> : null}
+    </>
+  ) : selectedHistorical ? (
+    <>
+      <p className="presentation-card__eyebrow">{formatYearMonth(selectedHistorical.yearMonth)} · {selectedHistorical.snapshotDate}</p>
+      <h2 className="presentation-card__title">{displayRawHistoricalValue(selectedHistorical.Name)}</h2>
+      <dl className="presentation-card__details">
+        <div><dt>Public category</dt><dd>{selectedHistorical.presentationCategory?.replaceAll("_", " ") ?? "Unresolved or other"}</dd></div>
+        <div><dt>Foreign_Po</dt><dd>{displayRawHistoricalValue(selectedHistorical.Foreign_Po)}</dd></div>
+        <div><dt>Head_of_St</dt><dd>{displayRawHistoricalValue(selectedHistorical.Head_of_St)}</dd></div>
+        <div><dt>Govt_in_Ex</dt><dd>{displayRawHistoricalValue(selectedHistorical.Govt_in_Ex)}</dd></div>
+      </dl>
+    </>
+  ) : selectedPerson ? (
+    <>
+      <p className="presentation-card__eyebrow">Person / story</p>
+      <h2 className="presentation-card__title">{selectedPerson.label}</h2>
+      <p className="presentation-card__body">{selectedPersonRoutes.length ? `${selectedPersonRoutes.length} documented movement segments in the current research collection.` : "No documented route segments in the current research collection."}</p>
+      <p className="presentation-card__meta">The timeline below draws the route progressively and keeps the underlying evidence available in the research dossier.</p>
+    </>
+  ) : null;
+
+  const presentationPanel = presentationPanelOpen ? (
+    <aside className="presentation-map__panel absolute top-3 left-3 z-20 w-[min(23rem,calc(100%-1.5rem))] overflow-y-auto border border-[#bdb7aa] bg-[#fffdf8]/96 p-4 shadow-[0_18px_45px_rgba(22,42,35,0.2)] backdrop-blur-md sm:top-5 sm:left-5 sm:max-h-[calc(100%-8rem)]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="presentation-card__eyebrow">Public presentation</p>
+          <h2 className="font-editorial mt-1 text-2xl font-bold text-[#173f36]">Historical Europe</h2>
+        </div>
+        <button type="button" className="presentation-icon-button" onClick={() => setPresentationPanelOpen(false)} aria-label="Collapse presentation controls">−</button>
+      </div>
+
+      {presentationMapConfig.personSelector ? (
+        <label className="mt-4 block">
+          <span className="presentation-label">Person / story</span>
+          <select
+            className={controlClass}
+            value={filters.person}
+            onChange={(event) => {
+              updateFilter("person", event.target.value);
+              setTimelineStep(event.target.value ? 0 : null);
+              setIsPlaying(false);
+              setSelection(null);
+            }}
+            aria-label="Person or story"
+          >
+            <option value="">All project stories</option>
+            {data.persons.map((person) => <option key={person.id} value={person.id}>{person.label}</option>)}
+          </select>
+        </label>
+      ) : null}
+
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        {presentationMapConfig.europeView ? <button type="button" className="presentation-secondary-button" onClick={() => { updateFilter("person", ""); setTimelineStep(null); fitMapToBbox(historicalManifest ? historicalManifestExtent(historicalManifest) : [-31.2656, 27.6381, 68.6969, 81.8599]); }}>Europe view</button> : null}
+        {presentationMapConfig.projectRegionView ? <button type="button" className="presentation-secondary-button" onClick={() => fitMapToBbox(PROJECT_REGION_BBOX)}>Project region</button> : null}
+      </div>
+
+      <details className="presentation-group" open={presentationMapConfig.historicalAdministration}>
+        <summary>Historical context</summary>
+        {presentationMapConfig.historicalAdministration ? (
+          <div className="presentation-group__content">
+            <LayerToggle label="Historical administration" marker="▧" checked={layers.historicalAdministration} onChange={(value) => updateLayer("historicalAdministration", value)} note={historicalLayerStatus === "ready" ? `${historicalFeatureCount} European polygons` : historicalLayerStatus === "failed" ? "Historical data unavailable" : "Monthly source snapshots"} />
+            <LayerToggle label="Modern basemap" marker="▦" checked={layers.basemap} onChange={(value) => updateLayer("basemap", value)} note={basemapStatus === "available" ? "OpenStreetMap connected" : "Local grid remains available"} />
+            {layers.historicalAdministration && historicalManifest && selectedHistoricalSnapshot ? (
+              <div className="presentation-history-controls" data-testid="presentation-historical-controls">
+                <label className="block">
+                  <span className="presentation-label">Month and year</span>
+                  <select aria-label="Presentation historical month" className={controlClass} value={historicalYearMonth} onChange={(event) => { setHistoricalYearMonth(event.target.value); setSelection(null); }} data-testid="presentation-month-select">
+                    {historicalManifest.snapshots.map((snapshot) => <option key={snapshot.yearMonth} value={snapshot.yearMonth}>{formatYearMonth(snapshot.yearMonth)}{snapshot.status === "limited_static" ? " — limited/static" : ""}</option>)}
+                  </select>
+                </label>
+                <input aria-label="Presentation historical timeline" type="range" min={0} max={historicalManifest.snapshots.length - 1} step={1} value={selectedHistoricalIndex} onChange={(event) => { const snapshot = historicalManifest.snapshots[Number(event.target.value)]; if (snapshot) { setHistoricalYearMonth(snapshot.yearMonth); setSelection(null); } }} className="mt-3 w-full accent-[#76536f]" data-testid="presentation-month-range" />
+                <div className="presentation-history-controls__row"><span>{selectedHistoricalSnapshot.snapshotDate}</span><span>{selectedHistoricalSnapshot.status === "primary" ? "Primary interval" : "Limited/static"}</span></div>
+                <label className="mt-3 block"><span className="presentation-label">Polygon opacity <strong>{Math.round(historicalOpacity * 100)}%</strong></span><input aria-label="Presentation polygon opacity" type="range" min={0.1} max={0.85} step={0.05} value={historicalOpacity} onChange={(event) => setHistoricalOpacity(Number(event.target.value))} className="w-full accent-[#76536f]" /></label>
+                {presentationMapConfig.legend && presentationLegend.length ? <div className="presentation-legend" aria-label="Public historical legend"><p className="presentation-label">Public legend</p>{presentationLegend.map((entry) => <div key={entry.value} className="presentation-legend__item"><span style={{ backgroundColor: entry.color }} aria-hidden="true" />{entry.label}</div>)}</div> : null}
+                {selectedHistoricalSnapshot.status === "limited_static" ? <p className="presentation-warning">October 1944–May 1945 is limited/static evidence; it is not equivalent to the primary interval.</p> : null}
+                <p className="presentation-method">{historicalManifest.methodologicalWarning}</p>
+                <p className="presentation-attribution">{historicalManifest.source.attribution}</p>
+              </div>
+            ) : historicalLayerStatus === "loading_manifest" || historicalLayerStatus === "loading_snapshot" ? <p role="status" className="presentation-method">Loading the selected month only…</p> : historicalLayerStatus === "failed" ? <div role="alert" className="presentation-warning">{historicalDiagnostic}<button type="button" className="presentation-secondary-button mt-2" onClick={() => historicalManifest ? setHistoricalSnapshotReloadToken((value) => value + 1) : setHistoricalReloadToken((value) => value + 1)}>Retry historical layer</button></div> : null}
+          </div>
+        ) : null}
+      </details>
+
+      <details className="presentation-group" open>
+        <summary>People and movement</summary>
+        <div className="presentation-group__content">
+          {presentationMapConfig.projectPlaces ? <LayerToggle label="Important places" marker="●" checked={layers.locations} onChange={(value) => updateLayer("locations", value)} /> : null}
+          {presentationMapConfig.routes ? <LayerToggle label="Routes" marker="→" checked={layers.individualRoutes} onChange={(value) => updateLayer("individualRoutes", value)} /> : null}
+        </div>
+      </details>
+
+      <details className="presentation-group">
+        <summary>More layers</summary>
+        <div className="presentation-group__content">
+          {presentationMapConfig.ehri ? <LayerToggle label="EHRI camps and ghettos" marker="■" checked={layers.localEhri} onChange={(value) => updateLayer("localEhri", value)} note="Supplied local registry" /> : null}
+          {presentationMapConfig.unresolvedPlaces ? <LayerToggle label="Unresolved places" marker="?" checked={layers.unresolved} onChange={(value) => updateLayer("unresolved", value)} note="Shown off-map when coordinates are unresolved" /> : null}
+        </div>
+      </details>
+
+      <div className="mt-4 flex flex-wrap gap-2 border-t border-[#d6d0c4] pt-3">
+        <button type="button" className="presentation-secondary-button" onClick={resetView}>Reset view</button>
+        {presentationMapConfig.fullscreen ? <button type="button" className="presentation-secondary-button" onClick={() => void toggleFullscreen()}>{isFullscreen ? "Exit full screen" : "Full screen"}</button> : null}
+        {presentationMapConfig.hideInterface ? <button type="button" className="presentation-secondary-button" onClick={() => setInterfaceHidden(true)}>Hide interface</button> : null}
+      </div>
+    </aside>
+  ) : null;
+
+  const presentationStoryCard = !interfaceHidden && presentationMapConfig.detailsPanel && (selection || filters.person) && presentationDetails ? (
+    <aside className="presentation-map__story absolute top-3 right-3 z-20 w-[min(23rem,calc(100%-1.5rem))] overflow-y-auto border border-[#bdb7aa] bg-[#fffdf8]/96 p-4 shadow-[0_18px_45px_rgba(22,42,35,0.2)] backdrop-blur-md sm:top-5 sm:right-5 sm:max-h-[calc(100%-8rem)]" data-testid="presentation-story-card">
+      <div className="mb-3 flex justify-end"><button type="button" className="presentation-icon-button" onClick={() => setSelection(null)} aria-label="Close story card">×</button></div>
+      {presentationDetails}
+      {selectedPlace ? <Link className="presentation-link-button" href={`/places/${selectedPlace.id}`}>Open place record</Link> : null}
+      {selectedRoute ? <Link className="presentation-link-button" href={`/persons/${selectedRoute.personId}`}>Open person dossier</Link> : null}
+      {selectedPerson && !selection ? <Link className="presentation-link-button" href={`/persons/${selectedPerson.id}`}>Open person dossier</Link> : null}
+    </aside>
+  ) : null;
+
+  const presentationTimeline = presentationMapConfig.timeline ? (
+    <section className="presentation-map__timeline absolute right-3 bottom-3 left-3 z-20 border border-[#bdb7aa] bg-[#fffdf8]/95 p-3 shadow-[0_12px_35px_rgba(22,42,35,0.18)] backdrop-blur-md sm:right-5 sm:bottom-5 sm:left-5" data-testid="presentation-timeline">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="min-w-44"><p className="presentation-card__eyebrow">Story timeline</p><p className="font-editorial text-lg font-bold text-[#173f36]">{selectedPerson?.label ?? "Select a person or story"}</p></div>
+        <div className="flex min-w-0 grow items-center gap-2 overflow-x-auto py-1">{selectedPersonRoutes.length ? selectedPersonRoutes.map((route, index) => <div key={route.id} className="flex min-w-fit items-center gap-2"><span className={`grid size-7 place-items-center rounded-full border text-sm font-bold ${timelineStep !== null && route.sequence <= timelineStep ? "border-[#173f36] bg-[#173f36] text-white" : "border-[#9fa69f] bg-white text-[#56645e]"}`}>{route.sequence}</span><span className="max-w-32 truncate text-sm text-[#5e6b65]">{route.destinationName}</span>{index < selectedPersonRoutes.length - 1 ? <span className="h-px w-8 bg-[#b9b3a7]" /> : null}</div>) : <p className="text-sm text-[#747f79]">No documented route selected.</p>}</div>
+        <div className="flex min-w-fit gap-2"><button type="button" disabled={!filters.person || !selectedPersonRoutes.length || isPlaying} onClick={() => { if (timelineStep === null || timelineStep >= selectedPersonRoutes.length) setTimelineStep(0); setIsPlaying(true); }} className="presentation-primary-button">Play once</button><button type="button" disabled={!isPlaying} onClick={() => setIsPlaying(false)} className="presentation-secondary-button">Pause</button><button type="button" disabled={!filters.person} onClick={resetView} className="presentation-secondary-button">Reset</button></div>
+      </div>
+      <p className="presentation-method mt-2">Playback never starts automatically and never loops.</p>
+    </section>
+  ) : null;
+
+  if (isPresentation) {
+    return (
+      <div ref={workspaceRef} data-interface-hidden={interfaceHidden ? "true" : "false"} className="map-workspace presentation-map-workspace relative isolate min-h-[680px] h-[calc(100vh-10rem)] overflow-hidden border-y border-[#bdb7aa] bg-[#d7d3ca]">
+        {renderMapCanvas()}
+        {!interfaceHidden ? presentationPanel : null}
+        {!interfaceHidden && !presentationPanelOpen ? <button type="button" className="presentation-map__reopen absolute top-3 left-3 z-30" onClick={() => setPresentationPanelOpen(true)}>Show controls</button> : null}
+        {presentationStoryCard}
+        {presentationTimeline}
+        {interfaceHidden ? <div className="presentation-map__hidden-tools absolute top-3 left-3 z-30 flex items-center gap-2"><button type="button" className="presentation-secondary-button shadow-lg" onClick={() => setInterfaceHidden(false)}>Show interface</button>{presentationMapConfig.legend && presentationLegend.length ? <div className="presentation-compact-legend">{presentationLegend.map((entry) => <span key={entry.value} title={entry.label} style={{ backgroundColor: entry.color }} />)}</div> : null}</div> : null}
+      </div>
+    );
+  }
+
+  function renderMapCanvas() {
+    return (
+    <div
+      className={isPresentation
+        ? "absolute inset-0 min-w-0 overflow-hidden bg-[#d7d3ca]"
+        : "relative min-h-[540px] min-w-0 overflow-hidden bg-[#d7d3ca] lg:min-h-0"}
+      data-map-state={mapLifecycle}
+    >
+      <div aria-hidden="true" className="map-local-fallback-grid absolute inset-0" />
+      <div
+        ref={containerRef}
+        className="absolute inset-0"
+        style={{ position: "absolute", inset: 0 }}
+        aria-label={isPresentation ? "Interactive public historical map" : "Interactive historical research map"}
+        data-testid="maplibre-container"
+      />
+      {mapLifecycle === "initializing" ? (
+        <div role="status" className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border border-[#a9a397] bg-[#fffdf8]/95 px-4 py-3 text-center shadow-lg">
+          <p className="text-[9px] font-black tracking-[0.12em] text-[#173f36] uppercase">Initializing map</p>
+          <p className="mt-1 text-[9px] text-[#68746e]">Loading the inline fallback style and project layers…</p>
+        </div>
+      ) : null}
+      {mapLifecycle === "failed" ? (
+        <div role="alert" className="absolute top-1/2 right-4 left-4 z-10 mx-auto max-w-lg -translate-y-1/2 border-2 border-[#8d352c] bg-[#fff8f3]/97 p-5 shadow-xl">
+          <p className="text-[9px] font-black tracking-[0.13em] text-[#8d352c] uppercase">Map rendering unavailable</p>
+          <p className="font-editorial mt-2 text-xl font-bold text-[#173f36]">The map could not initialize.</p>
+          <p className="mt-2 text-xs leading-5 text-[#5f6864]">{mapDiagnostic}</p>
+          <p className="mt-3 text-[9px] leading-4 text-[#777f7b]">Research filters and layer controls remain available. Enable WebGL 2, then refresh this page.</p>
+        </div>
+      ) : null}
+      {mapLifecycle === "ready" && mapDiagnostic && (mapDiagnostic !== basemapFallbackMessage || layers.basemap) ? (
+        <div role="alert" className="pointer-events-none absolute right-3 bottom-8 left-3 z-10 border border-[#b9883b] bg-[#fff8e8]/96 px-3 py-2 shadow-lg sm:right-auto sm:max-w-md">
+          <p className="text-[9px] font-black tracking-[0.11em] text-[#806024] uppercase">Local fallback active</p>
+          <p className="mt-1 text-[9px] leading-4 text-[#5e665f]">{mapDiagnostic}</p>
+        </div>
+      ) : null}
+      {mapLifecycle === "ready" && layers.historicalAdministration && historicalLayerStatus === "failed" && historicalDiagnostic ? (
+        <div role="alert" className="absolute top-3 right-14 z-10 max-w-sm border border-[#9d4d3b] bg-[#fff3ee]/97 px-3 py-2 shadow-lg" data-testid="historical-map-error">
+          <p className="text-[8px] font-black tracking-[0.11em] text-[#8d352c] uppercase">Historical layer unavailable</p>
+          <p className="mt-1 text-[8px] leading-3 text-[#6f453a]">{historicalDiagnostic}</p>
+        </div>
+      ) : null}
+      <div className="pointer-events-none absolute top-3 left-3 border border-[#a9a397] bg-[#fffdf8]/92 px-3 py-2 shadow-md backdrop-blur-sm">
+        <p className="text-[8px] font-black tracking-[0.13em] text-[#6f7974] uppercase">{isPresentation ? "Historical atlas" : "Visible evidence"}</p>
+        <p className="mt-1 text-xs font-bold text-[#173f36]">{visibleCorePlaces.length} places · {visibleRoutes.length} routes · {visibleEhriPlaces.length} EHRI{layers.historicalAdministration ? ` · ${historicalFeatureCount} historical` : ""}</p>
+        <p className="mt-1 text-[8px] text-[#707b76]" data-testid="map-service-status">
+          {mapLifecycle === "ready"
+            ? layers.basemap
+              ? basemapStatus === "available"
+                ? "Basemap connected · local fallback ready"
+                : basemapStatus === "unavailable"
+                  ? "Basemap unavailable · local fallback active"
+                  : "Basemap loading · local fallback ready"
+              : "Basemap hidden · local fallback active"
+            : mapLifecycle === "failed"
+              ? "Map initialization failed"
+              : "Map initializing"}
+        </p>
+        {layers.historicalAdministration ? (
+          <p className="mt-0.5 text-[8px] text-[#76536f]" data-testid="historical-map-status">
+            Historical {historicalYearMonth} · {historicalLayerStatus.replaceAll("_", " ")}
+          </p>
+        ) : null}
+        <p className="mt-0.5 text-[8px] text-[#707b76]">Research grid · no boundary claims</p>
+      </div>
+    </div>
+    );
+  }
+
   return (
-    <div className="grid min-h-[760px] border-y border-[#bdb7aa] bg-[#e5e0d5] lg:h-[calc(100vh-9rem)] lg:min-h-[720px] lg:grid-cols-[260px_minmax(420px,1fr)_292px] lg:grid-rows-[minmax(480px,1fr)_auto]">
+    <div className="map-workspace grid min-h-[760px] border-y border-[#bdb7aa] bg-[#e5e0d5] lg:h-[calc(100vh-9rem)] lg:min-h-[720px] lg:grid-cols-[260px_minmax(420px,1fr)_292px] lg:grid-rows-[minmax(480px,1fr)_auto]">
       <aside className="max-h-[36rem] overflow-y-auto border-b border-[#c8c1b4] bg-[#f6f2e9] p-4 lg:row-span-2 lg:max-h-none lg:border-r lg:border-b-0">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-editorial text-xl font-bold text-[#173f36]">{t("map.filters")}</h2>
@@ -1059,48 +1429,56 @@ export function MapWorkspace({
             </select>
           </label>
           <label className="block">
-            <span className="mb-1 block text-[8px] font-black tracking-[0.12em] text-[#66736d] uppercase">{t("map.dossier")}</span>
-            <select className={controlClass} value={filters.dossier} onChange={(event) => updateFilter("dossier", event.target.value)}>
-              <option value="">{t("common.all")}</option>
-              {data.dossiers.map((dossier) => <option key={dossier.id} value={dossier.id}>{dossier.id}</option>)}
-            </select>
-          </label>
-          <label className="block">
             <span className="mb-1 block text-[8px] font-black tracking-[0.12em] text-[#66736d] uppercase">{t("map.place")}</span>
             <select className={controlClass} value={filters.place} onChange={(event) => { updateFilter("place", event.target.value); if (event.target.value) setSelection({ kind: "place", id: event.target.value }); }}>
               <option value="">{t("common.all")}</option>
               {data.places.filter((place) => place.layer !== "ehri_local").map((place) => <option key={place.id} value={place.id}>{language === "ro" ? place.labelRo : place.label}</option>)}
             </select>
           </label>
-          <label className="block">
-            <span className="mb-1 block text-[8px] font-black tracking-[0.12em] text-[#66736d] uppercase">{t("map.event")}</span>
-            <select className={controlClass} value={filters.eventType} onChange={(event) => updateFilter("eventType", event.target.value)}>
-              <option value="">{t("common.all")}</option>
-              {data.eventTypes.map((eventType) => <option key={eventType} value={eventType}>{humanizeSlug(eventType)}</option>)}
-            </select>
-          </label>
-          <div className="grid grid-cols-2 gap-2">
-            <label>
-              <span className="mb-1 block text-[8px] font-black tracking-[0.12em] text-[#66736d] uppercase">{t("map.from")}</span>
-              <input className={controlClass} value={filters.fromYear} onChange={(event) => updateFilter("fromYear", event.target.value)} inputMode="numeric" placeholder="1938" />
-            </label>
-            <label>
-              <span className="mb-1 block text-[8px] font-black tracking-[0.12em] text-[#66736d] uppercase">{t("map.to")}</span>
-              <input className={controlClass} value={filters.toYear} onChange={(event) => updateFilter("toYear", event.target.value)} inputMode="numeric" placeholder="1944" />
-            </label>
-          </div>
-          <label className="block">
-            <span className="mb-1 block text-[8px] font-black tracking-[0.12em] text-[#66736d] uppercase">{t("map.confidence")}</span>
-            <select className={controlClass} value={filters.confidence} onChange={(event) => updateFilter("confidence", event.target.value)}>
-              <option value="">{t("common.all")}</option>
-              {(["high", "medium", "low", "unknown"] as const).map((confidence) => <option key={confidence}>{confidence}</option>)}
-            </select>
-          </label>
+          <details className="research-control-group">
+            <summary>Advanced filters</summary>
+            <div className="mt-3 space-y-3">
+              <label className="block">
+                <span className="mb-1 block text-[8px] font-black tracking-[0.12em] text-[#66736d] uppercase">{t("map.dossier")}</span>
+                <select className={controlClass} value={filters.dossier} onChange={(event) => updateFilter("dossier", event.target.value)}>
+                  <option value="">{t("common.all")}</option>
+                  {data.dossiers.map((dossier) => <option key={dossier.id} value={dossier.id}>{dossier.id}</option>)}
+                </select>
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-[8px] font-black tracking-[0.12em] text-[#66736d] uppercase">{t("map.event")}</span>
+                <select className={controlClass} value={filters.eventType} onChange={(event) => updateFilter("eventType", event.target.value)}>
+                  <option value="">{t("common.all")}</option>
+                  {data.eventTypes.map((eventType) => <option key={eventType} value={eventType}>{humanizeSlug(eventType)}</option>)}
+                </select>
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <label>
+                  <span className="mb-1 block text-[8px] font-black tracking-[0.12em] text-[#66736d] uppercase">{t("map.from")}</span>
+                  <input className={controlClass} value={filters.fromYear} onChange={(event) => updateFilter("fromYear", event.target.value)} inputMode="numeric" placeholder="1938" />
+                </label>
+                <label>
+                  <span className="mb-1 block text-[8px] font-black tracking-[0.12em] text-[#66736d] uppercase">{t("map.to")}</span>
+                  <input className={controlClass} value={filters.toYear} onChange={(event) => updateFilter("toYear", event.target.value)} inputMode="numeric" placeholder="1944" />
+                </label>
+              </div>
+              <label className="block">
+                <span className="mb-1 block text-[8px] font-black tracking-[0.12em] text-[#66736d] uppercase">{t("map.confidence")}</span>
+                <select className={controlClass} value={filters.confidence} onChange={(event) => updateFilter("confidence", event.target.value)}>
+                  <option value="">{t("common.all")}</option>
+                  {(["high", "medium", "low", "unknown"] as const).map((confidence) => <option key={confidence}>{confidence}</option>)}
+                </select>
+              </label>
+            </div>
+          </details>
         </div>
 
         <div className="mt-5 border-t border-[#d2ccbf] pt-4">
           <h2 className="font-editorial mb-2 text-lg font-bold text-[#173f36]">{t("map.layers")}</h2>
-          <LayerToggle
+          <details className="research-control-group" open>
+            <summary>Historical context</summary>
+            <div className="mt-3">
+            <LayerToggle
             label="OpenStreetMap basemap"
             marker="▦"
             checked={layers.basemap}
@@ -1114,8 +1492,8 @@ export function MapWorkspace({
                     ? "Unavailable; local fallback active"
               : "Loading public raster tiles"
             }
-          />
-          <LayerToggle
+            />
+            <LayerToggle
             label="Historical administration"
             marker="▧"
             checked={layers.historicalAdministration}
@@ -1136,8 +1514,8 @@ export function MapWorkspace({
                         : "Ready to load selected month"
                   : "Optional · local monthly snapshots"
             }
-          />
-          {layers.historicalAdministration ? (
+            />
+            {layers.historicalAdministration ? (
             <div
               className="mb-3 border border-[#c9bba5] bg-[#fffaf0] p-2.5"
               data-testid="historical-administration-controls"
@@ -1280,87 +1658,39 @@ export function MapWorkspace({
                 </div>
               ) : null}
             </div>
-          ) : null}
-          <LayerToggle label="Locations" marker="●" checked={layers.locations} onChange={(value) => updateLayer("locations", value)} />
-          <LayerToggle label="Individual routes" marker="→" checked={layers.individualRoutes} onChange={(value) => updateLayer("individualRoutes", value)} />
-          <LayerToggle label="Family / household context" marker="○" checked={layers.familyContext} onChange={(value) => updateLayer("familyContext", value)} note="Gold rings; requires a group filter" />
-          <LayerToggle label="Origin places" marker="●" checked={layers.origin} onChange={(value) => updateLayer("origin", value)} />
-          <LayerToggle label="Evacuation & deportation" marker="◆" checked={layers.evacuationDeportation} onChange={(value) => updateLayer("evacuationDeportation", value)} />
-          <LayerToggle label="Camps & ghettos" marker="▲" checked={layers.campsGhettos} onChange={(value) => updateLayer("campsGhettos", value)} />
-          <LayerToggle label="Forced labour" marker="✚" checked={layers.forcedLabour} onChange={(value) => updateLayer("forcedLabour", value)} />
-          <LayerToggle label="Death places" marker="✦" checked={layers.death} onChange={(value) => updateLayer("death", value)} />
-          <LayerToggle label="Return / repatriation" marker="↩" checked={layers.return} onChange={(value) => updateLayer("return", value)} />
-          <LayerToggle label="Unresolved places" marker="?" checked={layers.unresolved} onChange={(value) => updateLayer("unresolved", value)} note="Listed off-map; no fabricated points" />
-          <LayerToggle label="Local EHRI overlay" marker="■" checked={layers.localEhri} onChange={(value) => updateLayer("localEhri", value)} note={`${data.places.filter((place) => place.layer === "ehri_local").length} supplied records`} />
-          <LayerToggle label="Inferred routes" marker="⋯" checked={layers.inferred} onChange={(value) => updateLayer("inferred", value)} note="Disabled by default; none in pilot" />
-          <div className="mt-2 border-t border-[#ddd7ca] pt-2">
-            <LayerToggle label="WMS / WMTS services" marker="▤" checked={false} onChange={() => undefined} disabled note="Registry placeholder" />
-          </div>
+            ) : null}
+            </div>
+          </details>
+          <details className="research-control-group" open>
+            <summary>People and movement</summary>
+            <div className="mt-3">
+              <LayerToggle label="Locations" marker="●" checked={layers.locations} onChange={(value) => updateLayer("locations", value)} />
+              <LayerToggle label="Individual routes" marker="→" checked={layers.individualRoutes} onChange={(value) => updateLayer("individualRoutes", value)} />
+              <LayerToggle label="Family / household context" marker="○" checked={layers.familyContext} onChange={(value) => updateLayer("familyContext", value)} note="Gold rings; requires a group filter" />
+              <LayerToggle label="Origin places" marker="●" checked={layers.origin} onChange={(value) => updateLayer("origin", value)} />
+              <LayerToggle label="Evacuation & deportation" marker="◆" checked={layers.evacuationDeportation} onChange={(value) => updateLayer("evacuationDeportation", value)} />
+              <LayerToggle label="Camps & ghettos" marker="▲" checked={layers.campsGhettos} onChange={(value) => updateLayer("campsGhettos", value)} />
+              <LayerToggle label="Forced labour" marker="✚" checked={layers.forcedLabour} onChange={(value) => updateLayer("forcedLabour", value)} />
+              <LayerToggle label="Death places" marker="✦" checked={layers.death} onChange={(value) => updateLayer("death", value)} />
+              <LayerToggle label="Return / repatriation" marker="↩" checked={layers.return} onChange={(value) => updateLayer("return", value)} />
+            </div>
+          </details>
+          <details className="research-control-group">
+            <summary>More layers</summary>
+            <div className="mt-3">
+              <LayerToggle label="Unresolved places" marker="?" checked={layers.unresolved} onChange={(value) => updateLayer("unresolved", value)} note="Listed off-map; no fabricated points" />
+              <LayerToggle label="Local EHRI overlay" marker="■" checked={layers.localEhri} onChange={(value) => updateLayer("localEhri", value)} note={`${data.places.filter((place) => place.layer === "ehri_local").length} supplied records`} />
+              <LayerToggle label="Inferred routes" marker="⋯" checked={layers.inferred} onChange={(value) => updateLayer("inferred", value)} note="Disabled by default; none in pilot" />
+              <div className="mt-2 border-t border-[#ddd7ca] pt-2">
+                <LayerToggle label="WMS / WMTS services" marker="▤" checked={false} onChange={() => undefined} disabled note="Unavailable: no service registry or source data is configured" />
+                <p className="mt-1 text-xs leading-5 text-[#68746e]">This research-only placeholder is retained for future external services; it cannot be activated in the current V1 data model.</p>
+              </div>
+            </div>
+          </details>
         </div>
       </aside>
 
-      <div
-        className="relative min-h-[540px] min-w-0 overflow-hidden bg-[#d7d3ca] lg:min-h-0"
-        data-map-state={mapLifecycle}
-      >
-        <div aria-hidden="true" className="map-local-fallback-grid absolute inset-0" />
-        <div
-          ref={containerRef}
-          className="absolute inset-0"
-          style={{ position: "absolute", inset: 0 }}
-          aria-label="Interactive historical research map"
-          data-testid="maplibre-container"
-        />
-        {mapLifecycle === "initializing" ? (
-          <div role="status" className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border border-[#a9a397] bg-[#fffdf8]/95 px-4 py-3 text-center shadow-lg">
-            <p className="text-[9px] font-black tracking-[0.12em] text-[#173f36] uppercase">Initializing map</p>
-            <p className="mt-1 text-[9px] text-[#68746e]">Loading the inline fallback style and project layers…</p>
-          </div>
-        ) : null}
-        {mapLifecycle === "failed" ? (
-          <div role="alert" className="absolute top-1/2 right-4 left-4 z-10 mx-auto max-w-lg -translate-y-1/2 border-2 border-[#8d352c] bg-[#fff8f3]/97 p-5 shadow-xl">
-            <p className="text-[9px] font-black tracking-[0.13em] text-[#8d352c] uppercase">Map rendering unavailable</p>
-            <p className="font-editorial mt-2 text-xl font-bold text-[#173f36]">The map could not initialize.</p>
-            <p className="mt-2 text-xs leading-5 text-[#5f6864]">{mapDiagnostic}</p>
-            <p className="mt-3 text-[9px] leading-4 text-[#777f7b]">Research filters and layer controls remain available. Enable WebGL 2, then refresh this page.</p>
-          </div>
-        ) : null}
-        {mapLifecycle === "ready" && mapDiagnostic && (mapDiagnostic !== basemapFallbackMessage || layers.basemap) ? (
-          <div role="alert" className="pointer-events-none absolute right-3 bottom-8 left-3 z-10 border border-[#b9883b] bg-[#fff8e8]/96 px-3 py-2 shadow-lg sm:right-auto sm:max-w-md">
-            <p className="text-[9px] font-black tracking-[0.11em] text-[#806024] uppercase">Local fallback active</p>
-            <p className="mt-1 text-[9px] leading-4 text-[#5e665f]">{mapDiagnostic}</p>
-          </div>
-        ) : null}
-        {mapLifecycle === "ready" && layers.historicalAdministration && historicalLayerStatus === "failed" && historicalDiagnostic ? (
-          <div role="alert" className="absolute top-3 right-14 z-10 max-w-sm border border-[#9d4d3b] bg-[#fff3ee]/97 px-3 py-2 shadow-lg" data-testid="historical-map-error">
-            <p className="text-[8px] font-black tracking-[0.11em] text-[#8d352c] uppercase">Historical layer unavailable</p>
-            <p className="mt-1 text-[8px] leading-3 text-[#6f453a]">{historicalDiagnostic}</p>
-          </div>
-        ) : null}
-        <div className="pointer-events-none absolute top-3 left-3 border border-[#a9a397] bg-[#fffdf8]/92 px-3 py-2 shadow-md backdrop-blur-sm">
-          <p className="text-[8px] font-black tracking-[0.13em] text-[#6f7974] uppercase">Visible evidence</p>
-          <p className="mt-1 text-xs font-bold text-[#173f36]">{visibleCorePlaces.length} core · {visibleRoutes.length} routes · {visibleEhriPlaces.length} EHRI{layers.historicalAdministration ? ` · ${historicalFeatureCount} historical` : ""}</p>
-          <p className="mt-1 text-[8px] text-[#707b76]" data-testid="map-service-status">
-            {mapLifecycle === "ready"
-              ? layers.basemap
-                ? basemapStatus === "available"
-                  ? "Basemap connected · local fallback ready"
-                  : basemapStatus === "unavailable"
-                    ? "Basemap unavailable · local fallback active"
-                    : "Basemap loading · local fallback ready"
-                : "Basemap hidden · local fallback active"
-              : mapLifecycle === "failed"
-                ? "Map initialization failed"
-                : "Map initializing"}
-          </p>
-          {layers.historicalAdministration ? (
-            <p className="mt-0.5 text-[8px] text-[#76536f]" data-testid="historical-map-status">
-              Historical {historicalYearMonth} · {historicalLayerStatus.replaceAll("_", " ")}
-            </p>
-          ) : null}
-          <p className="mt-0.5 text-[8px] text-[#707b76]">Research grid · no boundary claims</p>
-        </div>
-      </div>
+      {renderMapCanvas()}
 
       <aside className="max-h-[38rem] overflow-y-auto border-t border-[#c8c1b4] bg-[#fffdf8] p-4 lg:row-span-2 lg:max-h-none lg:border-t-0 lg:border-l">
         <div className="mb-4 flex items-center justify-between">

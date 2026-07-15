@@ -7,6 +7,7 @@ import { useLanguage } from "./language-provider";
 const navItems = [
   { href: "/", key: "nav.overview" as const },
   { href: "/map", key: "nav.map" as const },
+  { href: "/presentation/map", key: "nav.presentationMap" as const },
   { href: "/persons", key: "nav.persons" as const },
   { href: "/places", key: "nav.places" as const },
   { href: "/documents", key: "nav.documents" as const },
@@ -18,7 +19,7 @@ export function SiteHeader() {
   const { language, setLanguage, t } = useLanguage();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#153a32]/96 text-[#f8f2e6] shadow-[0_10px_30px_rgba(17,42,35,0.18)] backdrop-blur-xl">
+    <header className="site-header sticky top-0 z-50 border-b border-white/10 bg-[#153a32]/96 text-[#f8f2e6] shadow-[0_10px_30px_rgba(17,42,35,0.18)] backdrop-blur-xl">
       <div className="mx-auto flex min-h-17 max-w-[1440px] items-center gap-5 px-4 sm:px-7 lg:px-12">
         <Link href="/" className="group mr-auto flex min-w-fit items-center gap-3" aria-label="Dosare Dorohoi overview">
           <span className="grid size-9 place-items-center border border-[#d7b36a]/70 text-[11px] font-black tracking-[0.14em] text-[#e7c680] transition group-hover:bg-[#e7c680] group-hover:text-[#173f36]">
