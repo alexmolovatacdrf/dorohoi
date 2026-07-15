@@ -7,7 +7,7 @@ Acest document păstrează punctul de continuare pentru următoarea sesiune. Con
 ## Starea Git
 
 - Branch: `feature/public-presentation-map`
-- HEAD: `98007da fix: clarify person dossiers and map interactions`
+- HEAD: `fc7549a fix: refine presentation map navigation and people panels`
 - Worktree: curat la momentul salvării
 - Nu au fost folosite reset, clean, checkout/restore destructiv și nu au fost șterse date existente.
 
@@ -21,6 +21,7 @@ Checkpoint-urile relevante, în ordine:
 6. `c999822` — Claude demo dataset switch
 7. `29733a4` — separate Presentation Map people controls
 8. `98007da` — family/person panel and map interaction fixes
+9. `fc7549a` — compact people sections, active camera states, place context and route lanes
 
 ## Server și URL-uri
 
@@ -52,6 +53,13 @@ URL-uri:
 - Opacitatea istorică are control separat, cu valoare implicită redusă pentru a păstra lizibile orașele, râurile și basemap-ul.
 - Footer-ul este ascuns pe paginile de hartă, astfel încât să nu ocupe permanent spațiu din viewport.
 - Fixture-ul Claude este comutat prin `?dataset=claude-demo`; nu este amestecat în `data/normalized/`.
+- Tab-ul activ al dataset-ului este acum corelat corect cu URL-ul; `?dataset=project` afișează clar Project data.
+- Europe view, Project region și Selected story au stare vizuală explicită, iar panoul arată eticheta „Active view”.
+- Zoom-ul este mutat în afara panoului drept pe desktop și deasupra timeline-ului pe mobil.
+- Lista familiei afișează capul/declarantul o singură dată; persoanele menționate sunt într-un `<details>` închis implicit.
+- Antetul sticky al ambelor panouri păstrează butonul de închidere accesibil în timpul scroll-ului.
+- Traseele inverse/repetate între aceleași localități primesc benzi vizuale diferite. Animația are acum 3,6 secunde per segment.
+- Click pe o localitate poate afișa persoanele asociate, grupate după contextul explicit documentat; în timpul animației este afișat locul curent și nota traseului.
 
 ## Datele din varianta Claude
 
@@ -83,7 +91,7 @@ node scripts/presentation/derive-claude-demo-map.mjs > data/demo/claude-map-demo
 - `npm test` — 29 teste în 4 fișiere
 - `npm run typecheck` — trecut
 - `npm run lint` — trecut
-- `npm run build` — trecut în verificarea anterioară
+- `npm run build` — trecut după ultimele modificări
 - `npm audit --json` — fără vulnerabilități raportate în verificarea anterioară
 
 După orice modificare nouă, prima verificare trebuie să fie:
@@ -110,7 +118,7 @@ Observație: `npm run build` poate rescrie automat importul din `next-env.d.ts` 
 
 ## Lucru rămas / atenționări
 
-- Mai trebuie făcută verificarea vizuală completă în browser după ultimele modificări de panou și interacțiuni.
+- Mai trebuie făcută verificarea vizuală completă în browser după ultimele modificări de panou și interacțiuni. Playwright este instalat ca CLI, dar mediul actual nu are Chrome/Chromium disponibil (`/opt/google/chrome/chrome`); instalarea automată a Chrome a eșuat deoarece cere sudo.
 - Trebuie salvate/confirmate screenshot-urile finale pentru Presentation Map Europe view, persoană selectată, interfață ascunsă, Research Map și mobil.
 - Trebuie confirmat în browser că toate layerele Presentation Map (basemap, persoane, trasee, locuri, EHRI și unresolved) se afișează corect cu ambele surse de date.
 - Integrarea viitoare a unei persoane menționate în mai multe dosare trebuie să folosească un identificator stabil și legături documentate între apariții/dosare; nu trebuie făcută deduplicare automată pe nume.
@@ -126,4 +134,3 @@ Observație: `npm run build` poate rescrie automat importul din `next-env.d.ts` 
 - `docs/PRESENTATION_MAP.md` — documentația Presentation Map
 - `docs/HISTORICAL_ADMINISTRATION.md` — documentația dataset-ului istoric
 - `docs/STATUS.md` — statusul proiectului
-
