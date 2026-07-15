@@ -7,7 +7,7 @@ Acest document păstrează punctul de continuare pentru următoarea sesiune. Con
 ## Starea Git
 
 - Branch: `feature/public-presentation-map`
-- HEAD: `c807fae feat: share route and people visuals across maps`
+- HEAD: `6d0e6c0 fix: show family directory disclosure arrows`
 - Worktree: curat la momentul salvării
 - Nu au fost folosite reset, clean, checkout/restore destructiv și nu au fost șterse date existente.
 
@@ -25,6 +25,7 @@ Checkpoint-urile relevante, în ordine:
 10. `ca343ab` — separate reverse route lanes, compact family card and person search
 11. `57c5249` — visible selected-person route list in Research Map context panel
 12. `c807fae` — shared curved route geometry and family/person directory in both maps
+13. `6d0e6c0` — visible disclosure triangles for family and mentioned-people lists
 
 ## Server și URL-uri
 
@@ -68,6 +69,7 @@ URL-uri:
 - După selectarea unei persoane în Research Map, panoul `Context` din dreapta afișează acum numele persoanei, numărul de segmente și lista traseelor selectabile; un click pe un segment deschide detaliile sale de proveniență.
 - Research Map folosește acum aceeași geometrie de prezentare pentru trasee ca Presentation Map: curbe Bézier, săgeți direcționale și benzi separate pentru mișcări inverse sau repetate între aceleași localități.
 - Panoul `Context` din Research Map include acum directorul comun `Families and mentioned people`, cu căutare și secțiuni dropdown pentru persoanele menționate. Capul/declarantul nu este repetat în lista de membri.
+- Directorul `Families and mentioned people` este acum el însuși un dropdown vizibil în ambele hărți: triunghiul `▸` închide lista, iar `▾` o extinde. Listele interne ale persoanelor menționate folosesc aceeași convenție.
 
 ## Datele din varianta Claude
 
