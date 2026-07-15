@@ -1,4 +1,4 @@
-# European Borders WWII — regional historical administration layer
+# European Borders WWII — regional and full historical administration layers
 
 ## Scope and source custody
 
@@ -164,3 +164,57 @@ requires an external network connection. The locally served historical layer,
 project places, routes, controls and neutral research grid remain usable when
 that external tile service is unavailable; the application is not described as
 fully offline-capable.
+
+## Regional versus full dataset
+
+Two browser derivatives are committed and serve different map experiences:
+
+| Derivative | URL prefix | Extent | Consumer |
+| --- | --- | --- | --- |
+| Regional | `/data/historical-administration/` | documented Dorohoi research window | Research Map (`/map`) |
+| Full | `/data/historical-administration-full/` | every polygon surviving conversion from the original monthly shapefile | Presentation Map (`/presentation/map`) |
+
+The regional derivative keeps `regionalBbox` and `regionalFeatureCount`. The
+full derivative keeps `featureCount`, `dataBbox`, `naturalExtent` and
+`presentationCategory`. `lib/historical-administration/schemas.ts` uses strict
+scope-aware Zod unions so the two contracts remain compatible without making
+regional-only or full-only metadata broadly optional. Legacy generated regional
+JSON does not need a new field: its scope is inferred from its validated URL.
+
+The full derivative contains 91 files and 120,150,216 bytes in total:
+
+- 88 monthly snapshots: 119,363,689 bytes, averaging 1,356,405 bytes;
+- largest monthly snapshot: `1941-10.geojson`, 1,367,115 bytes;
+- `manifest.json`: 305,106 bytes;
+- `territorial-changes.geojson`: 473,151 bytes.
+
+The full output has no Git LFS configuration and is currently committed as
+ordinary Git assets. It is suitable for local development and month-at-a-time
+browser loading; the browser requests the manifest and only the selected
+monthly file. It is large for repeated Git history, so future growth should be
+reviewed before adding more derivatives. No optimization was applied after
+validation: full geometry uses the source extent, topology-preserving Shapely
+simplification with the documented `0.005` degree tolerance, five-decimal
+coordinate rounding and no rectangular geographic crop. Polygon validity is
+checked after conversion, and raw attributes remain on every feature.
+
+The full manifest derives the public vocabulary `presentationCategory` from
+the unchanged raw `Name` and `Foreign_Po` values. The public legend groups
+features as sovereign/state territory, Romanian-occupied or administered,
+German-occupied or administered, Soviet-controlled, and unresolved/other.
+Raw `Name`, `Foreign_Po`, `Head_of_St` and `Govt_in_Ex` remain available in the
+details panel. The derived category is a traceable display classification, not
+a replacement for the source field and not a new historical assertion.
+
+The checkpoint command used to validate the committed derivatives is:
+
+```bash
+external-data/european-borders-wwii/.venv/bin/python \
+  scripts/historical-administration/preprocess.py \
+  --scope all --verify-output
+```
+
+To reproduce both outputs from the source archive, run the same processor
+without `--verify-output`; it validates the archive before writing deterministic
+staging output. The committed output is the current browser artifact, while
+the processor remains the reproducible source of future replacements.

@@ -1,5 +1,14 @@
 # Dosare Dorohoi V1 status
 
+## Current branch checkpoint
+
+The active branch is `feature/public-presentation-map`. The historical-data
+checkpoint is `9430b14` (`feat: finalize full-extent historical administration
+dataset`). It includes the strict regional/full schema contract, the validated
+full-extent browser derivatives and tests for all 88 full monthly snapshots plus
+`Territorial_Changes`. The public map work follows this checkpoint and is kept
+in separate logical commits.
+
 ## Delivery status
 
 V1 is implemented as a person-centred, static-data Next.js research platform.
@@ -222,3 +231,20 @@ unavailable.
    file-backed V1 research process has been evaluated by researchers.
 6. Add future dossier adapters behind the existing normalized contracts and
    keep cross-dossier identity matching candidate-only until human review.
+
+## Presentation Map status
+
+`/presentation/map` now uses the shared MapLibre workspace in presentation mode.
+It has a full-Europe historical default, public category legend, raw historical
+details, month selection, opacity, Europe/Project region camera controls,
+person/story selection, route timeline, manual one-shot playback, compact
+layer groups, fullscreen and hide-interface controls. `/map` remains the
+advanced Research Map and now places Dossiers, Event type and Confidence under
+collapsed Advanced filters; map layers are grouped without removing existing
+capabilities.
+
+The WMS/WMTS toggle is not a partially wired layer. No service registry, source
+data or MapLibre source is configured for it in V1, so it is omitted from the
+Presentation Map and retained only as a disabled, explanatory Research Map
+placeholder. The local EHRI and historical layers are separate, valid local
+data paths.
