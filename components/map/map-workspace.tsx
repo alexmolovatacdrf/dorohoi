@@ -669,6 +669,7 @@ export function MapWorkspace({
   const [historicalSnapshotReloadToken, setHistoricalSnapshotReloadToken] = useState(0);
   const [presentationPanelOpen, setPresentationPanelOpen] = useState(true);
   const [presentationPeoplePanelOpen, setPresentationPeoplePanelOpen] = useState(true);
+  const [presentationOpenFamilyId, setPresentationOpenFamilyId] = useState<string | null>(null);
   const [presentationViewport, setPresentationViewport] = useState<"europe" | "project" | "story">(
     initialPerson ? "story" : "europe",
   );
@@ -822,11 +823,10 @@ export function MapWorkspace({
       data.places.filter((place) => {
         if (place.layer !== "ehri_local" || !place.coordinates || !layers.localEhri || !layers.campsGhettos) return false;
         if (filters.place && place.id !== filters.place) return false;
-        if (filters.person || filters.group || filters.dossier || filters.eventType || filters.fromYear || filters.toYear) return false;
         if (filters.confidence && place.confidence !== filters.confidence) return false;
         return true;
       }),
-    [data.places, filters, layers.campsGhettos, layers.localEhri],
+    [data.places, filters.confidence, filters.place, layers.campsGhettos, layers.localEhri],
   );
 
   const preTimelineRoutes = useMemo(
@@ -1417,8 +1417,8 @@ export function MapWorkspace({
     const narrowPresentation = isPresentation && typeof window !== "undefined" && window.innerWidth < 720;
     const padding = isPresentation
       ? narrowPresentation
-        ? { top: presentationPanelOpen ? 360 : 72, right: presentationPeoplePanelOpen ? 360 : 28, bottom: 170, left: 28 }
-        : { top: 72, right: presentationPeoplePanelOpen ? 400 : 72, bottom: 170, left: presentationPanelOpen ? 400 : 72 }
+        ? { top: presentationPanelOpen ? 360 : 72, right: presentationPeoplePanelOpen ? 360 : 28, bottom: isPlaying ? 250 : 190, left: 28 }
+        : { top: 72, right: presentationPeoplePanelOpen ? 400 : 72, bottom: isPlaying ? 250 : 190, left: presentationPanelOpen ? 400 : 72 }
       : 36;
     map.fitBounds(
       [
@@ -1431,7 +1431,7 @@ export function MapWorkspace({
         maxZoom: maxZoom ?? (isPresentation ? 7 : 9),
       },
     );
-  }, [isPresentation, presentationPanelOpen, presentationPeoplePanelOpen]);
+  }, [isPlaying, isPresentation, presentationPanelOpen, presentationPeoplePanelOpen]);
 
   const fitPersonView = useCallback(() => {
     if (!filters.person) return;
@@ -1864,7 +1864,11 @@ export function MapWorkspace({
         const dossier = data.dossiers.find((item) => item.id === (head ?? groupPeople[0])?.dossierId);
         const hasFamilyDetails = mentionedPeople.length > 0 || Boolean(dossier);
         const familyCountLabel = mentionedPeople.length ? `${mentionedPeople.length} mentioned` : "0 mentioned";
-        const selectFamilyHead = () => head ? selectPresentationPerson(head.id) : selectPresentationGroup(group.id);
+        const selectFamilyHead = () => {
+          setPresentationOpenFamilyId(null);
+          if (head) selectPresentationPerson(head.id);
+          else selectPresentationGroup(group.id);
+        };
         const familyHeadLabel = head?.label ?? group.label.replace(/\s+·\s+dosar\s+.*$/i, "");
         const familyHeadButton = (
           <span
@@ -1891,7 +1895,15 @@ export function MapWorkspace({
         );
         return (
           hasFamilyDetails ? (
-            <details key={group.id} className="presentation-family-card presentation-family-card--disclosure">
+            <details
+              key={group.id}
+              className="presentation-family-card presentation-family-card--disclosure"
+              open={presentationOpenFamilyId === group.id}
+              onToggle={(event) => {
+                if (event.currentTarget.open) setPresentationOpenFamilyId(group.id);
+                else if (presentationOpenFamilyId === group.id) setPresentationOpenFamilyId(null);
+              }}
+            >
               <summary className="presentation-family-card__summary" aria-label={`Show ${familyCountLabel} and dossier record for ${familyHeadLabel}`}>
                 {familyHeadButton}
                 <span className="presentation-family-card__count">{familyCountLabel}</span>
@@ -2037,7 +2049,7 @@ export function MapWorkspace({
         data-people-panel-open={presentationPeoplePanelOpen ? "true" : "false"}
         data-controls-open={presentationPanelOpen ? "true" : "false"}
         data-presentation-viewport={presentationViewport}
-        className="map-workspace presentation-map-workspace relative isolate min-h-[680px] h-[calc(100vh-10rem)] overflow-hidden border-y border-[#bdb7aa] bg-[#d7d3ca]"
+        className="map-workspace presentation-map-workspace relative isolate min-h-[560px] h-[calc(100vh-12rem)] overflow-hidden border-y border-[#bdb7aa] bg-[#d7d3ca]"
       >
         {renderMapCanvas()}
         {!interfaceHidden ? presentationPanel : null}
@@ -2120,7 +2132,7 @@ export function MapWorkspace({
   }
 
   return (
-    <div className="map-workspace grid min-h-[760px] border-y border-[#bdb7aa] bg-[#e5e0d5] lg:h-[calc(100vh-9rem)] lg:min-h-[720px] lg:grid-cols-[260px_minmax(420px,1fr)_292px] lg:grid-rows-[minmax(480px,1fr)_auto]">
+    <div className="map-workspace grid min-h-[760px] border-y border-[#bdb7aa] bg-[#e5e0d5] lg:h-[calc(100vh-12rem)] lg:min-h-[560px] lg:grid-cols-[260px_minmax(420px,1fr)_292px] lg:grid-rows-[minmax(440px,1fr)_auto]">
       <aside className="research-map__filters max-h-[36rem] overflow-y-auto border-b border-[#c8c1b4] bg-[#f6f2e9] p-4 lg:row-span-2 lg:max-h-none lg:border-r lg:border-b-0">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-editorial text-xl font-bold text-[#173f36]">{t("map.filters")}</h2>

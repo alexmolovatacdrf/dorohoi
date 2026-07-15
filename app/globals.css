@@ -240,6 +240,7 @@ summary {
 .presentation-map__people,
 .presentation-map__timeline {
   font-size: 0.9375rem;
+  min-height: 9.5rem;
 }
 
 .presentation-map__people {
