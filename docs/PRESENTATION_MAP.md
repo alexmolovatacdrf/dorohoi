@@ -101,7 +101,7 @@ public assets. Sensitive material must not be placed in this static deployment.
 
 The current protected review deployment is:
 
-`https://dosare-dorohoi-presentation-o20jihmr1.vercel.app/presentation/map?dataset=project`
+`https://dosare-dorohoi-presentation-9dnxfjv3j.vercel.app/presentation/map?dataset=project`
 
 On the Hobby plan, share the unique deployment URL above rather than the
 stable `*.vercel.app` project alias. The unique URL is the one covered by
