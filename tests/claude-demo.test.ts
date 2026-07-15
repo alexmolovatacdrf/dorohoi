@@ -23,5 +23,6 @@ describe("Claude map demo fixture", () => {
     expect(data.routes.filter((route) => route.personId === roza?.id).length).toBeGreaterThan(0);
     expect(data.routes.find((route) => route.personId === roza?.id)?.dossierId).toBe(roza?.dossierId);
     expect(data.routes.every((route) => route.sourceLabel.includes("Claude demo"))).toBe(true);
+    expect(data.places.every((place) => place.personContexts.length === place.personIds.length)).toBe(true);
   });
 });

@@ -71,9 +71,11 @@ normalized data supports that relationship.
 
 The bottom timeline uses a slow, one-shot progression. Each route is rendered
 as a smooth visual curve between its documented endpoints, with a moving
-progress marker; the curve is explicitly a presentation aid, not a claim about
-the exact historical road. Playback never starts automatically and never
-loops.
+progress marker; reverse or repeated movements between the same two places are
+assigned separate visual lanes so they do not sit on top of one another. The
+curve is explicitly a presentation aid, not a claim about the exact historical
+road. Playback never starts automatically and never loops. During playback the
+current documented place and the route note are shown in the timeline card.
 
 The left panel collapses, the right people panel can also collapse, and the
 timeline stays along the bottom. Selected story details appear in the people
@@ -83,12 +85,22 @@ uses the browser Fullscreen API and reports the current state to assistive
 technology.
 
 The left presentation panel contains only map-view controls: camera presets,
-historical month, opacity and layers. People, families and dossier members are
-selected in the separate right-side People and families panel. Selecting a
-family fits all of its documented endpoints; selecting an individual retains
-individual route ownership and enables that person's timeline. The global
-site footer is hidden on map workspaces so it cannot reduce the map viewport;
-it remains available on the editorial and research pages.
+historical month, opacity and layers. Europe view and Project region expose an
+explicit pressed/active state. People, families and dossier members are
+selected in the separate right-side People and families panel. A family card
+shows only its documented head/declarant by default; people mentioned inside
+the dossier are in a collapsed subsection and the head is not repeated there.
+The panel header stays visible while its list is scrolled. Selecting an
+individual fits a closer bounding box over all of that person's documented
+endpoints and places, retains individual route ownership and enables that
+person's timeline. Clicking a place opens grouped, source-bound person
+connections when the normalized data supports them. The global site footer is
+hidden on map workspaces so it cannot reduce the map viewport; it remains
+available on the editorial and research pages.
+
+The map zoom controls are positioned outside the open people panel on desktop
+and above the bottom timeline on mobile. Layer symbols use a consistent visual
+set for territory, basemap, places, routes, EHRI and unresolved records.
 
 Historical polygon details are interaction-based: they do not open on pointer
 hover. A normal click or a right-click on a polygon opens the closeable raw

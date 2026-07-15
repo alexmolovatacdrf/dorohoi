@@ -167,9 +167,127 @@ summary {
   max-height: calc(100% - 8rem);
 }
 
+.presentation-panel__header {
+  position: sticky;
+  z-index: 3;
+  top: -1rem;
+  margin: -1rem -1rem 0;
+  border-bottom: 1px solid #ded8cc;
+  background: rgb(255 253 248 / 97%);
+  padding: 1rem;
+}
+
+.presentation-layer-marker {
+  display: inline-grid;
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: 0 0 auto;
+  place-items: center;
+  margin-top: 0.1rem;
+  border: 1px solid #6d8178;
+  color: #173f36;
+  font-size: 0.75rem !important;
+  font-weight: 900;
+  line-height: 1 !important;
+}
+
+.presentation-layer-marker--historical {
+  background: repeating-linear-gradient(135deg, #d4aaa0 0 2px, #fff8ed 2px 4px);
+}
+
+.presentation-layer-marker--basemap {
+  background:
+    linear-gradient(90deg, transparent 42%, #6d8178 42% 58%, transparent 58%),
+    linear-gradient(0deg, transparent 42%, #6d8178 42% 58%, transparent 58%);
+}
+
+.presentation-layer-marker--places {
+  width: 0.85rem;
+  height: 0.85rem;
+  margin-inline: 0.125rem;
+  border-radius: 999px;
+  background: #236353;
+}
+
+.presentation-layer-marker--routes {
+  border: 0;
+  color: #236353;
+  font-size: 1rem !important;
+}
+
+.presentation-layer-marker--ehri {
+  border-color: #355b67;
+  background: #9fb8bd;
+}
+
+.presentation-layer-marker--unresolved {
+  border-radius: 999px;
+  color: #8d352c;
+}
+
+.presentation-map-workspace .maplibregl-ctrl-top-right {
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 35;
+  transition: right 180ms ease;
+}
+
+.presentation-map-workspace[data-people-panel-open="true"] .maplibregl-ctrl-top-right {
+  right: 25.5rem;
+}
+
+.presentation-view-button {
+  position: relative;
+}
+
+.presentation-view-status {
+  margin-top: 0.75rem;
+  color: #68766e;
+  font-size: 0.8125rem !important;
+  font-weight: 700;
+}
+
+.presentation-view-button--active {
+  border-color: #173f36;
+  background: #e4eee8;
+  color: #173f36;
+  box-shadow: inset 0 0 0 2px #173f36;
+}
+
+.presentation-view-button--active::after {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.35rem;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: #a54f32;
+  content: "";
+}
+
 .presentation-map__reopen--right {
   right: 1.25rem;
   left: auto;
+}
+
+.presentation-waypoint {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 0.7rem;
+  border-left: 3px solid #a54f32;
+  background: #fff8ec;
+  padding: 0.55rem 0.7rem;
+  color: #52645c;
+}
+
+.presentation-waypoint strong {
+  color: #173f36;
+  font-size: 1rem;
+}
+
+.presentation-waypoint > span:last-child {
+  color: #68766e;
+  font-size: 0.8125rem !important;
 }
 
 .presentation-people-list {
@@ -223,6 +341,55 @@ summary {
   gap: 0.25rem;
   border-top: 1px solid #ded8cc;
   padding: 0.35rem;
+}
+
+.presentation-place-people {
+  margin-top: 1rem;
+  border-top: 1px solid #d6d0c4;
+  padding-top: 0.8rem;
+}
+
+.presentation-place-people__group {
+  margin-top: 0.45rem;
+  border: 1px solid #ded8cc;
+  background: rgb(248 243 232 / 64%);
+}
+
+.presentation-place-people__group summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.55rem 0.65rem;
+  color: #315c50;
+  font-weight: 800;
+}
+
+.presentation-place-people__group summary span:last-child {
+  color: #76536f;
+  font-size: 0.75rem !important;
+}
+
+.presentation-place-people__items {
+  display: grid;
+  gap: 0.2rem;
+  border-top: 1px solid #ded8cc;
+  padding: 0.35rem;
+}
+
+.presentation-place-person {
+  width: 100%;
+  padding: 0.45rem 0.55rem;
+  color: #315c50;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-color: #b6c6bd;
+  text-underline-offset: 0.15em;
+}
+
+.presentation-place-person:hover {
+  background: #e9f0eb;
+  color: #173f36;
 }
 
 .presentation-person-option,
@@ -423,6 +590,13 @@ summary {
   color: #fff;
 }
 
+.presentation-secondary-button.presentation-view-button--active {
+  border-color: #173f36;
+  background: #e4eee8;
+  color: #173f36;
+  box-shadow: inset 0 0 0 2px #173f36;
+}
+
 .presentation-link-button {
   width: 100%;
   margin-top: 1rem;
@@ -575,6 +749,13 @@ body:has(.map-workspace) .site-footer {
     left: 0.75rem;
     width: auto;
     max-height: calc(100% - 10rem);
+  }
+
+  .presentation-map-workspace .maplibregl-ctrl-top-right,
+  .presentation-map-workspace[data-people-panel-open="true"] .maplibregl-ctrl-top-right {
+    top: auto;
+    right: 0.75rem;
+    bottom: 11rem;
   }
 
   .presentation-map__reopen--right {

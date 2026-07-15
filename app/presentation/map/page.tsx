@@ -40,8 +40,8 @@ export default async function PresentationMapPage({
       </div>
       <div className="presentation-dataset-switcher mx-auto flex max-w-[1600px] flex-wrap items-center gap-2 px-4 pb-3 sm:px-7 lg:px-10" aria-label="Map test data">
         <span className="presentation-dataset-switcher__label">Test data</span>
-        <a className={isClaudeDemo ? "presentation-dataset-switcher__link presentation-dataset-switcher__link--active" : "presentation-dataset-switcher__link"} href="/presentation/map?dataset=project">Project data</a>
-        <a className={isClaudeDemo ? "presentation-dataset-switcher__link" : "presentation-dataset-switcher__link presentation-dataset-switcher__link--active"} href="/presentation/map?dataset=claude-demo">Claude demo</a>
+        <a aria-current={!isClaudeDemo ? "page" : undefined} className={!isClaudeDemo ? "presentation-dataset-switcher__link presentation-dataset-switcher__link--active" : "presentation-dataset-switcher__link"} href="/presentation/map?dataset=project">Project data</a>
+        <a aria-current={isClaudeDemo ? "page" : undefined} className={isClaudeDemo ? "presentation-dataset-switcher__link presentation-dataset-switcher__link--active" : "presentation-dataset-switcher__link"} href="/presentation/map?dataset=claude-demo">Claude demo</a>
       </div>
       <MapWorkspace
         data={mapData}

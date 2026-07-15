@@ -1,6 +1,7 @@
 import claudeDemo from "@/data/demo/claude-map-demo.json";
 import type {
   MapPlaceDatum,
+  MapPlacePersonContext,
   MapRouteDatum,
   MapViewModel,
 } from "@/lib/data/selectors";
@@ -16,6 +17,20 @@ export const CLAUDE_DEMO_SOURCE = {
 const mapData: MapViewModel = {
   places: claudeDemo.places.map((place): MapPlaceDatum => ({
     ...place,
+    personContexts: place.personIds.map((personId): MapPlacePersonContext => {
+      const routeContexts = claudeDemo.routes.filter(
+        (route) =>
+          route.personId === personId &&
+          (route.originId === place.id || route.destinationId === place.id),
+      );
+      const person = claudeDemo.persons.find((candidate) => candidate.id === personId);
+      return {
+        personId,
+        roles: [],
+        eventTypes: [...new Set(routeContexts.flatMap((route) => route.eventTypes))],
+        dossierIds: person?.dossierId ? [person.dossierId] : [],
+      };
+    }),
     placeType: place.placeType as MapPlaceDatum["placeType"],
     layer: place.layer as MapPlaceDatum["layer"],
     confidence: place.confidence as MapPlaceDatum["confidence"],

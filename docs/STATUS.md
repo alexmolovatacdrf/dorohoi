@@ -291,6 +291,14 @@ Presentation Map and retained only as a disabled, explanatory Research Map
 placeholder. The local EHRI and historical layers are separate, valid local
 data paths.
 
+The latest presentation-map refinement keeps the people list focused on the
+documented head/declarant and moves mentioned people into collapsed dossier
+subsections. Both map panels have sticky headers, camera presets expose their
+active state, and zoom controls reserve space beside the people panel. Person
+selection uses a closer local fit, repeated/reverse route segments use separate
+visual lanes, and place details can show grouped, source-bound people and
+documented context without assigning a relative's route to another person.
+
 ## Final handoff verification
 
 On 14 July 2026 the full historical output was verified again: both regional
@@ -298,7 +306,7 @@ and full derivatives passed checksum validation for 88 monthly files and
 `Territorial_Changes`. `npm run normalize` completed without changing the
 normalized collections. The final checks passed:
 
-- `npm test`: 27 tests passed;
+- `npm test`: 29 tests passed;
 - `npm run typecheck`: passed;
 - `npm run lint`: passed;
 - `npm run build`: passed, including `/presentation/map` and `/map` routes;

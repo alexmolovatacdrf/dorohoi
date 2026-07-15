@@ -220,7 +220,15 @@ export interface MapPlaceDatum {
   dossierIds: string[];
   roles: string[];
   categories: Array<"origin" | "evacuation_deportation" | "forced_labour" | "death" | "return">;
+  personContexts: MapPlacePersonContext[];
   sourceLabel: string;
+}
+
+export interface MapPlacePersonContext {
+  personId: string;
+  roles: string[];
+  eventTypes: string[];
+  dossierIds: string[];
 }
 
 export interface MapRouteDatum {
@@ -291,6 +299,27 @@ export function getMapViewModel(data: NormalizedBundle = getResearchData()): Map
 
   const places: MapPlaceDatum[] = data.places.map((place) => {
     const mentions = mentionsByPlace.get(place.placeId) ?? [];
+    const contexts = new Map<string, MapPlacePersonContext>();
+    for (const mention of mentions) {
+      const event = mention.ownerType === "event" ? eventsById.get(mention.ownerId) : undefined;
+      const mentionedPersonIds = mention.personIds.length
+        ? mention.personIds
+        : mention.ownerType === "person"
+          ? [mention.ownerId]
+          : event?.participantIds ?? [];
+      for (const personId of mentionedPersonIds) {
+        const current = contexts.get(personId) ?? {
+          personId,
+          roles: [],
+          eventTypes: [],
+          dossierIds: [],
+        };
+        current.roles = [...new Set([...current.roles, mention.role])];
+        if (event) current.eventTypes = [...new Set([...current.eventTypes, event.eventType])];
+        current.dossierIds = [...new Set([...current.dossierIds, ...mention.documentIds])];
+        contexts.set(personId, current);
+      }
+    }
     const events = mentions.flatMap((mention) => {
       if (mention.ownerType !== "event") return [];
       const event = eventsById.get(mention.ownerId);
@@ -320,6 +349,7 @@ export function getMapViewModel(data: NormalizedBundle = getResearchData()): Map
       dossierIds: [...new Set(mentions.flatMap((mention) => mention.documentIds))],
       roles,
       categories: categoriesForPlace(roles, eventTypes),
+      personContexts: [...contexts.values()],
       sourceLabel: place.sourceRefs[0]?.sourceFile ?? "Source unavailable",
     };
   });
