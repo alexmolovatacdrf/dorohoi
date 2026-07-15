@@ -40,6 +40,12 @@ The black `N` button seen during local development is the Next.js development
 overlay (`Open Next.js Dev Tools`), not an application map control. It should
 not be treated as part of the public interface or production screenshots.
 
+The Presentation Map control layout now separates concerns: the left panel is
+reserved for camera, period, opacity and layer settings, while the right panel
+lists families, dossiers and individual people and shows the selected story
+details. Map pages hide the global footer so it cannot remain in or consume the
+map viewport; editorial pages retain it.
+
 The Presentation Map now exposes a clearly labelled test-data switcher. The
 Project data option uses the normalized collections. The Claude demo option
 uses the derived fixture at `data/demo/claude-map-demo.json`, containing 48

@@ -158,8 +158,99 @@ summary {
 
 .presentation-map__panel,
 .presentation-map__story,
+.presentation-map__people,
 .presentation-map__timeline {
   font-size: 0.9375rem;
+}
+
+.presentation-map__people {
+  max-height: calc(100% - 8rem);
+}
+
+.presentation-map__reopen--right {
+  right: 1.25rem;
+  left: auto;
+}
+
+.presentation-people-list {
+  margin-top: 1rem;
+  border-top: 1px solid #d6d0c4;
+  padding-top: 0.75rem;
+}
+
+.presentation-people-dossier {
+  margin-top: 0.4rem;
+  border: 1px solid #ded8cc;
+  background: rgb(248 243 232 / 64%);
+}
+
+.presentation-people-dossier summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.55rem 0.65rem;
+  color: #315c50;
+  font-weight: 800;
+}
+
+.presentation-people-dossier summary span:last-child {
+  color: #76536f;
+  font-size: 0.75rem !important;
+}
+
+.presentation-people-dossier__items {
+  display: grid;
+  gap: 0.25rem;
+  border-top: 1px solid #ded8cc;
+  padding: 0.35rem;
+}
+
+.presentation-person-option,
+.presentation-group-option {
+  display: flex;
+  min-width: 0;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 0.55rem 0.6rem;
+  color: #34473f;
+  text-align: left;
+}
+
+.presentation-person-option:hover,
+.presentation-group-option:hover,
+.presentation-person-option--selected,
+.presentation-group-option--selected {
+  border-color: #8ba399;
+  background: #e9f0eb;
+  color: #173f36;
+}
+
+.presentation-person-option--all {
+  margin-top: 0.9rem;
+  border-color: #c8c3b8;
+  background: #fffdf8;
+  font-weight: 800;
+}
+
+.presentation-person-option__role {
+  flex: 0 0 auto;
+  max-width: 10rem;
+  overflow: hidden;
+  color: #6d7972;
+  font-size: 0.75rem !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.presentation-people-detail {
+  margin-top: 1rem;
+  border-top: 2px solid #76536f;
+  padding-top: 0.9rem;
 }
 
 .presentation-card__eyebrow,
@@ -442,10 +533,28 @@ body.presentation-interface-hidden .presentation-map-workspace {
   border-top: 0;
 }
 
+/* Map pages are immersive workspaces; the site footer should remain on the
+   research and editorial pages, not consume map viewport height. */
+body:has(.map-workspace) .site-footer {
+  display: none;
+}
+
 @media (max-width: 720px) {
   .presentation-map-workspace {
     min-height: 760px;
     height: calc(100vh - 12rem);
+  }
+
+  .presentation-map__people {
+    top: 0.75rem;
+    right: 0.75rem;
+    left: 0.75rem;
+    width: auto;
+    max-height: calc(100% - 10rem);
+  }
+
+  .presentation-map__reopen--right {
+    right: 0.75rem;
   }
 
   .presentation-map__timeline {

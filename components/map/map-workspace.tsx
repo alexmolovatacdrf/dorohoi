@@ -500,6 +500,7 @@ export function MapWorkspace({
   const [historicalReloadToken, setHistoricalReloadToken] = useState(0);
   const [historicalSnapshotReloadToken, setHistoricalSnapshotReloadToken] = useState(0);
   const [presentationPanelOpen, setPresentationPanelOpen] = useState(true);
+  const [presentationPeoplePanelOpen, setPresentationPeoplePanelOpen] = useState(true);
   const [interfaceHidden, setInterfaceHidden] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selection, setSelection] = useState<Selection>(
@@ -545,6 +546,12 @@ export function MapWorkspace({
   }, [isPresentation]);
 
   useEffect(() => {
+    if (!isPresentation || typeof window === "undefined" || window.innerWidth >= 720) return;
+    const frame = window.requestAnimationFrame(() => setPresentationPeoplePanelOpen(false));
+    return () => window.cancelAnimationFrame(frame);
+  }, [isPresentation]);
+
+  useEffect(() => {
     if (!isPresentation) return;
     document.body.classList.toggle("presentation-interface-hidden", interfaceHidden);
     return () => document.body.classList.remove("presentation-interface-hidden");
@@ -561,6 +568,12 @@ export function MapWorkspace({
   const selectedPersonRoutes = useMemo(
     () => data.routes.filter((route) => route.personId === filters.person).sort((left, right) => left.sequence - right.sequence),
     [data.routes, filters.person],
+  );
+  const selectedGroupRoutes = useMemo(
+    () => selectedGroup
+      ? data.routes.filter((route) => selectedGroup.personIds.includes(route.personId))
+      : [],
+    [data.routes, selectedGroup],
   );
   const selectedHistoricalSnapshot = useMemo(
     () => historicalManifest
@@ -1186,8 +1199,8 @@ export function MapWorkspace({
     const narrowPresentation = isPresentation && typeof window !== "undefined" && window.innerWidth < 720;
     const padding = isPresentation
       ? narrowPresentation
-        ? { top: presentationPanelOpen ? 360 : 72, right: 28, bottom: 170, left: 28 }
-        : { top: 72, right: 72, bottom: 170, left: presentationPanelOpen ? 420 : 72 }
+        ? { top: presentationPanelOpen ? 360 : 72, right: presentationPeoplePanelOpen ? 360 : 28, bottom: 170, left: 28 }
+        : { top: 72, right: presentationPeoplePanelOpen ? 420 : 72, bottom: 170, left: presentationPanelOpen ? 420 : 72 }
       : 36;
     map.fitBounds(
       [
@@ -1200,7 +1213,7 @@ export function MapWorkspace({
         maxZoom: isPresentation ? 7 : 9,
       },
     );
-  }, [isPresentation, presentationPanelOpen]);
+  }, [isPresentation, presentationPanelOpen, presentationPeoplePanelOpen]);
 
   const fitPersonView = useCallback(() => {
     if (!filters.person) return;
@@ -1218,6 +1231,21 @@ export function MapWorkspace({
     fitMapToBbox(bbox);
   }, [data.places, data.routes, filters.person, fitMapToBbox]);
 
+  const fitGroupView = useCallback(() => {
+    if (!selectedGroup) return;
+    const coordinates: Array<[number, number]> = [];
+    for (const route of data.routes.filter((candidate) => selectedGroup.personIds.includes(candidate.personId))) {
+      coordinates.push(...route.coordinates);
+    }
+    for (const place of data.places) {
+      if (place.personIds.some((personId) => selectedGroup.personIds.includes(personId)) && place.coordinates) {
+        coordinates.push([place.coordinates.longitude, place.coordinates.latitude]);
+      }
+    }
+    const bbox = boundsFromCoordinates(coordinates);
+    if (bbox) fitMapToBbox(bbox);
+  }, [data.places, data.routes, fitMapToBbox, selectedGroup]);
+
   useEffect(() => {
     if (!isPresentation || !mapReady || !historicalManifest || filters.person) return;
     if (!layers.historicalAdministration) return;
@@ -1228,6 +1256,11 @@ export function MapWorkspace({
     if (!isPresentation || !mapReady || !filters.person) return;
     fitPersonView();
   }, [filters.person, isPresentation, mapReady, fitPersonView]);
+
+  useEffect(() => {
+    if (!isPresentation || !mapReady || filters.person || !filters.group) return;
+    fitGroupView();
+  }, [filters.group, filters.person, fitGroupView, isPresentation, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -1306,6 +1339,36 @@ export function MapWorkspace({
   const updateLayer = <K extends keyof Layers>(key: K, value: Layers[K]) =>
     setLayers((current) => ({ ...current, [key]: value }));
 
+  const selectPresentationPerson = (personId: string) => {
+    updateFilter("person", personId);
+    updateFilter("group", "");
+    setTimelineStep(null);
+    setTimelineProgress(0);
+    setIsPlaying(false);
+    setSelection(null);
+  };
+
+  const selectPresentationGroup = (groupId: string) => {
+    updateFilter("group", groupId);
+    updateFilter("person", "");
+    setTimelineStep(null);
+    setTimelineProgress(0);
+    setIsPlaying(false);
+    setSelection(null);
+  };
+
+  const clearPresentationSelection = () => {
+    updateFilter("person", "");
+    updateFilter("group", "");
+    setTimelineStep(null);
+    setTimelineProgress(0);
+    setIsPlaying(false);
+    setSelection(null);
+    if (isPresentation) {
+      fitMapToBbox(historicalManifest ? historicalManifestExtent(historicalManifest) : [-31.2656, 27.6381, 68.6969, 81.8599]);
+    }
+  };
+
   const toggleFullscreen = async () => {
     if (!workspaceRef.current) return;
     if (document.fullscreenElement) {
@@ -1322,6 +1385,10 @@ export function MapWorkspace({
     if (!isPresentation) return;
     if (filters.person) {
       fitPersonView();
+      return;
+    }
+    if (filters.group) {
+      fitGroupView();
       return;
     }
     if (historicalManifest) fitMapToBbox(historicalManifestExtent(historicalManifest));
@@ -1372,6 +1439,16 @@ export function MapWorkspace({
     </>
   ) : null;
 
+  const presentationGroupDetails = selectedGroup ? (
+    <>
+      <p className="presentation-card__eyebrow">Family / dossier</p>
+      <h2 className="presentation-card__title">{selectedGroup.label}</h2>
+      <p className="presentation-card__body">{selectedGroup.personIds.length} people · {selectedGroupRoutes.length} documented movement segments.</p>
+      <p className="presentation-card__body">Select an individual above to animate that person’s own documented route.</p>
+      <p className="presentation-card__meta">Family context does not assign one person’s route to another person.</p>
+    </>
+  ) : null;
+
   const presentationPanel = presentationPanelOpen ? (
     <aside className="presentation-map__panel absolute top-3 left-3 z-20 w-[min(23rem,calc(100%-1.5rem))] overflow-y-auto border border-[#bdb7aa] bg-[#fffdf8]/96 p-4 shadow-[0_18px_45px_rgba(22,42,35,0.2)] backdrop-blur-md sm:top-5 sm:left-5 sm:max-h-[calc(100%-8rem)]">
       <div className="flex items-start justify-between gap-3">
@@ -1382,54 +1459,8 @@ export function MapWorkspace({
         <button type="button" className="presentation-icon-button" onClick={() => setPresentationPanelOpen(false)} aria-label="Collapse presentation controls">−</button>
       </div>
 
-      {presentationMapConfig.personSelector ? (
-        <label className="mt-4 block">
-          <span className="presentation-label">Person / story</span>
-          <select
-            className={controlClass}
-            value={filters.person}
-            onChange={(event) => {
-              updateFilter("person", event.target.value);
-              setTimelineStep(null);
-              setTimelineProgress(0);
-              setIsPlaying(false);
-              setSelection(null);
-            }}
-            aria-label="Person or story"
-          >
-            <option value="">All project stories</option>
-            {data.dossiers.map((dossier) => {
-              const dossierPeople = data.persons.filter((person) => person.dossierId === dossier.id);
-              if (!dossierPeople.length) return null;
-              return (
-                <optgroup key={dossier.id} label={`${dossier.label} · ${dossierPeople.length} people`}>
-                  {dossierPeople.map((person) => {
-                    const isHeadOrDeclarant = person.roles.some((role) => /^declarant$|cap de familie|head/i.test(role));
-                    return <option key={person.id} value={person.id}>{person.label}{isHeadOrDeclarant ? " · head / declarant" : " · family member"}</option>;
-                  })}
-                </optgroup>
-              );
-            })}
-            {data.persons.some((person) => !person.dossierId) ? (
-              <optgroup label="Unlinked project stories">
-                {data.persons.filter((person) => !person.dossierId).map((person) => <option key={person.id} value={person.id}>{person.label}</option>)}
-              </optgroup>
-            ) : null}
-          </select>
-        </label>
-      ) : null}
-
-      {isPresentation && dataSource ? (
-        <div className="presentation-dataset-card" data-testid="presentation-data-source">
-          <p className="presentation-label">Test dataset</p>
-          <p className="presentation-dataset-card__title">{dataSource.label}</p>
-          <p className="presentation-card__meta">{dataSource.description}</p>
-          {dataSource.sourceFile ? <p className="presentation-card__meta">Source: {dataSource.sourceFile}</p> : null}
-        </div>
-      ) : null}
-
       <div className="mt-3 grid grid-cols-2 gap-2">
-        {presentationMapConfig.europeView ? <button type="button" className="presentation-secondary-button" onClick={() => { updateFilter("person", ""); setTimelineStep(null); fitMapToBbox(historicalManifest ? historicalManifestExtent(historicalManifest) : [-31.2656, 27.6381, 68.6969, 81.8599]); }}>Europe view</button> : null}
+        {presentationMapConfig.europeView ? <button type="button" className="presentation-secondary-button" onClick={clearPresentationSelection}>Europe view</button> : null}
         {presentationMapConfig.projectRegionView ? <button type="button" className="presentation-secondary-button" onClick={() => fitMapToBbox(PROJECT_REGION_BBOX)}>Project region</button> : null}
       </div>
 
@@ -1484,13 +1515,57 @@ export function MapWorkspace({
     </aside>
   ) : null;
 
-  const presentationStoryCard = !interfaceHidden && presentationMapConfig.detailsPanel && (selection || filters.person) && presentationDetails ? (
-    <aside className="presentation-map__story absolute top-3 right-3 z-20 w-[min(23rem,calc(100%-1.5rem))] overflow-y-auto border border-[#bdb7aa] bg-[#fffdf8]/96 p-4 shadow-[0_18px_45px_rgba(22,42,35,0.2)] backdrop-blur-md sm:top-5 sm:right-5 sm:max-h-[calc(100%-8rem)]" data-testid="presentation-story-card">
-      <div className="mb-3 flex justify-end"><button type="button" className="presentation-icon-button" onClick={() => setSelection(null)} aria-label="Close story card">×</button></div>
-      {presentationDetails}
-      {selectedPlace ? <Link className="presentation-link-button" href={`/places/${selectedPlace.id}`}>Open place record</Link> : null}
-      {selectedRoute ? <Link className="presentation-link-button" href={`/persons/${selectedRoute.personId}`}>Open person dossier</Link> : null}
-      {selectedPerson && !selection ? <Link className="presentation-link-button" href={`/persons/${selectedPerson.id}`}>Open person dossier</Link> : null}
+  const presentationPeoplePanel = !interfaceHidden && presentationPeoplePanelOpen && presentationMapConfig.personSelector ? (
+    <aside className="presentation-map__people absolute top-3 right-3 z-20 w-[min(26rem,calc(100%-1.5rem))] overflow-y-auto border border-[#bdb7aa] bg-[#fffdf8]/96 p-4 shadow-[0_18px_45px_rgba(22,42,35,0.2)] backdrop-blur-md sm:top-5 sm:right-5 sm:max-h-[calc(100%-8rem)]" data-testid="presentation-people-panel">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="presentation-card__eyebrow">People and families</p>
+          <h2 className="font-editorial mt-1 text-2xl font-bold text-[#173f36]">Select a story</h2>
+        </div>
+        <button type="button" className="presentation-icon-button" onClick={() => setPresentationPeoplePanelOpen(false)} aria-label="Collapse people and families">−</button>
+      </div>
+      {dataSource ? <p className="presentation-dataset-card mt-3" data-testid="presentation-data-source"><strong>{dataSource.label}</strong><br />{dataSource.description}{dataSource.sourceFile ? <><br />Source: {dataSource.sourceFile}</> : null}</p> : null}
+      <button type="button" className={`presentation-person-option presentation-person-option--all${!filters.person && !filters.group ? " presentation-person-option--selected" : ""}`} onClick={clearPresentationSelection} aria-pressed={!filters.person && !filters.group}>
+        <span>All stories</span><span className="presentation-person-option__role">Europe view</span>
+      </button>
+
+      <div className="presentation-people-list">
+        <p className="presentation-label">Families</p>
+        {data.groups.map((group) => (
+          <button key={group.id} type="button" className={`presentation-group-option${filters.group === group.id ? " presentation-group-option--selected" : ""}`} onClick={() => selectPresentationGroup(group.id)} aria-pressed={filters.group === group.id}>
+            <span>{group.label}</span><span className="presentation-person-option__role">{group.personIds.length} people</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="presentation-people-list">
+        <p className="presentation-label">People</p>
+        {data.dossiers.map((dossier, dossierIndex) => {
+          const dossierPeople = data.persons.filter((person) => person.dossierId === dossier.id);
+          if (!dossierPeople.length) return null;
+          return (
+            <details key={dossier.id} className="presentation-people-dossier" open={dossierIndex === 0 || dossierPeople.some((person) => person.id === filters.person)}>
+              <summary><span>{dossier.label}</span><span>{dossierPeople.length}</span></summary>
+              <div className="presentation-people-dossier__items">
+                {dossierPeople.map((person) => {
+                  const isHeadOrDeclarant = person.roles.some((role) => /^declarant$|cap de familie|head/i.test(role));
+                  return <button key={person.id} type="button" className={`presentation-person-option${filters.person === person.id ? " presentation-person-option--selected" : ""}`} onClick={() => selectPresentationPerson(person.id)} aria-pressed={filters.person === person.id}><span>{person.label}</span><span className="presentation-person-option__role">{isHeadOrDeclarant ? "head / declarant" : person.roles[0] ?? "family member"}</span></button>;
+                })}
+              </div>
+            </details>
+          );
+        })}
+      </div>
+
+      {(presentationDetails || presentationGroupDetails) ? (
+        <div className="presentation-people-detail" data-testid="presentation-story-card">
+          <div className="mb-3 flex items-center justify-between gap-2"><p className="presentation-label">Selected detail</p><button type="button" className="presentation-icon-button" onClick={clearPresentationSelection} aria-label="Clear selected person or family">×</button></div>
+          {presentationDetails ?? presentationGroupDetails}
+          {selectedPlace ? <Link className="presentation-link-button" href={`/places/${selectedPlace.id}`}>Open place record</Link> : null}
+          {selectedRoute ? <Link className="presentation-link-button" href={`/persons/${selectedRoute.personId}`}>Open person dossier</Link> : null}
+          {selectedPerson && !selection ? <Link className="presentation-link-button" href={`/persons/${selectedPerson.id}`}>Open person dossier</Link> : null}
+        </div>
+      ) : null}
     </aside>
   ) : null;
 
@@ -1511,7 +1586,8 @@ export function MapWorkspace({
         {renderMapCanvas()}
         {!interfaceHidden ? presentationPanel : null}
         {!interfaceHidden && !presentationPanelOpen ? <button type="button" className="presentation-map__reopen absolute top-3 left-3 z-30" onClick={() => setPresentationPanelOpen(true)}>Show controls</button> : null}
-        {presentationStoryCard}
+        {presentationPeoplePanel}
+        {!interfaceHidden && !presentationPeoplePanelOpen && presentationMapConfig.personSelector ? <button type="button" className="presentation-map__reopen presentation-map__reopen--right absolute top-3 right-3 z-30" onClick={() => setPresentationPeoplePanelOpen(true)}>Show people</button> : null}
         {presentationTimeline}
         {interfaceHidden ? <div className="presentation-map__hidden-tools absolute top-3 left-3 z-30 flex items-center gap-2"><button type="button" className="presentation-secondary-button shadow-lg" onClick={() => setInterfaceHidden(false)}>Show interface</button>{presentationMapConfig.legend && presentationLegend.length ? <div className="presentation-compact-legend">{presentationLegend.map((entry) => <span key={entry.value} title={entry.label} style={{ backgroundColor: entry.color }} />)}</div> : null}</div> : null}
       </div>

@@ -75,11 +75,20 @@ progress marker; the curve is explicitly a presentation aid, not a claim about
 the exact historical road. Playback never starts automatically and never
 loops.
 
-The left panel collapses, the story card appears only after a selection, and
-the timeline stays along the bottom. Hide interface leaves the map, timeline
+The left panel collapses, the right people panel can also collapse, and the
+timeline stays along the bottom. Selected story details appear in the people
+panel after a selection. Hide interface leaves the map, timeline
 and compact legend visible; Show interface restores the controls. Full screen
 uses the browser Fullscreen API and reports the current state to assistive
 technology.
+
+The left presentation panel contains only map-view controls: camera presets,
+historical month, opacity and layers. People, families and dossier members are
+selected in the separate right-side People and families panel. Selecting a
+family fits all of its documented endpoints; selecting an individual retains
+individual route ownership and enables that person's timeline. The global
+site footer is hidden on map workspaces so it cannot reduce the map viewport;
+it remains available on the editorial and research pages.
 
 ## Typed module configuration
 
