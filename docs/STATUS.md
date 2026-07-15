@@ -77,6 +77,22 @@ embedded `Platforma_WJC (10).html` sample. Its map adapter adds the separate
 The fixture remains isolated from normalized person research data and retains
 the source filename and SHA-256 for traceability.
 
+The Presentation Map now has a third test-data tab, `Eugenia data`, at
+`/presentation/map?dataset=eugenia`. Its fixture is generated from the supplied
+`Export_Dosare_Eugenia.xlsx` and `Export_Dosare_Eugenia.json` files. The complete
+Excel `Eugenia_brut` sheet (52 rows) and the JSON's 16 verified dossier bundles
+(65 structured people, 27 victims and scan-checked corrections) remain separate
+inside `data/demo/eugenia-map-demo.json`. The adapter exposes all 52 table rows
+and the verified dossier families in the right-side directory.
+
+This demo source does not write to `data/source/` or `data/normalized/`. It
+resolves only unambiguous Dorohoi and Mohyliv-Podilskyi mentions against the
+existing gazetteer, keeps compound/uncertain names as unresolved raw mentions,
+and creates routes only when both endpoints and person ownership are explicit.
+The EHRI overlay remains an independent 385-place layer. Imported demo IDs do
+not link to `/persons/:id` until the records are deliberately normalized and
+identity-linked.
+
 The Research Map now exposes the same Project data / Claude demo switcher. Its
 default remains the normalized regional project data; `/map?dataset=claude-demo`
 loads the isolated Claude fixture into the advanced research interface for

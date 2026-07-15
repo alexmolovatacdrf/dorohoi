@@ -678,6 +678,7 @@ export function MapWorkspace({
     label: string;
     description: string;
     sourceFile: string | null;
+    supportsResearchRecords?: boolean;
   };
   initialPerson?: string;
   initialPlace?: string;
@@ -2010,7 +2011,7 @@ export function MapWorkspace({
           ) : null}
           {story?.sourceLabel ? <p className="person-story-modal__source">Source: {story.sourceLabel}</p> : null}
           <div className="person-story-modal__actions">
-            <Link href={`/persons/${storyPerson.id}`} className="presentation-link-button">Open full research record</Link>
+            {dataSource?.supportsResearchRecords !== false ? <Link href={`/persons/${storyPerson.id}`} className="presentation-link-button">Open full research record</Link> : null}
             <button type="button" className="presentation-secondary-button" onClick={closePersonStory}>Close</button>
           </div>
         </div>
@@ -2230,8 +2231,8 @@ export function MapWorkspace({
           {presentationDetails ?? presentationGroupDetails}
           {selectedPerson ? <button type="button" disabled={!selectedPersonRoutes.length || isPlaying} className="presentation-primary-button mt-3" onClick={startRoutePlayback}>{isPlaying ? "Playing route…" : selectedPersonRoutes.length ? "Play route" : "No documented route"}</button> : null}
           {selectedPlace ? <Link className="presentation-link-button" href={`/places/${selectedPlace.id}`}>Open place record</Link> : null}
-          {selectedRoute ? <Link className="presentation-link-button" href={`/persons/${selectedRoute.personId}`}>Open person dossier</Link> : null}
-          {selectedPerson && !selection ? <Link className="presentation-link-button" href={`/persons/${selectedPerson.id}`}>Open person dossier</Link> : null}
+          {selectedRoute && dataSource?.supportsResearchRecords !== false ? <Link className="presentation-link-button" href={`/persons/${selectedRoute.personId}`}>Open person dossier</Link> : null}
+          {selectedPerson && !selection && dataSource?.supportsResearchRecords !== false ? <Link className="presentation-link-button" href={`/persons/${selectedPerson.id}`}>Open person dossier</Link> : null}
         </div>
       ) : null}
     </aside>
@@ -2678,7 +2679,7 @@ export function MapWorkspace({
             </dl>
             {selectedRoute.notes ? <p className="mt-3 text-xs leading-5 text-[#61706a]">{selectedRoute.notes}</p> : null}
             <p className="mt-3 break-all text-[9px] leading-4 text-[#838b87]">{selectedRoute.sourceLabel}</p>
-            <Link href={`/persons/${selectedRoute.personId}`} className="mt-4 flex justify-center bg-[#173f36] px-4 py-2.5 text-[9px] font-black tracking-[0.11em] text-white uppercase">Open person dossier</Link>
+            {dataSource?.supportsResearchRecords !== false ? <Link href={`/persons/${selectedRoute.personId}`} className="mt-4 flex justify-center bg-[#173f36] px-4 py-2.5 text-[9px] font-black tracking-[0.11em] text-white uppercase">Open person dossier</Link> : null}
           </div>
         ) : selectedHistorical ? (
           <div data-testid="historical-feature-details">
@@ -2736,7 +2737,7 @@ export function MapWorkspace({
               )) : <p className="mt-2 text-xs text-[#68766e]">The person record remains available for provenance in the dossier.</p>}
             </div>
             <button type="button" className="presentation-secondary-button mt-3 w-full" onClick={() => openPersonStory(selectedPerson.id)}>Open person story</button>
-            <Link href={`/persons/${selectedPerson.id}`} className="mt-4 flex justify-center bg-[#173f36] px-4 py-2.5 text-[9px] font-black tracking-[0.11em] text-white uppercase">Open person dossier</Link>
+            {dataSource?.supportsResearchRecords !== false ? <Link href={`/persons/${selectedPerson.id}`} className="mt-4 flex justify-center bg-[#173f36] px-4 py-2.5 text-[9px] font-black tracking-[0.11em] text-white uppercase">Open person dossier</Link> : null}
           </div>
         ) : (
           <div>

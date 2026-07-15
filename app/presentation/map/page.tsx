@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { MapWorkspace } from "@/components/map/map-workspace";
 import { CLAUDE_DEMO_SOURCE, getClaudeDemoMapViewModel } from "@/lib/data/claude-demo";
+import { EUGENIA_DEMO_SOURCE, getEugeniaDemoMapViewModel } from "@/lib/data/eugenia-demo";
 import { getMapViewModel } from "@/lib/data/selectors";
 
 export const metadata: Metadata = { title: "Presentation Map" };
@@ -12,15 +13,22 @@ export default async function PresentationMapPage({
 }) {
   const params = await searchParams;
   const isClaudeDemo = params.dataset === "claude-demo";
-  const mapData = isClaudeDemo ? getClaudeDemoMapViewModel() : getMapViewModel();
+  const isEugenia = params.dataset === "eugenia";
+  const mapData = isClaudeDemo
+    ? getClaudeDemoMapViewModel()
+    : isEugenia
+      ? getEugeniaDemoMapViewModel()
+      : getMapViewModel();
   const dataSource = isClaudeDemo
     ? CLAUDE_DEMO_SOURCE
-    : {
-        key: "project",
-        label: "Project normalized data",
-        description: "Current evidence-bound project collections",
-        sourceFile: null,
-      };
+    : isEugenia
+      ? { ...EUGENIA_DEMO_SOURCE, supportsResearchRecords: false }
+      : {
+          key: "project",
+          label: "Project normalized data",
+          description: "Current evidence-bound project collections",
+          sourceFile: null,
+        };
 
   return (
     <div className="presentation-page">
@@ -40,8 +48,9 @@ export default async function PresentationMapPage({
       </div>
       <div className="presentation-dataset-switcher mx-auto flex max-w-[1600px] flex-wrap items-center gap-2 px-4 pb-3 sm:px-7 lg:px-10" aria-label="Map test data">
         <span className="presentation-dataset-switcher__label">Test data</span>
-        <a aria-current={!isClaudeDemo ? "page" : undefined} className={!isClaudeDemo ? "presentation-dataset-switcher__link presentation-dataset-switcher__link--active" : "presentation-dataset-switcher__link"} href="/presentation/map?dataset=project">Project data</a>
+        <a aria-current={!isClaudeDemo && !isEugenia ? "page" : undefined} className={!isClaudeDemo && !isEugenia ? "presentation-dataset-switcher__link presentation-dataset-switcher__link--active" : "presentation-dataset-switcher__link"} href="/presentation/map?dataset=project">Project data</a>
         <a aria-current={isClaudeDemo ? "page" : undefined} className={isClaudeDemo ? "presentation-dataset-switcher__link presentation-dataset-switcher__link--active" : "presentation-dataset-switcher__link"} href="/presentation/map?dataset=claude-demo">Claude demo</a>
+        <a aria-current={isEugenia ? "page" : undefined} className={isEugenia ? "presentation-dataset-switcher__link presentation-dataset-switcher__link--active" : "presentation-dataset-switcher__link"} href="/presentation/map?dataset=eugenia">Eugenia data</a>
       </div>
       <MapWorkspace
         data={mapData}

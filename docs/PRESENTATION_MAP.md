@@ -14,6 +14,8 @@ The presentation page has a visible test-data switcher:
   project collections;
 - `/presentation/map?dataset=claude-demo` uses the separate map fixture derived
   from the embedded data in `Platforma_WJC (10).html`.
+- `/presentation/map?dataset=eugenia` uses the supplied Eugenia export as a
+  third, separately labelled dataset tab next to Project data and Claude demo.
 
 The Claude fixture contains 48 persons, 11 dossiers, 15 prototype places and
 26 route segments. The map adapter adds the separate 385-record local EHRI
@@ -39,6 +41,49 @@ The Research Map also exposes the same switcher at `/map`. Its default remains
 the normalized project collection; `/map?dataset=claude-demo` loads the isolated
 Claude fixture into the advanced research interface without mixing it into
 `data/normalized/`.
+
+### Eugenia export
+
+The Eugenia tab is backed by `data/demo/eugenia-map-demo.json`, generated from
+the two supplied Downloads files. It retains both layers of the export instead
+of treating them as interchangeable:
+
+- `Export_Dosare_Eugenia.xlsx` contributes all 52 rows from `Eugenia_brut`;
+- `Export_Dosare_Eugenia.json` contributes 16 dossier records, 65 structured
+  people, 27 victims and the scan-checked correction notes;
+- all 52 Eugenia table rows remain selectable in the right-hand family/person
+  directory, while the 16 verified dossiers expose their structured family
+  members and victims separately;
+- the fixture stores the original source filenames and SHA-256 values in its
+  metadata. The Excel source hash is
+  `537699f5f4a007fbbb69736feb6ab5bea060c96aea1816de766cf2e97ad01c74`; the
+  JSON source hash is
+  `c8c804b118e980921b3a5c228ddce4daa3d7533c195a7d05393da7240a943bab`.
+
+The deployable fixture can be rebuilt, without touching `data/source/`, with:
+
+```bash
+python3 scripts/presentation/prepare-eugenia-demo.py \
+  --xlsx /mnt/c/Users/Alex\ Molovata/Downloads/Export_Dosare_Eugenia.xlsx \
+  --json /mnt/c/Users/Alex\ Molovata/Downloads/Export_Dosare_Eugenia.json \
+  --output data/demo/eugenia-map-demo.json
+```
+
+The map adapter resolves only unambiguous Dorohoi and Mohyliv-Podilskyi
+mentions against the existing curated gazetteer. Compound names such as
+`Sargorod Jud. Moghilău` and `Zvorastea, Dorohoi` remain raw/unresolved rather
+than being silently collapsed into another place. The 385-place EHRI layer is
+available independently under More layers. Routes are created only when the
+source gives both endpoints and the movement belongs to the selected person;
+the statement in dossier 2526 about the wife and children is therefore not
+drawn as Isidor's route. Unresolved labour locations and uncertain place
+readings remain available through the unresolved layer.
+
+The imported Eugenia records are a presentation/demo source, not yet part of
+`data/normalized/`. The verified JSON and Excel rows remain visibly distinct so
+future identity linking across dossiers can be reviewed rather than inferred
+from a name alone. The demo source does not link to `/persons/:id` research
+records because those imported IDs are not yet in the normalized bundle.
 
 ## Presentation-only review deployment
 

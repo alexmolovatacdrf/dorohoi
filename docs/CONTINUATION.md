@@ -46,6 +46,7 @@ URL-uri:
 
 - Presentation Map cu datele proiectului: `http://127.0.0.1:3000/presentation/map?dataset=project`
 - Presentation Map cu fixture-ul derivat din Claude: `http://127.0.0.1:3000/presentation/map?dataset=claude-demo`
+- Presentation Map cu exportul Eugenia: `http://127.0.0.1:3000/presentation/map?dataset=eugenia`
 - Research Map: `http://127.0.0.1:3000/map`
 
 Vercel Production după ultimul deploy:
@@ -53,6 +54,7 @@ Vercel Production după ultimul deploy:
 - protected unique deployment: `https://dosare-dorohoi-platform-chatgpt-pslixdzkj.vercel.app`
 - Presentation Map project: `https://dosare-dorohoi-platform-chatgpt-pslixdzkj.vercel.app/presentation/map?dataset=project`
 - Presentation Map Claude: `https://dosare-dorohoi-platform-chatgpt-pslixdzkj.vercel.app/presentation/map?dataset=claude-demo`
+- Presentation Map Eugenia: `https://dosare-dorohoi-platform-chatgpt-pslixdzkj.vercel.app/presentation/map?dataset=eugenia`
 - Research Map Claude: `https://dosare-dorohoi-platform-chatgpt-pslixdzkj.vercel.app/map?dataset=claude-demo`
 
 Separate gradual-review deployment for Eugenia:
@@ -60,6 +62,7 @@ Separate gradual-review deployment for Eugenia:
 - Vercel project: `dosare-dorohoi-presentation`
 - protected unique URL: `https://dosare-dorohoi-presentation-o20jihmr1.vercel.app/presentation/map?dataset=project`
 - Claude demo variant on the same protected deployment: `https://dosare-dorohoi-presentation-o20jihmr1.vercel.app/presentation/map?dataset=claude-demo`
+- Eugenia data variant on the same protected deployment: `https://dosare-dorohoi-presentation-o20jihmr1.vercel.app/presentation/map?dataset=eugenia`
 - stable alias (do not share as the private link on Hobby): `https://dosare-dorohoi-presentation.vercel.app`
 
 The separate project has `PRESENTATION_ONLY=true` and Vercel Authentication
