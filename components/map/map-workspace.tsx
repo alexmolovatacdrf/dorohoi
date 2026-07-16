@@ -325,6 +325,12 @@ function historicalPropertiesFromRenderedFeature(
   return parsed.success ? parsed.data : null;
 }
 
+function historicalMapLabel(properties: HistoricalFeatureProperties): string {
+  return displayRawHistoricalValue(properties.Name) === "Transnistria"
+    ? "Government of Transnistria"
+    : displayRawHistoricalValue(properties.Name);
+}
+
 function historicalFeatureLabelCoordinate(
   feature: HistoricalFeatureCollection["features"][number],
 ): [number, number] | null {
@@ -1243,53 +1249,10 @@ export function MapWorkspace({
               "circle-stroke-opacity": 0.8,
             },
           });
-          // Project places use the labeled DOM marker system below. EHRI keeps
-          // a vector symbol/label layer so the larger external overlay remains
-          // performant while route endpoints stay named and clickable.
-          map.addLayer({
-            id: "ehri-place-symbols",
-            type: "circle",
-            source: "ehri-places",
-            paint: {
-              "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 3.5, 8, 5.5],
-              "circle-color": ["get", "color"],
-              "circle-stroke-width": 1.5,
-              "circle-stroke-color": "#fffdf8",
-            },
-          });
-          map.addLayer({
-            id: "ehri-place-labels",
-            type: "symbol",
-            source: "ehri-places",
-            layout: {
-              "text-field": ["get", "label"],
-              "text-size": ["interpolate", ["linear"], ["zoom"], 4, 8, 8, 11],
-              "text-offset": [0, 1.15],
-              "text-anchor": "top",
-              "text-optional": false,
-              "text-allow-overlap": true,
-            },
-            paint: {
-              "text-color": "#244e59",
-              "text-halo-color": "#fffdf8",
-              "text-halo-width": 1.2,
-            },
-          });
-
-          const placeLayers = ["ehri-place-symbols", "ehri-place-labels"];
-          for (const layerId of placeLayers) {
-            map.on("mouseenter", layerId, () => { map.getCanvas().style.cursor = "pointer"; });
-            map.on("mouseleave", layerId, () => { map.getCanvas().style.cursor = ""; });
-            map.on("click", layerId, (event) => {
-              const id = event.features?.[0]?.properties?.id;
-              if (typeof id !== "string") return;
-              if (selectionRef.current?.kind === "place" && selectionRef.current.id === id) {
-                setSelection(null);
-              } else {
-                setSelection({ kind: "place", id });
-              }
-            });
-          }
+          // All project and EHRI places use the same DOM marker system below.
+          // This keeps every route endpoint readable and avoids two competing
+          // label designs for the same journey.
+          const placeLayers: string[] = [];
           const routeLayers = ["routes-explicit", "routes-partial", "routes-inferred", "route-direction"];
           for (const layerId of routeLayers) {
             map.on("mouseenter", layerId, () => { map.getCanvas().style.cursor = "pointer"; });
@@ -1543,8 +1506,8 @@ export function MapWorkspace({
           if (!coordinates) return [];
           const element = document.createElement("span");
           element.className = "historical-map-label";
-          element.textContent = displayRawHistoricalValue(feature.properties.Name);
-          element.setAttribute("aria-label", displayRawHistoricalValue(feature.properties.Name));
+          element.textContent = historicalMapLabel(feature.properties);
+          element.setAttribute("aria-label", historicalMapLabel(feature.properties));
           return [new maplibregl.Marker({ element, anchor: "center" }).setLngLat(coordinates).addTo(map)];
         });
         setHistoricalFeatureCount(parsed.features.length);
@@ -1668,7 +1631,10 @@ export function MapWorkspace({
     if (!mapReady || !map) return;
 
     coreMarkersRef.current.forEach((marker) => marker.remove());
-    coreMarkersRef.current = visibleCorePlaces.flatMap((place) => {
+    const markerPlaces = [...visibleCorePlaces, ...visibleEhriPlaces].filter(
+      (place, index, places) => places.findIndex((candidate) => candidate.id === place.id) === index,
+    );
+    coreMarkersRef.current = markerPlaces.flatMap((place) => {
       if (!place.coordinates) return [];
       const element = document.createElement("button");
       element.type = "button";
@@ -1719,7 +1685,7 @@ export function MapWorkspace({
       coreMarkersRef.current.forEach((marker) => marker.remove());
       coreMarkersRef.current = [];
     };
-  }, [filters.person, language, mapReady, visibleCorePlaces]);
+  }, [filters.person, language, mapReady, visibleCorePlaces, visibleEhriPlaces]);
 
   useEffect(() => {
     if (!isPlaying || !filters.person) return;
@@ -1959,7 +1925,20 @@ export function MapWorkspace({
     fitMapToBbox(PRESENTATION_DEFAULT_BBOX, 8);
   };
 
-  const presentationLegend = historicalManifest?.presentationVocabulary?.legend ?? [];
+  const presentationLegend = (historicalManifest?.presentationVocabulary?.legend ?? []).map((entry) => ({
+    ...entry,
+    // These representative shades match the named territories on the map.
+    // Raw Foreign_Po and Name values remain unchanged in the details panel.
+    color: entry.value === "soviet_controlled"
+      ? HISTORICAL_PRESENTATION_NAME_COLORS["Soviet Union"]
+      : entry.value === "romanian_occupied"
+        ? HISTORICAL_PRESENTATION_NAME_COLORS.Transnistria
+        : entry.value === "german_allied_state"
+          ? HISTORICAL_PRESENTATION_NAME_COLORS.Germany
+          : entry.value === "german_occupied"
+            ? HISTORICAL_PRESENTATION_NAME_COLORS["Reichskommissariat Ukraine"]
+            : entry.color,
+  }));
   const publicMapLegend = [
     ...presentationLegend,
     { value: "origin", label: "Birth, origin or residence", color: "#b9883b" },

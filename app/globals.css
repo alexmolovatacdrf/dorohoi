@@ -1505,17 +1505,17 @@ body:has(.map-workspace) .site-footer {
 .historical-map-label {
   max-width: 10rem;
   pointer-events: none;
-  border: 1px solid rgb(38 59 54 / 28%);
-  border-radius: 0.2rem;
-  background: rgb(255 253 248 / 76%);
+  border: 0;
+  background: transparent;
   padding: 0.12rem 0.25rem;
   color: #263b36;
   font-family: var(--font-ui);
-  font-size: 0.58rem;
+  font-size: 0.68rem;
   font-weight: 800;
+  letter-spacing: 0.025em;
   line-height: 1.1;
   text-align: center;
-  text-shadow: 0 1px 0 rgb(255 253 248 / 80%);
+  text-shadow: 0 1px 0 #fffdf8, 0 0 0.2rem rgb(255 253 248 / 85%);
 }
 
 .maplibregl-popup-close-button {

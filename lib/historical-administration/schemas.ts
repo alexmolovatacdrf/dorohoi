@@ -38,17 +38,17 @@ export const HISTORICAL_PRESENTATION_CATEGORY_COLORS = {
 // the broader presentationCategory colours continue to explain the public
 // political grouping in the legend.
 export const HISTORICAL_PRESENTATION_NAME_COLORS = {
-  Romania: "#a86639",
-  Hungary: "#9a7441",
-  Germany: "#70475e",
-  Bulgaria: "#ab8350",
-  Finland: "#8d704c",
-  Italy: "#85564f",
-  Slovakia: "#b1845e",
-  "Vichy France": "#986955",
-  Transnistria: "#c6533d",
-  "Reichskommissariat Ukraine": "#5b4a78",
-  "Soviet Union": "#3c7098",
+  Romania: "#a87345",
+  Hungary: "#b38a45",
+  Germany: "#6f5369",
+  Bulgaria: "#a37843",
+  Finland: "#8b754c",
+  Italy: "#86605a",
+  Slovakia: "#b18d68",
+  "Vichy France": "#987466",
+  Transnistria: "#dc4d2f",
+  "Reichskommissariat Ukraine": "#6b4c75",
+  "Soviet Union": "#b33342",
 } as const;
 
 export const historicalScopeSchema = z.enum(["regional", "full"]);
