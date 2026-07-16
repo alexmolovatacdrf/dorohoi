@@ -34,6 +34,23 @@ export const HISTORICAL_PRESENTATION_CATEGORY_COLORS = {
   unresolved_other: "#8d8b84",
 } as const;
 
+// State-specific shades keep neighbouring territories distinguishable while
+// the broader presentationCategory colours continue to explain the public
+// political grouping in the legend.
+export const HISTORICAL_PRESENTATION_NAME_COLORS = {
+  Romania: "#a86639",
+  Hungary: "#9a7441",
+  Germany: "#70475e",
+  Bulgaria: "#ab8350",
+  Finland: "#8d704c",
+  Italy: "#85564f",
+  Slovakia: "#b1845e",
+  "Vichy France": "#986955",
+  Transnistria: "#c6533d",
+  "Reichskommissariat Ukraine": "#5b4a78",
+  "Soviet Union": "#3c7098",
+} as const;
+
 export const historicalScopeSchema = z.enum(["regional", "full"]);
 export const historicalExtentModeSchema = z.enum([
   "regional_crop",

@@ -36,6 +36,7 @@ import {
   HISTORICAL_LINE_LAYER_ID,
   FULL_HISTORICAL_MANIFEST_URL,
   HISTORICAL_MANIFEST_URL,
+  HISTORICAL_PRESENTATION_NAME_COLORS,
   HISTORICAL_SOURCE_ID,
   defaultHistoricalSnapshot,
   displayRawHistoricalValue,
@@ -115,7 +116,7 @@ function historicalFillColorExpression(
   mode: MapWorkspaceMode,
 ): ExpressionSpecification {
   if (mode === "presentation") {
-    return [
+    const categoryExpression: ExpressionSpecification = [
       "match",
       ["get", "presentationCategory"],
       "sovereign_state",
@@ -134,6 +135,33 @@ function historicalFillColorExpression(
       HISTORICAL_PRESENTATION_CATEGORY_COLORS.unresolved_other,
       HISTORICAL_PRESENTATION_CATEGORY_COLORS.unresolved_other,
     ];
+    return [
+      "match",
+      ["get", "Name"],
+      "Romania",
+      HISTORICAL_PRESENTATION_NAME_COLORS.Romania,
+      "Hungary",
+      HISTORICAL_PRESENTATION_NAME_COLORS.Hungary,
+      "Germany",
+      HISTORICAL_PRESENTATION_NAME_COLORS.Germany,
+      "Bulgaria",
+      HISTORICAL_PRESENTATION_NAME_COLORS.Bulgaria,
+      "Finland",
+      HISTORICAL_PRESENTATION_NAME_COLORS.Finland,
+      "Italy",
+      HISTORICAL_PRESENTATION_NAME_COLORS.Italy,
+      "Slovakia",
+      HISTORICAL_PRESENTATION_NAME_COLORS.Slovakia,
+      "Vichy France",
+      HISTORICAL_PRESENTATION_NAME_COLORS["Vichy France"],
+      "Transnistria",
+      HISTORICAL_PRESENTATION_NAME_COLORS.Transnistria,
+      "Reichskommissariat Ukraine",
+      HISTORICAL_PRESENTATION_NAME_COLORS["Reichskommissariat Ukraine"],
+      "Soviet Union",
+      HISTORICAL_PRESENTATION_NAME_COLORS["Soviet Union"],
+      categoryExpression,
+    ] as ExpressionSpecification;
   }
   return [
     "match",
@@ -200,11 +228,11 @@ const basemapVariantLabels: Record<BasemapVariant, string> = {
 function historicalDetailLabel(field: "Foreign_Po" | "Head_of_St" | "Govt_in_Ex"): string {
   switch (field) {
     case "Foreign_Po":
-      return "Foreign power / authority (Foreign_Po)";
+      return "Foreign power / authority";
     case "Head_of_St":
-      return "Head of state / authority (Head_of_St)";
+      return "Head of state / authority";
     case "Govt_in_Ex":
-      return "Government in exile (Govt_in_Ex)";
+      return "Government in exile";
   }
 }
 
@@ -295,6 +323,22 @@ function historicalPropertiesFromRenderedFeature(
     sourceFeatureIndex: Number(properties.sourceFeatureIndex),
   });
   return parsed.success ? parsed.data : null;
+}
+
+function historicalFeatureLabelCoordinate(
+  feature: HistoricalFeatureCollection["features"][number],
+): [number, number] | null {
+  const rings = feature.geometry.type === "Polygon"
+    ? [feature.geometry.coordinates[0]]
+    : feature.geometry.coordinates.map((polygon) => polygon[0]);
+  const points = rings.flat().filter((point): point is [number, number] => point.length >= 2);
+  if (!points.length) return null;
+  const longitudes = points.map(([longitude]) => longitude);
+  const latitudes = points.map(([, latitude]) => latitude);
+  return [
+    (Math.min(...longitudes) + Math.max(...longitudes)) / 2,
+    (Math.min(...latitudes) + Math.max(...latitudes)) / 2,
+  ];
 }
 
 function hasWebGl2(): boolean {
@@ -717,6 +761,7 @@ export function MapWorkspace({
   const workspaceRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const coreMarkersRef = useRef<Marker[]>([]);
+  const historicalLabelMarkersRef = useRef<Marker[]>([]);
   const historicalPopupRef = useRef<maplibregl.Popup | null>(null);
   const placePopupRef = useRef<maplibregl.Popup | null>(null);
   const languageRef = useRef(language);
@@ -1111,7 +1156,6 @@ export function MapWorkspace({
               "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.9, 8, 1.8, 11, 2.4],
             },
           });
-
           map.addLayer({
             id: "routes-explicit",
             type: "line",
@@ -1370,6 +1414,8 @@ export function MapWorkspace({
       if (basemapTimer !== undefined) window.clearTimeout(basemapTimer);
       coreMarkersRef.current.forEach((marker) => marker.remove());
       coreMarkersRef.current = [];
+      historicalLabelMarkersRef.current.forEach((marker) => marker.remove());
+      historicalLabelMarkersRef.current = [];
       historicalPopupRef.current?.remove();
       historicalPopupRef.current = null;
       activeMap?.remove();
@@ -1438,6 +1484,8 @@ export function MapWorkspace({
       if (map.getLayer(HISTORICAL_LINE_LAYER_ID)) {
         map.setLayoutProperty(HISTORICAL_LINE_LAYER_ID, "visibility", "none");
       }
+      historicalLabelMarkersRef.current.forEach((marker) => marker.remove());
+      historicalLabelMarkersRef.current = [];
       historicalPopupRef.current?.remove();
       historicalPopupRef.current = null;
       window.queueMicrotask(() => {
@@ -1454,6 +1502,8 @@ export function MapWorkspace({
     if (!historicalManifest || !selectedHistoricalSnapshot) return;
     const controller = new AbortController();
     source.setData(emptyHistoricalCollection);
+    historicalLabelMarkersRef.current.forEach((marker) => marker.remove());
+    historicalLabelMarkersRef.current = [];
     map.setLayoutProperty(HISTORICAL_FILL_LAYER_ID, "visibility", "visible");
     map.setLayoutProperty(HISTORICAL_LINE_LAYER_ID, "visibility", "visible");
     window.queueMicrotask(() => {
@@ -1488,11 +1538,22 @@ export function MapWorkspace({
           );
         }
         source.setData(parsed as HistoricalFeatureCollection);
+        historicalLabelMarkersRef.current = parsed.features.flatMap((feature) => {
+          const coordinates = historicalFeatureLabelCoordinate(feature);
+          if (!coordinates) return [];
+          const element = document.createElement("span");
+          element.className = "historical-map-label";
+          element.textContent = displayRawHistoricalValue(feature.properties.Name);
+          element.setAttribute("aria-label", displayRawHistoricalValue(feature.properties.Name));
+          return [new maplibregl.Marker({ element, anchor: "center" }).setLngLat(coordinates).addTo(map)];
+        });
         setHistoricalFeatureCount(parsed.features.length);
         setHistoricalLayerStatus("ready");
       } catch (error) {
         if (controller.signal.aborted) return;
         source.setData(emptyHistoricalCollection);
+        historicalLabelMarkersRef.current.forEach((marker) => marker.remove());
+        historicalLabelMarkersRef.current = [];
         setHistoricalFeatureCount(0);
         setHistoricalLayerStatus("failed");
         setHistoricalDiagnostic(
@@ -1505,6 +1566,8 @@ export function MapWorkspace({
     return () => {
       disposed = true;
       controller.abort();
+      historicalLabelMarkersRef.current.forEach((marker) => marker.remove());
+      historicalLabelMarkersRef.current = [];
     };
   }, [
     historicalManifest,

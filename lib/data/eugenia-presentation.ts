@@ -113,24 +113,75 @@ const explicitPresentationPlaces: Place[] = importedPresentationPlaces.places.ma
   relatedPlaceIds: [],
 }));
 
-// The normalized gazetteer deliberately keeps the broad historical region
-// unresolved because it is not a settlement. The presentation map needs one
-// stable endpoint when the source table says only “Transnistria”, so derive a
-// representative point from the supplied August 1941 historical polygon.
-// This is a display centroid, not a claim about a precise camp or settlement.
+// Presentation-only coordinate supplements for explicit table values that
+// cannot otherwise be drawn. These do not replace the raw source wording.
+// Darabani is the source-table origin for dossier 2571 and is resolved to the
+// town record below. Transnistria remains a display centroid, not a claim
+// about a precise camp or settlement.
 const presentationDerivedCoordinates: Record<string, {
   latitude: number;
   longitude: number;
   sourceRecordId: string;
+  sourceUrl: string | null;
 }> = {
   "PL-CORE-TRANSNISTRIA": {
     latitude: 47.6245710692,
     longitude: 29.8991366689,
     sourceRecordId: "1941-08-003",
+    sourceUrl: null,
   },
 };
 
-const allPlaces = [...(normalizedPlaces as Place[]), ...explicitPresentationPlaces].map((place) => {
+const presentationDerivedPlaces: Place[] = [{
+  id: "PL-PRESENTATION-DARABANI",
+  dossierId: null,
+  sourceRefs: [{
+    sourceFile: "https://www.openstreetmap.org/way/75538886",
+    sourceDataset: "curated_gazetteer",
+    documentId: null,
+    dossierId: null,
+    pagePdf: null,
+    pagePrinted: null,
+    field: "presentation route origin coordinate",
+    sourceRecordId: "OSM way 75538886",
+    fragmentRaw: "Darabani",
+  }],
+  raw: { originalName: "Darabani", variants: ["Darabani"] },
+  normalized: {
+    normalizedName: "Darabani",
+    displayNames: { en: "Darabani", ro: "Darabani" },
+    resolutionStatus: "resolved",
+    coordinateSource: "OpenStreetMap town record",
+  },
+  confidence: "high",
+  assertionStatus: "explicit",
+  reviewState: "not_required",
+  alternativeReadings: [],
+  placeId: "PL-PRESENTATION-DARABANI",
+  originalName: "Darabani",
+  normalizedName: "Darabani",
+  displayNames: { en: "Darabani", ro: "Darabani" },
+  variants: ["Darabani"],
+  placeType: "settlement",
+  coordinates: { latitude: 48.199792, longitude: 26.5966606 },
+  coordinateSource: {
+    label: "OpenStreetMap town record",
+    url: "https://www.openstreetmap.org/way/75538886",
+    accessed: "2026-07-16",
+    sourceRecordId: "OSM way 75538886",
+  },
+  coordinateConfidence: "high",
+  resolutionStatus: "resolved",
+  layer: "core",
+  externalDatasetId: null,
+  relatedPlaceIds: [],
+}];
+
+const allPlaces = [
+  ...(normalizedPlaces as Place[]),
+  ...explicitPresentationPlaces,
+  ...presentationDerivedPlaces,
+].map((place) => {
   const derived = presentationDerivedCoordinates[place.placeId];
   if (!derived || place.coordinates) return place;
   return {
@@ -138,7 +189,7 @@ const allPlaces = [...(normalizedPlaces as Place[]), ...explicitPresentationPlac
     coordinates: { latitude: derived.latitude, longitude: derived.longitude },
     coordinateSource: {
       label: "Centroid derived from the supplied August 1941 historical administration polygon",
-      url: null,
+      url: derived.sourceUrl,
       accessed: "2026-07-16",
       sourceRecordId: derived.sourceRecordId,
     },
@@ -248,6 +299,17 @@ function placeIdForRaw(value: unknown, mode: "any" | "settlement" = "any"): stri
 function splitPlaces(value: unknown): string[] {
   const raw = clean(value);
   return raw ? raw.split(/\s*(?:,|;|→|->)\s*/).map((part) => part.trim()).filter(Boolean) : [];
+}
+
+function cleanPresentationPlaceLabel(value: string): string {
+  return value
+    .replace(/\s*\([^)]*\)\s*$/u, "")
+    .replace(/\s+(?:concentration camp|camp|ghetto|historical region|regiune istorică)$/iu, "")
+    .trim();
+}
+
+function presentationPlaceLabel(place: Place, language: "en" | "ro" = "en"): string {
+  return cleanPresentationPlaceLabel(language === "ro" ? place.displayNames.ro : place.displayNames.en);
 }
 
 const familyRoleWords = new Set([
@@ -406,9 +468,9 @@ const mapData: MapViewModel = (() => {
       personName,
       dossierId,
       originId: origin.placeId,
-      originName: origin.displayNames.en,
+      originName: presentationPlaceLabel(origin),
       destinationId: destination.placeId,
-      destinationName: destination.displayNames.en,
+      destinationName: presentationPlaceLabel(destination),
       coordinates: [[origin.coordinates.longitude, origin.coordinates.latitude], [destination.coordinates.longitude, destination.coordinates.latitude]],
       routeStatus,
       confidence: "unknown",
@@ -494,8 +556,9 @@ const mapData: MapViewModel = (() => {
     for (const [index, stop] of stops.slice(1).entries()) {
       const place = stop.placeId ? basePlaces.get(stop.placeId) : null;
       const label = stop.kind === "intermediary" ? "Intermediary deportation" : "Deportation destination";
+      const stopDate = index === 0 ? destinationDate ?? stop.date : stop.date;
       if (place) {
-        addContext(place.placeId, personId, dossierId, label.toLocaleLowerCase("en"), "deportation", stop.date, deportationDetails, `${personId}-stop-${index + 1}`);
+        addContext(place.placeId, personId, dossierId, label.toLocaleLowerCase("en"), "deportation", stopDate, deportationDetails, `${personId}-stop-${index + 1}`);
       } else {
         addUnresolved(`${personId}-route-stop-${index + 1}`, stop.raw, `${label.toLocaleLowerCase("en")} (raw)`, personId, dossierId);
       }
@@ -504,7 +567,7 @@ const mapData: MapViewModel = (() => {
         placeId: stop.placeId,
         placeName: place?.displayNames.en ?? stop.raw,
         placeNameRo: place?.displayNames.ro ?? stop.raw,
-        date: stop.date,
+        date: stopDate,
         label,
         description: deportationDetails,
         sourceLabel,
@@ -526,6 +589,7 @@ const mapData: MapViewModel = (() => {
         unresolvedGap = false;
         continue;
       }
+      const routeDate = routeSequence === 0 ? destinationDate ?? current.date : current.date;
       routeSequence += 1;
       addRoute(
         personId,
@@ -533,7 +597,7 @@ const mapData: MapViewModel = (() => {
         dossierId,
         lastResolvedPlace,
         currentPlace,
-        current.date,
+        routeDate,
         routeSequence,
         originFallback || unresolvedGap ? "partial" : "explicit",
         deportationDetails,
@@ -617,8 +681,8 @@ const mapData: MapViewModel = (() => {
     const placeEventTypes = [...new Set(contexts.flatMap((context) => context.eventTypes))];
     places.push({
       id: place.placeId,
-      label: place.displayNames.en,
-      labelRo: place.displayNames.ro,
+      label: presentationPlaceLabel(place),
+      labelRo: presentationPlaceLabel(place, "ro"),
       coordinates: place.coordinates,
       placeType: place.placeType,
       layer: place.layer,
@@ -637,8 +701,8 @@ const mapData: MapViewModel = (() => {
 
   const ehriPlaces = allPlaces.filter((place) => place.layer === "ehri_local" && place.coordinates).map((place): MapPlaceDatum => ({
     id: place.placeId,
-    label: place.displayNames.en,
-    labelRo: place.displayNames.ro,
+    label: presentationPlaceLabel(place),
+    labelRo: presentationPlaceLabel(place, "ro"),
     coordinates: place.coordinates,
     placeType: place.placeType,
     layer: place.layer,

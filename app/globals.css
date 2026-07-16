@@ -1502,6 +1502,22 @@ body:has(.map-workspace) .site-footer {
   color: #26342f;
 }
 
+.historical-map-label {
+  max-width: 10rem;
+  pointer-events: none;
+  border: 1px solid rgb(38 59 54 / 28%);
+  border-radius: 0.2rem;
+  background: rgb(255 253 248 / 76%);
+  padding: 0.12rem 0.25rem;
+  color: #263b36;
+  font-family: var(--font-ui);
+  font-size: 0.58rem;
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+  text-shadow: 0 1px 0 rgb(255 253 248 / 80%);
+}
+
 .maplibregl-popup-close-button {
   top: 0.35rem;
   right: 0.35rem;

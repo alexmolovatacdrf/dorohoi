@@ -43,10 +43,10 @@ describe("verified Eugenia Presentation Map dataset", () => {
       .filter((route) => route.personName === "Bacalu Avram Moise" && route.eventTypes.includes("deportation"))
       .sort((left, right) => left.sequence - right.sequence);
     expect(bacaluRoutes.map((route) => route.destinationName)).toEqual([
-      "Mohyliv-Podilskyi (Moghilev)",
-      "Scazineţ concentration camp",
-      "Pecioara concentration camp",
-      "Tulcin concentration camp",
+      "Mohyliv-Podilskyi",
+      "Scazineţ",
+      "Pecioara",
+      "Tulcin",
     ]);
     expect(bacaluRoutes.map((route) => route.sequence)).toEqual([1, 2, 3, 4]);
   });
@@ -79,7 +79,7 @@ describe("verified Eugenia Presentation Map dataset", () => {
   it("bridges unresolved intermediary stops between known route endpoints and returns to Dorohoi", () => {
     const ciobotaru = data.routes.filter((route) => route.personName === "Ciobotaru Marcu");
     expect(ciobotaru.map((route) => route.destinationName)).toEqual([
-      "Mohyliv-Podilskyi (Moghilev)",
+      "Mohyliv-Podilskyi",
       "Dorohoi",
     ]);
     expect(ciobotaru[0]?.routeStatus).toBe("partial");
@@ -88,6 +88,20 @@ describe("verified Eugenia Presentation Map dataset", () => {
       const routes = data.routes.filter((route) => route.personName === personName);
       expect(routes.at(-1)?.destinationName).toBe("Dorohoi");
     }
+  });
+
+  it("uses the explicit Darabani origin and the Transnistria deportation date for the first movement", () => {
+    const routes = data.routes
+      .filter((route) => route.personName === "Cojocaru Sloim")
+      .sort((left, right) => left.sequence - right.sequence);
+
+    expect(routes.map((route) => [route.originName, route.destinationName])).toEqual([
+      ["Darabani", "Târgu Jiu"],
+      ["Târgu Jiu", "Mohyliv-Podilskyi"],
+      ["Mohyliv-Podilskyi", "Dorohoi"],
+    ]);
+    expect(routes[0]?.dateRaw).toBe("01/10/1941");
+    expect(routes[0]?.routeStatus).toBe("explicit");
   });
 
   it("does not expose the old verified-transcript wording in dossier labels", () => {
