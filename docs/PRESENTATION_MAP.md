@@ -20,9 +20,10 @@ while a reviewed translation layer can be added when the corrected Eugenia
 table is supplied.
 
 The ordinary OpenStreetMap raster layer remains the map base:
-`https://tile.openstreetmap.org/{z}/{x}/{y}.png`. Presentation mode uses a
-clearer raster treatment and starts with historical polygon opacity at 18%, so
-roads, rivers and settlement labels remain visible.
+`https://tile.openstreetmap.org/{z}/{x}/{y}.png`. The map offers Standard OSM,
+Light OSM and Muted OSM appearances so natural areas can be visually reduced
+while roads, rivers and settlement labels remain available. Presentation mode
+starts with historical polygon opacity at 18%.
 
 ## Research/demo fixtures
 
@@ -87,7 +88,10 @@ place as the explicitly documented presentation fallback. Intermediary and
 destination values are split in their written order. A route segment is drawn
 only when both consecutive places have coordinates in the existing project
 gazetteer; other raw places remain visible as unresolved ordered timeline
-mentions. No coordinate or relative's route is invented.
+mentions. The public pilot appends a clearly marked inferred presentation
+endpoint at Dorohoi to drawable routes. It has no invented date and is labelled
+as a presentation endpoint because the table does not supply a separate return
+record. No coordinate or relative's documentary route is invented.
 
 The presentation adapter does not import the former 16-dossier/52-row demo
 fixture. The old file remains in the repository for historical reproducibility,

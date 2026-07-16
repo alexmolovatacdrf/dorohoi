@@ -40,7 +40,7 @@ describe("verified Eugenia Presentation Map dataset", () => {
 
   it("keeps multiple Deported to locations in source order", () => {
     const bacaluRoutes = data.routes
-      .filter((route) => route.personName === "Bacalu Avram Moise")
+      .filter((route) => route.personName === "Bacalu Avram Moise" && route.eventTypes.includes("deportation"))
       .sort((left, right) => left.sequence - right.sequence);
     expect(bacaluRoutes.map((route) => route.destinationName)).toEqual([
       "Mohyliv-Podilskyi (Moghilev)",
@@ -49,6 +49,15 @@ describe("verified Eugenia Presentation Map dataset", () => {
       "Tulcin concentration camp",
     ]);
     expect(bacaluRoutes.map((route) => route.sequence)).toEqual([1, 2, 3, 4]);
+  });
+
+  it("adds the requested Dorohoi presentation endpoint after each drawable route", () => {
+    const routes = data.routes.filter((route) => route.personName === "Bacalu Avram Moise").sort((left, right) => left.sequence - right.sequence);
+    const returnRoute = routes.at(-1);
+    expect(returnRoute?.destinationName).toBe("Dorohoi");
+    expect(returnRoute?.routeStatus).toBe("inferred");
+    expect(returnRoute?.eventTypes).toEqual(["return"]);
+    expect(returnRoute?.notes).toContain("source table does not supply a return date");
   });
 
   it("does not expose the old verified-transcript wording in dossier labels", () => {

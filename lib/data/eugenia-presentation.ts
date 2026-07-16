@@ -364,6 +364,7 @@ const mapData: MapViewModel = (() => {
     sequence: number,
     routeStatus: MapRouteDatum["routeStatus"],
     notes: string | null,
+    routeEventTypes: string[] = ["deportation"],
   ) => {
     if (!origin.coordinates || !destination.coordinates) return;
     const routeId = `eugenia-presentation-${dossierId}-${sequence}`;
@@ -387,11 +388,12 @@ const mapData: MapViewModel = (() => {
       sequence,
       sourceLabel,
       notes,
-      eventTypes: ["deportation"],
+      eventTypes: routeEventTypes,
     });
-    addContext(origin.placeId, personId, dossierId, "deportation origin", "deportation", date, notes, `${routeId}-origin`);
-    addContext(destination.placeId, personId, dossierId, "deportation destination", "deportation", date, notes, `${routeId}-destination`);
-    eventTypes.add("deportation");
+    const eventType = routeEventTypes[0] ?? "deportation";
+    addContext(origin.placeId, personId, dossierId, `${eventType} origin`, eventType, date, notes, `${routeId}-origin`);
+    addContext(destination.placeId, personId, dossierId, `${eventType} destination`, eventType, date, notes, `${routeId}-destination`);
+    for (const routeEventType of routeEventTypes) eventTypes.add(routeEventType);
   };
 
   for (const row of imported.rows) {
@@ -478,6 +480,7 @@ const mapData: MapViewModel = (() => {
     }
 
     let routeSequence = 0;
+    let lastResolvedPlace = originPlaceId ? basePlaces.get(originPlaceId) ?? null : null;
     for (let index = 1; index < stops.length; index += 1) {
       const previous = stops[index - 1];
       const current = stops[index];
@@ -486,6 +489,39 @@ const mapData: MapViewModel = (() => {
       if (!previousPlace || !currentPlace) continue;
       routeSequence += 1;
       addRoute(personId, headName, dossierId, previousPlace, currentPlace, current.date, routeSequence, originFallback ? "partial" : "explicit", deportationDetails);
+      if (currentPlace.coordinates) lastResolvedPlace = currentPlace;
+    }
+
+    const dorohoi = basePlaces.get("PL-CORE-DOROHOI") ?? null;
+    const presentationReturnNote = "Presentation endpoint: Dorohoi. The source table does not supply a return date or a separate return record.";
+    if (dorohoi && lastResolvedPlace) {
+      if (lastResolvedPlace.placeId !== dorohoi.placeId) {
+        routeSequence += 1;
+        addRoute(
+          personId,
+          headName,
+          dossierId,
+          lastResolvedPlace,
+          dorohoi,
+          null,
+          routeSequence,
+          "inferred",
+          presentationReturnNote,
+          ["return"],
+        );
+      } else {
+        addContext(dorohoi.placeId, personId, dossierId, "return destination", "return", null, presentationReturnNote, `${personId}-return-endpoint`);
+      }
+      addTimeline(personId, {
+        id: `${personId}-return-dorohoi`,
+        placeId: dorohoi.placeId,
+        placeName: dorohoi.displayNames.en,
+        placeNameRo: dorohoi.displayNames.ro,
+        date: null,
+        label: "Return / repatriation endpoint",
+        description: presentationReturnNote,
+        sourceLabel,
+      });
     }
 
     for (const [index, member] of mentioned.entries()) {

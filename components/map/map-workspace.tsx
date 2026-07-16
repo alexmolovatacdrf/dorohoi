@@ -120,6 +120,10 @@ function historicalFillColorExpression(
       ["get", "presentationCategory"],
       "sovereign_state",
       HISTORICAL_PRESENTATION_CATEGORY_COLORS.sovereign_state,
+      "neutral_state",
+      HISTORICAL_PRESENTATION_CATEGORY_COLORS.neutral_state,
+      "german_allied_state",
+      HISTORICAL_PRESENTATION_CATEGORY_COLORS.german_allied_state,
       "romanian_occupied",
       HISTORICAL_PRESENTATION_CATEGORY_COLORS.romanian_occupied,
       "german_occupied",
@@ -185,6 +189,24 @@ const controlClass =
 const basemapFallbackMessage =
   "OpenStreetMap tiles are unavailable. The local research grid, project places, routes, filters and layer controls remain active.";
 const ANIMATION_SEGMENT_DURATION_MS = 5600;
+type BasemapVariant = "standard" | "light" | "muted";
+
+const basemapVariantLabels: Record<BasemapVariant, string> = {
+  standard: "Standard OSM",
+  light: "Light OSM",
+  muted: "Muted OSM",
+};
+
+function historicalDetailLabel(field: "Foreign_Po" | "Head_of_St" | "Govt_in_Ex"): string {
+  switch (field) {
+    case "Foreign_Po":
+      return "Foreign power / authority (Foreign_Po)";
+    case "Head_of_St":
+      return "Head of state / authority (Head_of_St)";
+    case "Govt_in_Ex":
+      return "Government in exile (Govt_in_Ex)";
+  }
+}
 
 function LayerToggle({
   label,
@@ -241,24 +263,17 @@ function historicalPopupContent(
 
   const foreignPower = document.createElement("p");
   foreignPower.className = "historical-map-popup__detail";
-  foreignPower.textContent = `Foreign_Po: ${displayRawHistoricalValue(properties.Foreign_Po)}`;
-
-  if (properties.presentationCategory) {
-    const presentationCategory = document.createElement("p");
-    presentationCategory.className = "historical-map-popup__detail";
-    presentationCategory.textContent = `Public category: ${properties.presentationCategory.replaceAll("_", " ")}`;
-    root.append(presentationCategory);
-  }
+  foreignPower.textContent = `${historicalDetailLabel("Foreign_Po")}: ${displayRawHistoricalValue(properties.Foreign_Po)}`;
 
   const headOfState = document.createElement("p");
   headOfState.className = "historical-map-popup__detail";
-  headOfState.textContent = `Head_of_St: ${displayRawHistoricalValue(properties.Head_of_St)}`;
+  headOfState.textContent = `${historicalDetailLabel("Head_of_St")}: ${displayRawHistoricalValue(properties.Head_of_St)}`;
 
-  const instruction = document.createElement("p");
-  instruction.className = "historical-map-popup__instruction";
-  instruction.textContent = "Click for all raw fields and methodology.";
+  const government = document.createElement("p");
+  government.className = "historical-map-popup__detail";
+  government.textContent = `${historicalDetailLabel("Govt_in_Ex")}: ${displayRawHistoricalValue(properties.Govt_in_Ex)}`;
 
-  root.append(dateLabel, name, foreignPower, headOfState, instruction);
+  root.append(name, dateLabel, foreignPower, headOfState, government);
   return root;
 }
 
@@ -310,6 +325,11 @@ function placeColor(place: MapPlaceDatum): string {
   if (place.categories.includes("evacuation_deportation")) return "#a54f32";
   if (place.categories.includes("origin")) return "#b9883b";
   return "#236353";
+}
+
+function placeMarkerSymbol(place: MapPlaceDatum): string {
+  if (place.layer === "ehri_local") return place.placeType === "camp" ? "▣" : "◆";
+  return placeSymbol(place);
 }
 
 function mapLabelOffset(placeId: string): [number, number] {
@@ -452,6 +472,12 @@ function routeProgressCollection(
   routes: MapRouteDatum[] = route ? [route] : [],
 ): FeatureCollection<Point, GeoJsonProperties> {
   if (!route) return emptyPointCollection;
+  const path = curvedRouteCoordinates(route, routeCurveOffset(route, routes));
+  const easedProgress = easeInOutCubic(progress);
+  const point = routePointAtProgress(path, easedProgress);
+  const before = routePointAtProgress(path, Math.max(0, easedProgress - 0.025));
+  const after = routePointAtProgress(path, Math.min(1, easedProgress + 0.025));
+  const angle = Math.atan2(after[1] - before[1], after[0] - before[0]) * (180 / Math.PI);
   return {
     type: "FeatureCollection",
     features: [{
@@ -459,10 +485,7 @@ function routeProgressCollection(
       id: `progress-${route.id}`,
       geometry: {
         type: "Point",
-        coordinates: routePointAtProgress(
-          curvedRouteCoordinates(route, routeCurveOffset(route, routes)),
-          easeInOutCubic(progress),
-        ),
+        coordinates: point,
       },
       properties: {
         color: route.routeStatus === "partial"
@@ -470,6 +493,8 @@ function routeProgressCollection(
           : route.routeStatus === "inferred"
             ? "#7e6b8d"
             : "#236353",
+        routeStatus: route.routeStatus,
+        angle,
       },
     }],
   };
@@ -705,6 +730,7 @@ export function MapWorkspace({
   const [historicalManifest, setHistoricalManifest] = useState<HistoricalManifest | null>(null);
   const [historicalYearMonth, setHistoricalYearMonth] = useState("1941-08");
   const [historicalOpacity, setHistoricalOpacity] = useState(0.18);
+  const [basemapVariant, setBasemapVariant] = useState<BasemapVariant>("standard");
   const [historicalLayerStatus, setHistoricalLayerStatus] = useState<HistoricalLayerStatus>("loading_manifest");
   const [historicalDiagnostic, setHistoricalDiagnostic] = useState<string | null>(null);
   const [historicalFeatureCount, setHistoricalFeatureCount] = useState(0);
@@ -748,7 +774,7 @@ export function MapWorkspace({
     return: true,
     unresolved: !isPresentation,
     localEhri: false,
-    inferred: false,
+    inferred: isPresentation,
   }));
   const [timelineStep, setTimelineStep] = useState<number | null>(null);
   const [timelineProgress, setTimelineProgress] = useState(0);
@@ -1074,8 +1100,8 @@ export function MapWorkspace({
             layout: { visibility: "none" },
             paint: {
               "line-color": "#3f403d",
-              "line-opacity": 0.72,
-              "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.55, 8, 1.25],
+              "line-opacity": 0.9,
+              "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.9, 8, 1.8, 11, 2.4],
             },
           });
 
@@ -1105,6 +1131,9 @@ export function MapWorkspace({
           map.addImage("route-arrow-explicit", routeArrow("#236353"));
           map.addImage("route-arrow-partial", routeArrow("#a54f32"));
           map.addImage("route-arrow-inferred", routeArrow("#7e6b8d"));
+          map.addImage("route-progress-arrow-explicit", routeArrow("#236353"));
+          map.addImage("route-progress-arrow-partial", routeArrow("#a54f32"));
+          map.addImage("route-progress-arrow-inferred", routeArrow("#7e6b8d"));
 
           map.addLayer({
             id: "route-direction",
@@ -1129,25 +1158,24 @@ export function MapWorkspace({
             },
           });
           map.addLayer({
-            id: "route-progress-halo",
-            type: "circle",
+            id: "route-progress-arrow",
+            type: "symbol",
             source: "route-progress",
-            paint: {
-              "circle-radius": 11,
-              "circle-color": "rgba(255,253,248,0.92)",
-              "circle-stroke-width": 1,
-              "circle-stroke-color": ["get", "color"],
-            },
-          });
-          map.addLayer({
-            id: "route-progress-core",
-            type: "circle",
-            source: "route-progress",
-            paint: {
-              "circle-radius": 6,
-              "circle-color": ["get", "color"],
-              "circle-stroke-width": 1.5,
-              "circle-stroke-color": "#ffffff",
+            layout: {
+              "icon-image": [
+                "match",
+                ["get", "routeStatus"],
+                "partial",
+                "route-progress-arrow-partial",
+                "inferred",
+                "route-progress-arrow-inferred",
+                "route-progress-arrow-explicit",
+              ],
+              "icon-size": 0.92,
+              "icon-rotate": ["get", "angle"],
+              "icon-rotation-alignment": "map",
+              "icon-allow-overlap": true,
+              "icon-ignore-placement": true,
             },
           });
 
@@ -1163,39 +1191,40 @@ export function MapWorkspace({
               "circle-stroke-opacity": 0.8,
             },
           });
+          // Project places use the labeled DOM marker system below. EHRI keeps
+          // a vector symbol/label layer so the larger external overlay remains
+          // performant while route endpoints stay named and clickable.
           map.addLayer({
-            id: "research-place-halos",
-            type: "circle",
-            source: "research-places",
-            paint: {
-              "circle-radius": 11,
-              "circle-color": "rgba(255,253,248,0.88)",
-              "circle-stroke-width": 1,
-              "circle-stroke-color": "#173f36",
-            },
-          });
-          map.addLayer({
-            id: "research-place-cores",
-            type: "circle",
-            source: "research-places",
-            paint: {
-              "circle-radius": 6,
-              "circle-color": ["get", "color"],
-            },
-          });
-          map.addLayer({
-            id: "ehri-place-halos",
+            id: "ehri-place-symbols",
             type: "circle",
             source: "ehri-places",
             paint: {
-              "circle-radius": 7,
-              "circle-color": "rgba(53,91,103,0.28)",
-              "circle-stroke-width": 1,
-              "circle-stroke-color": "#355b67",
+              "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 3.5, 8, 5.5],
+              "circle-color": ["get", "color"],
+              "circle-stroke-width": 1.5,
+              "circle-stroke-color": "#fffdf8",
+            },
+          });
+          map.addLayer({
+            id: "ehri-place-labels",
+            type: "symbol",
+            source: "ehri-places",
+            layout: {
+              "text-field": ["get", "label"],
+              "text-size": ["interpolate", ["linear"], ["zoom"], 4, 8, 8, 11],
+              "text-offset": [0, 1.15],
+              "text-anchor": "top",
+              "text-optional": true,
+              "text-allow-overlap": false,
+            },
+            paint: {
+              "text-color": "#244e59",
+              "text-halo-color": "#fffdf8",
+              "text-halo-width": 1.2,
             },
           });
 
-          const placeLayers = ["research-place-halos", "research-place-cores", "ehri-place-halos"];
+          const placeLayers = ["ehri-place-symbols", "ehri-place-labels"];
           for (const layerId of placeLayers) {
             map.on("mouseenter", layerId, () => { map.getCanvas().style.cursor = "pointer"; });
             map.on("mouseleave", layerId, () => { map.getCanvas().style.cursor = ""; });
@@ -1214,7 +1243,7 @@ export function MapWorkspace({
             map.on("mouseenter", layerId, () => { map.getCanvas().style.cursor = "pointer"; });
             map.on("mouseleave", layerId, () => { map.getCanvas().style.cursor = ""; });
             map.on("click", layerId, (event) => {
-              if (map.queryRenderedFeatures(event.point, { layers: placeLayers }).length) return;
+              if (placeLayers.length && map.queryRenderedFeatures(event.point, { layers: placeLayers }).length) return;
               const id = event.features?.[0]?.properties?.id;
               if (typeof id !== "string") return;
               if (selectionRef.current?.kind === "route" && selectionRef.current.id === id) {
@@ -1371,6 +1400,21 @@ export function MapWorkspace({
     if (!mapReady || !map || !map.getLayer(BASEMAP_LAYER_ID)) return;
     map.setLayoutProperty(BASEMAP_LAYER_ID, "visibility", layers.basemap ? "visible" : "none");
   }, [layers.basemap, mapReady]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!mapReady || !map || !map.getLayer(BASEMAP_LAYER_ID)) return;
+    const paint = basemapVariant === "standard"
+      ? { opacity: isPresentation ? 0.98 : 0.88, saturation: isPresentation ? -0.02 : -0.28, contrast: isPresentation ? 0.02 : -0.06, brightnessMin: 0.1, brightnessMax: isPresentation ? 1 : 0.96 }
+      : basemapVariant === "light"
+        ? { opacity: 0.82, saturation: -0.72, contrast: -0.08, brightnessMin: 0.24, brightnessMax: 1 }
+        : { opacity: 0.68, saturation: -1, contrast: -0.18, brightnessMin: 0.36, brightnessMax: 0.98 };
+    map.setPaintProperty(BASEMAP_LAYER_ID, "raster-opacity", paint.opacity);
+    map.setPaintProperty(BASEMAP_LAYER_ID, "raster-saturation", paint.saturation);
+    map.setPaintProperty(BASEMAP_LAYER_ID, "raster-contrast", paint.contrast);
+    map.setPaintProperty(BASEMAP_LAYER_ID, "raster-brightness-min", paint.brightnessMin);
+    map.setPaintProperty(BASEMAP_LAYER_ID, "raster-brightness-max", paint.brightnessMax);
+  }, [basemapVariant, isPresentation, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -1557,8 +1601,11 @@ export function MapWorkspace({
       if (!place.coordinates) return [];
       const element = document.createElement("button");
       element.type = "button";
-      element.className = "research-map-marker";
-      element.setAttribute("aria-label", `Inspect ${language === "ro" ? place.labelRo : place.label}`);
+      element.className = `research-map-marker${place.layer === "ehri_local" ? " research-map-marker--ehri" : ""}`;
+      const placeLabel = language === "ro" ? place.labelRo : place.label;
+      const roleLabel = place.roles.length ? ` · ${place.roles.join(" / ")}` : "";
+      element.setAttribute("aria-label", `Inspect ${placeLabel}${roleLabel}`);
+      element.title = `${placeLabel}${roleLabel}`;
 
       const label = document.createElement("span");
       label.className = "research-map-marker__label";
@@ -1575,9 +1622,9 @@ export function MapWorkspace({
         dateLabel.textContent = formatDateRange(eventDate, language);
       }
       const pin = document.createElement("span");
-      pin.className = "research-map-marker__pin";
+      pin.className = `research-map-marker__pin${place.layer === "ehri_local" ? " research-map-marker__pin--ehri" : ""}`;
       pin.style.backgroundColor = placeColor(place);
-      pin.textContent = placeSymbol(place);
+      pin.textContent = placeMarkerSymbol(place);
       element.append(label);
       if (dateLabel) element.append(dateLabel);
       element.append(pin);
@@ -1908,13 +1955,12 @@ export function MapWorkspace({
     </>
   ) : selectedHistorical ? (
     <>
-      <p className="presentation-card__eyebrow">{formatYearMonth(selectedHistorical.yearMonth, language)} · {formatIsoDate(selectedHistorical.snapshotDate, language)}</p>
       <h2 className="presentation-card__title">{displayRawHistoricalValue(selectedHistorical.Name)}</h2>
+      <p className="presentation-card__eyebrow">{formatYearMonth(selectedHistorical.yearMonth, language)} · supplied {formatIsoDate(selectedHistorical.snapshotDate, language)}</p>
       <dl className="presentation-card__details">
-        <div><dt>Public category</dt><dd>{selectedHistorical.presentationCategory?.replaceAll("_", " ") ?? "Unresolved or other"}</dd></div>
-        <div><dt>Foreign_Po</dt><dd>{displayRawHistoricalValue(selectedHistorical.Foreign_Po)}</dd></div>
-        <div><dt>Head_of_St</dt><dd>{displayRawHistoricalValue(selectedHistorical.Head_of_St)}</dd></div>
-        <div><dt>Govt_in_Ex</dt><dd>{displayRawHistoricalValue(selectedHistorical.Govt_in_Ex)}</dd></div>
+        <div><dt>{historicalDetailLabel("Foreign_Po")}</dt><dd>{displayRawHistoricalValue(selectedHistorical.Foreign_Po)}</dd></div>
+        <div><dt>{historicalDetailLabel("Head_of_St")}</dt><dd>{displayRawHistoricalValue(selectedHistorical.Head_of_St)}</dd></div>
+        <div><dt>{historicalDetailLabel("Govt_in_Ex")}</dt><dd>{displayRawHistoricalValue(selectedHistorical.Govt_in_Ex)}</dd></div>
       </dl>
     </>
   ) : selectedPerson ? (
@@ -2177,6 +2223,12 @@ export function MapWorkspace({
             <LayerToggle label="Historical administration" marker="historical" checked={layers.historicalAdministration} onChange={(value) => updateLayer("historicalAdministration", value)} />
             {layers.historicalAdministration ? <label className="presentation-opacity-control"><span className="presentation-label">Historical opacity <strong>{Math.round(historicalOpacity * 100)}%</strong></span><input aria-label="Presentation polygon opacity" type="range" min={0.08} max={0.5} step={0.02} value={historicalOpacity} onChange={(event) => setHistoricalOpacity(Number(event.target.value))} className="w-full accent-[#76536f]" /></label> : null}
             <LayerToggle label="Modern basemap" marker="basemap" checked={layers.basemap} onChange={(value) => updateLayer("basemap", value)} />
+            <label className="presentation-basemap-select">
+              <span className="presentation-label">Basemap appearance</span>
+              <select aria-label="Basemap appearance" className={controlClass} value={basemapVariant} onChange={(event) => setBasemapVariant(event.target.value as BasemapVariant)}>
+                {(Object.keys(basemapVariantLabels) as BasemapVariant[]).map((variant) => <option key={variant} value={variant}>{basemapVariantLabels[variant]}</option>)}
+              </select>
+            </label>
             {layers.historicalAdministration && historicalManifest && selectedHistoricalSnapshot ? (
               <div className="presentation-history-controls" data-testid="presentation-historical-controls">
                 <label className="block">
@@ -2459,6 +2511,12 @@ export function MapWorkspace({
               : "Loading public raster tiles"
             }
             />
+            <label className="mt-2 block">
+              <span className="mb-1 block text-[8px] font-black tracking-[0.1em] text-[#66736d] uppercase">Basemap appearance</span>
+              <select aria-label="Research basemap appearance" className={controlClass} value={basemapVariant} onChange={(event) => setBasemapVariant(event.target.value as BasemapVariant)}>
+                {(Object.keys(basemapVariantLabels) as BasemapVariant[]).map((variant) => <option key={variant} value={variant}>{basemapVariantLabels[variant]}</option>)}
+              </select>
+            </label>
             <LayerToggle
             label="Historical administration"
             marker="▧"
@@ -2581,7 +2639,7 @@ export function MapWorkspace({
                   </label>
 
                   <div className="mt-3 border-t border-[#ddd0bc] pt-2" aria-label="Historical administration legend">
-                    <p className="text-[8px] font-black tracking-[0.12em] text-[#76536f] uppercase">Foreign_Po display legend</p>
+                    <p className="text-[8px] font-black tracking-[0.12em] text-[#76536f] uppercase">Historical power / authority legend</p>
                     <div className="mt-1.5 max-h-32 space-y-1 overflow-y-auto pr-1">
                       {historicalManifest.derivedForeignPowerVocabulary.legend.map((entry) => (
                         <div key={entry.value} className="flex items-start gap-2 text-[8px] leading-3 text-[#52605a]">
@@ -2706,23 +2764,22 @@ export function MapWorkspace({
                 {selectedHistoricalSnapshot?.status === "limited_static" ? "limited / static" : "primary interval"}
               </StatusBadge>
             </div>
-            <p className="mt-3 text-[9px] font-black tracking-[0.12em] text-[#76536f] uppercase">
-              {formatYearMonth(selectedHistorical.yearMonth, language)} · supplied {formatIsoDate(selectedHistorical.snapshotDate, language)}
-            </p>
             <h3 className="font-editorial mt-1 text-2xl leading-7 font-bold text-[#173f36]">
               {displayRawHistoricalValue(selectedHistorical.Name)}
             </h3>
+            <p className="mt-2 text-[9px] font-black tracking-[0.12em] text-[#76536f] uppercase">
+              {formatYearMonth(selectedHistorical.yearMonth, language)} · supplied {formatIsoDate(selectedHistorical.snapshotDate, language)}
+            </p>
             <p className="mt-2 text-[9px] leading-4 text-[#6c746f]">
-              Raw monthly DBF attributes. Field names and values are retained as supplied.
+              Historical state or territory name followed by the supplied authority fields.
             </p>
             <dl className="mt-4 space-y-2 border-y border-[#ded8cc] py-3 text-[10px] leading-4">
               <div><dt className="font-bold text-[#4c5954]">Name</dt><dd className="break-words">{displayRawHistoricalValue(selectedHistorical.Name)}</dd></div>
-              <div><dt className="font-bold text-[#4c5954]">Foreign_Po</dt><dd className="break-words">{displayRawHistoricalValue(selectedHistorical.Foreign_Po)}</dd></div>
-              <div><dt className="font-bold text-[#4c5954]">Head_of_St</dt><dd className="break-words">{displayRawHistoricalValue(selectedHistorical.Head_of_St)}</dd></div>
-              <div><dt className="font-bold text-[#4c5954]">Govt_in_Ex</dt><dd className="break-words">{displayRawHistoricalValue(selectedHistorical.Govt_in_Ex)}</dd></div>
+              <div><dt className="font-bold text-[#4c5954]">{historicalDetailLabel("Foreign_Po")}</dt><dd className="break-words">{displayRawHistoricalValue(selectedHistorical.Foreign_Po)}</dd></div>
+              <div><dt className="font-bold text-[#4c5954]">{historicalDetailLabel("Head_of_St")}</dt><dd className="break-words">{displayRawHistoricalValue(selectedHistorical.Head_of_St)}</dd></div>
+              <div><dt className="font-bold text-[#4c5954]">{historicalDetailLabel("Govt_in_Ex")}</dt><dd className="break-words">{displayRawHistoricalValue(selectedHistorical.Govt_in_Ex)}</dd></div>
             </dl>
             <div className="mt-3 flex flex-wrap gap-1.5">
-              <StatusBadge tone="gold">{selectedHistorical.foreignPowerCategory.replaceAll("_", " ")}</StatusBadge>
               <StatusBadge tone="blue">source row {selectedHistorical.sourceFeatureIndex}</StatusBadge>
             </div>
             {selectedHistorical.editorialFlagIds.length ? (
@@ -2731,7 +2788,7 @@ export function MapWorkspace({
                 {selectedHistorical.editorialFlagIds.map((flag) => <p key={flag} className="mt-1 break-all text-[8px] leading-3 text-[#6b5d52]">{flag}</p>)}
               </div>
             ) : null}
-            <p className="mt-3 text-[9px] leading-4 text-[#6f675f]"><code>Head_of_St</code> may identify a de facto ruler, governor, occupation official, prime minister or force rather than a constitutional head of state.</p>
+            <p className="mt-3 text-[9px] leading-4 text-[#6f675f]">The authority field may identify a de facto ruler, governor, occupation official, prime minister or force rather than a constitutional head of state.</p>
             {historicalManifest ? (
               <>
                 <p className="mt-3 border-t border-[#ded8cc] pt-3 text-[8px] leading-4 text-[#77716b]">{historicalManifest.methodologicalWarning}</p>
