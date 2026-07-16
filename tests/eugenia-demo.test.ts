@@ -41,4 +41,15 @@ describe("Eugenia Presentation Map dataset", () => {
     expect(data.routes.some((route) => route.personName === "Popsingher Iancu" && route.originName === "Dorohoi")).toBe(true);
     expect(data.routes.every((route) => route.routeStatus === "explicit")).toBe(true);
   });
+
+  it("does not duplicate an Eugenia route endpoint in the person-place summary", () => {
+    const dorohoi = data.places.find((place) => place.id === "PL-CORE-DOROHOI");
+    const hoisieIds = data.persons.filter((person) => person.label === "Hoisie Bercu").map((person) => person.id);
+    expect(hoisieIds).toHaveLength(2);
+    for (const personId of hoisieIds) {
+      const context = dorohoi?.personContexts.find((candidate) => candidate.personId === personId);
+      expect(context?.connections).toHaveLength(1);
+      expect(context?.connections[0]?.id).toMatch(/^route-/);
+    }
+  });
 });

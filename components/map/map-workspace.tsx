@@ -1675,7 +1675,19 @@ export function MapWorkspace({
         sourceLabel: route.sourceLabel,
       }));
     const connections = [...(directContext?.connections ?? []), ...routeConnections];
-    const uniqueConnections = [...new Map(connections.map((connection) => [connection.id, connection])).values()];
+    // A source-bound event and the route endpoint derived from the same
+    // evidence can have different IDs. The public summary should show that
+    // evidence once while retaining genuinely different dates/descriptions.
+    const uniqueConnections = [...new Map(connections.map((connection) => [
+      [
+        connection.date?.start ?? "",
+        connection.date?.end ?? "",
+        typeof connection.date?.raw === "string" ? connection.date.raw : "",
+        connection.description ?? "",
+        connection.sourceLabel,
+      ].join("\u001f"),
+      connection,
+    ])).values()];
     return {
       personId: selectedPerson.id,
       roles: [...new Set([...(directContext?.roles ?? []), ...routeConnections.flatMap((connection) => connection.roles)])],

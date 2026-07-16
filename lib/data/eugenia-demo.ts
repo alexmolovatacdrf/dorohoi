@@ -183,7 +183,7 @@ function placeIdForRaw(value: unknown): string | null {
   // Keep compound or administrative descriptions unresolved. For example,
   // "Sargorod Jud. Moghilău" is not the same place as Mohyliv-Podilskyi and
   // "Zvorastea, Dorohoi" should not be silently reduced to Dorohoi.
-  if (/sargorod|zvorastea|mileanca/.test(text)) return null;
+  if (/sargorod|zvorastea|yvorastea|mileanca/.test(text)) return null;
   if (/doroho/.test(text) && !/[;,]/.test(text)) return dorohoi?.placeId ?? null;
   if (/moghil|mogilev/.test(text) && !/[;,]/.test(text)) return mohyliv?.placeId ?? null;
   return null;
@@ -255,6 +255,7 @@ const mapData: MapViewModel = (() => {
     eventType: string,
     date: DateRange | null,
     description: string | null,
+    connectionId?: string,
   ) => {
     usedCorePlaceIds.add(placeId);
     eventTypes.add(eventType);
@@ -270,7 +271,7 @@ const mapData: MapViewModel = (() => {
     current.eventTypes = [...new Set([...current.eventTypes, eventType])];
     current.dossierIds = [...new Set([...current.dossierIds, dossierId])];
     current.connections.push({
-      id: `eugenia-context-${placeId}-${personId}-${current.connections.length}`,
+      id: connectionId ?? `eugenia-context-${placeId}-${personId}-${current.connections.length}`,
       roles: [role],
       eventTypes: [eventType],
       date,
@@ -337,8 +338,11 @@ const mapData: MapViewModel = (() => {
       eventTypes: ["deportation"],
     };
     routes.push(route);
-    addContext(originId, personId, dossierId, "deportation origin", "deportation", date, notes);
-    addContext(destinationId, personId, dossierId, "deportation destination", "deportation", date, notes);
+    // Give route endpoint contexts the same stable identity used by the UI's
+    // route connection. This prevents one endpoint being rendered once from
+    // the place context and once again from the route layer.
+    addContext(originId, personId, dossierId, "deportation origin", "deportation", date, notes, `route-${routeId}`);
+    addContext(destinationId, personId, dossierId, "deportation destination", "deportation", date, notes, `route-${routeId}`);
     eventTypes.add("deportation");
     addTimeline(personId, {
       id: `${routeId}-timeline`,
@@ -458,13 +462,15 @@ const mapData: MapViewModel = (() => {
     dossier.victime.forEach((victim, index) => addVerifiedPerson(victim, dossier.persoane.length + index, true));
     const originId = placeIdForRaw(dossier.deportat_din);
     const destinationId = placeIdForRaw(dossier.deportat_la);
-    if (originId && headId) addContext(originId, headId, dossierId, "deportation origin", "deportation", routeDate(dossier), dossier.deportat_cand ?? null);
-    else if (dossier.deportat_din && headId) addUnresolved(`${dossierId}-deportation-origin`, dossier.deportat_din, "deportation origin (raw)", headId, dossierId);
-    if (destinationId && headId) addContext(destinationId, headId, dossierId, "deportation destination", "deportation", routeDate(dossier), dossier.deportat_cand ?? null);
-    else if (dossier.deportat_la && headId) addUnresolved(`${dossierId}-deportation-destination`, dossier.deportat_la, "deportation destination (raw)", headId, dossierId);
+    const familyOnlyDeportation = /soția|copiii|wife|children/i.test(dossier.deportat_cand ?? "");
+    const canDrawRoute = Boolean(headId && originId && destinationId && !familyOnlyDeportation);
+    if (!canDrawRoute && originId && headId && !familyOnlyDeportation) addContext(originId, headId, dossierId, "deportation origin", "deportation", routeDate(dossier), dossier.deportat_cand ?? null);
+    else if (!originId && dossier.deportat_din && headId) addUnresolved(`${dossierId}-deportation-origin`, dossier.deportat_din, "deportation origin (raw)", headId, dossierId);
+    if (!canDrawRoute && destinationId && headId && !familyOnlyDeportation) addContext(destinationId, headId, dossierId, "deportation destination", "deportation", routeDate(dossier), dossier.deportat_cand ?? null);
+    else if (!destinationId && dossier.deportat_la && headId) addUnresolved(`${dossierId}-deportation-destination`, dossier.deportat_la, "deportation destination (raw)", headId, dossierId);
     if (dossier.munca_fortata && headId) addUnresolved(`${dossierId}-forced-labour`, dossier.munca_fortata, "forced labour locations (raw)", headId, dossierId);
 
-    if (headId && originId && destinationId && !/soția|soția|copiii|wife|children/i.test(dossier.deportat_cand ?? "")) {
+    if (canDrawRoute && headId && originId && destinationId) {
       addRoute(headId, dossier.nume + " " + dossier.prenume, dossierId, originId, destinationId, routeDate(dossier), dossier.deportat_cand ?? null, `${dossierId}-deportation`);
     }
     const forcedLabor = clean(dossier.eugenia["Forced labor"]);
@@ -495,7 +501,6 @@ const mapData: MapViewModel = (() => {
     const originId = placeIdForRaw(originRaw);
     const deportationOriginId = placeIdForRaw(row["Deported from"]);
     const destinationId = placeIdForRaw(row["Deported to Transnistria"]);
-    const origin = originId ?? deportationOriginId;
     const story = createStory(
       personId,
       dossierId,
@@ -519,16 +524,18 @@ const mapData: MapViewModel = (() => {
     );
     addPerson({ id: personId, label: name, dossierId, roles: ["Eugenia table person"], story }, story);
     groups.push({ id: dossierId, label: `${name} · Eugenia table · ${rawDossierId}`, personIds: [personId], kind: "family" });
-    if (origin) addContext(origin, personId, dossierId, originId ? "birth place" : "deportation origin", originId ? "birth" : "deportation", birthDate, null);
+    if (originId) addContext(originId, personId, dossierId, "birth place", "birth", birthDate, null);
     else if (originRaw) addUnresolved(`${personId}-birth-place`, originRaw, "birth place (raw)", personId, dossierId);
-    if (deportationOriginId) addContext(deportationOriginId, personId, dossierId, "deportation origin", "deportation", toDateRange(row["Date of deportation to Transnistria"]), clean(row["Deportation details"]));
-    else if (row["Deported from"]) addUnresolved(`${personId}-deportation-origin`, row["Deported from"], "deportation origin (raw)", personId, dossierId);
-    if (destinationId) addContext(destinationId, personId, dossierId, "deportation destination", "deportation", toDateRange(row["Date of deportation to Transnistria"]), clean(row["Deportation details"]));
-    else if (row["Deported to Transnistria"]) addUnresolved(`${personId}-deportation-destination`, row["Deported to Transnistria"], "deportation destination (raw)", personId, dossierId);
-    if (row["Forced labor"]) addUnresolved(`${personId}-forced-labour`, row["Forced labor"], "forced labour locations (raw)", personId, dossierId);
+    const tableRouteDate = toDateRange(row["Date of deportation to Transnistria"]);
     if (deportationOriginId && destinationId) {
-      addRoute(personId, name, dossierId, deportationOriginId, destinationId, toDateRange(row["Date of deportation to Transnistria"]), clean(row["Deportation details"]), `${dossierId}-deportation`);
+      addRoute(personId, name, dossierId, deportationOriginId, destinationId, tableRouteDate, clean(row["Deportation details"]), `${dossierId}-deportation`);
+    } else {
+      if (deportationOriginId) addContext(deportationOriginId, personId, dossierId, "deportation origin", "deportation", tableRouteDate, clean(row["Deportation details"]));
+      else if (row["Deported from"]) addUnresolved(`${personId}-deportation-origin`, row["Deported from"], "deportation origin (raw)", personId, dossierId);
+      if (destinationId) addContext(destinationId, personId, dossierId, "deportation destination", "deportation", tableRouteDate, clean(row["Deportation details"]));
+      else if (row["Deported to Transnistria"]) addUnresolved(`${personId}-deportation-destination`, row["Deported to Transnistria"], "deportation destination (raw)", personId, dossierId);
     }
+    if (row["Forced labor"]) addUnresolved(`${personId}-forced-labour`, row["Forced labor"], "forced labour locations (raw)", personId, dossierId);
   }
 
   const places: MapPlaceDatum[] = [];
