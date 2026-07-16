@@ -1487,14 +1487,25 @@ body:has(.map-workspace) .site-footer {
 }
 
 .research-map-marker--ehri .research-map-marker__label {
-  border-color: rgb(53 91 103 / 36%);
+  max-width: 7.5rem;
+  border: 0;
+  background: transparent;
+  padding: 0.08rem 0.12rem;
+  box-shadow: none;
+  color: #355b67;
+  font-size: 0.49rem;
+  line-height: 1.05;
+  text-shadow: 0 1px 0 #fffdf8, 0 0 0.18rem rgb(255 253 248 / 92%);
 }
 
 .research-map-marker__pin--ehri {
-  width: 1.15rem;
-  height: 1.15rem;
+  width: 0.9rem;
+  height: 0.9rem;
   border-radius: 0.25rem;
-  font-size: 0.64rem;
+  border-width: 1px;
+  box-shadow: 0 1px 0.3rem rgb(23 63 54 / 24%);
+  font-size: 0.48rem;
+  opacity: 0.84;
 }
 
 .historical-map-popup {

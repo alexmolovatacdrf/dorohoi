@@ -2,6 +2,7 @@ import eugeniaPresentation from "@/data/normalized/eugenia-presentation.json";
 import eugeniaPresentationPlaces from "@/data/normalized/eugenia-presentation-places.json";
 import normalizedPlaces from "@/data/normalized/places.json";
 import type { DateRange, Place } from "@/lib/domain/schemas";
+import { ehriMapLabel } from "@/lib/data/ehri-labels";
 import type {
   MapPlaceDatum,
   MapPlacePersonConnection,
@@ -314,6 +315,7 @@ function cleanPresentationPlaceLabel(value: string): string {
 }
 
 function presentationPlaceLabel(place: Place, language: "en" | "ro" = "en"): string {
+  if (place.layer === "ehri_local") return ehriMapLabel(place, language);
   return cleanPresentationPlaceLabel(language === "ro" ? place.displayNames.ro : place.displayNames.en);
 }
 
@@ -706,8 +708,8 @@ const mapData: MapViewModel = (() => {
 
   const ehriPlaces = allPlaces.filter((place) => place.layer === "ehri_local" && place.coordinates).map((place): MapPlaceDatum => ({
     id: place.placeId,
-    label: presentationPlaceLabel(place),
-    labelRo: presentationPlaceLabel(place, "ro"),
+    label: ehriMapLabel(place),
+    labelRo: ehriMapLabel(place, "ro"),
     coordinates: place.coordinates,
     placeType: place.placeType,
     layer: place.layer,
@@ -724,7 +726,7 @@ const mapData: MapViewModel = (() => {
   }));
 
   return {
-    places: [...places, ...ehriPlaces],
+    places: [...places, ...ehriPlaces.filter((place) => !places.some((existing) => existing.id === place.id))],
     routes,
     persons: persons
       .map((person) => ({ ...person, story: stories.get(person.id) }))

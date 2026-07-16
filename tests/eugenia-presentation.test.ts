@@ -1,4 +1,5 @@
 import eugeniaPresentation from "@/data/normalized/eugenia-presentation.json";
+import { isReadableEhriMapLabel } from "@/lib/data/ehri-labels";
 import { EUGENIA_PRESENTATION_SOURCE, getEugeniaPresentationMapViewModel } from "@/lib/data/eugenia-presentation";
 import { describe, expect, it } from "vitest";
 
@@ -44,7 +45,7 @@ describe("verified Eugenia Presentation Map dataset", () => {
       .sort((left, right) => left.sequence - right.sequence);
     expect(bacaluRoutes.map((route) => route.destinationName)).toEqual([
       "Mohyliv-Podilskyi",
-      "Scazineţ",
+      "Scazineț",
       "Pecioara",
       "Tulcin",
     ]);
@@ -122,5 +123,15 @@ describe("verified Eugenia Presentation Map dataset", () => {
   it("does not expose the old verified-transcript wording in dossier labels", () => {
     expect(data.dossiers.every((dossier) => !dossier.label.includes("verified transcript"))).toBe(true);
     expect(data.dossiers.find((dossier) => dossier.id === "EUG-P-2527")?.label).toBe("Dossier 2527");
+  });
+
+  it("uses compact public Latin-script labels for every EHRI point", () => {
+    const ehri = data.places.filter((place) => place.layer === "ehri_local");
+    expect(ehri).toHaveLength(385);
+    expect(ehri.every((place) => isReadableEhriMapLabel(place.label))).toBe(true);
+    expect(data.places.find((place) => place.id === "PL-EHRI-0233")?.label).toBe("Rădăuți-Prut");
+    expect(data.places.find((place) => place.id === "PL-EHRI-0383")?.label).toBe("Cernăuți");
+    expect(data.places.find((place) => place.id === "PL-EHRI-0382")?.label).toBe("Mohyliv-Podilskyi");
+    expect(ehri.every((place) => !/\b(?:ghetto|getto|ghetou|camp|lagar|lagăr)\b/i.test(place.label))).toBe(true);
   });
 });

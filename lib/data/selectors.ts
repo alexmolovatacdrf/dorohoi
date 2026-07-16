@@ -13,6 +13,7 @@ import type {
   DateRange,
 } from "@/lib/domain/schemas";
 import { getResearchData } from "./repository";
+import { ehriMapLabel } from "./ehri-labels";
 
 function byDate(left: Event, right: Event): number {
   const leftDate = left.date.start ?? "9999-99-99";
@@ -508,8 +509,8 @@ export function getMapViewModel(data: NormalizedBundle = getResearchData()): Map
     const eventTypes = uniqueById(events).map((event) => event.eventType);
     return {
       id: place.placeId,
-      label: place.displayNames.en,
-      labelRo: place.displayNames.ro,
+      label: ehriMapLabel(place),
+      labelRo: ehriMapLabel(place, "ro"),
       coordinates: place.coordinates,
       placeType: place.placeType,
       layer: place.layer,

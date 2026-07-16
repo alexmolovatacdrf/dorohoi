@@ -1,6 +1,7 @@
 import eugeniaExport from "@/data/demo/eugenia-map-demo.json";
 import normalizedPlaces from "@/data/normalized/places.json";
 import type { DateRange, Place } from "@/lib/domain/schemas";
+import { ehriMapLabel } from "@/lib/data/ehri-labels";
 import type {
   MapPlaceDatum,
   MapPlacePersonConnection,
@@ -547,8 +548,8 @@ const mapData: MapViewModel = (() => {
     const placeEventTypes = [...new Set(contexts.flatMap((context) => context.eventTypes))];
     places.push({
       id: place.placeId,
-      label: place.displayNames.en,
-      labelRo: place.displayNames.ro,
+      label: ehriMapLabel(place),
+      labelRo: ehriMapLabel(place, "ro"),
       coordinates: place.coordinates,
       placeType: place.placeType,
       layer: place.layer,
@@ -569,8 +570,8 @@ const mapData: MapViewModel = (() => {
     .filter((place) => place.layer === "ehri_local" && place.coordinates)
     .map((place): MapPlaceDatum => ({
       id: place.placeId,
-      label: place.displayNames.en,
-      labelRo: place.displayNames.ro,
+      label: ehriMapLabel(place),
+      labelRo: ehriMapLabel(place, "ro"),
       coordinates: place.coordinates,
       placeType: place.placeType,
       layer: place.layer,
