@@ -113,7 +113,39 @@ const explicitPresentationPlaces: Place[] = importedPresentationPlaces.places.ma
   relatedPlaceIds: [],
 }));
 
-const allPlaces = [...(normalizedPlaces as Place[]), ...explicitPresentationPlaces];
+// The normalized gazetteer deliberately keeps the broad historical region
+// unresolved because it is not a settlement. The presentation map needs one
+// stable endpoint when the source table says only “Transnistria”, so derive a
+// representative point from the supplied August 1941 historical polygon.
+// This is a display centroid, not a claim about a precise camp or settlement.
+const presentationDerivedCoordinates: Record<string, {
+  latitude: number;
+  longitude: number;
+  sourceRecordId: string;
+}> = {
+  "PL-CORE-TRANSNISTRIA": {
+    latitude: 47.6245710692,
+    longitude: 29.8991366689,
+    sourceRecordId: "1941-08-003",
+  },
+};
+
+const allPlaces = [...(normalizedPlaces as Place[]), ...explicitPresentationPlaces].map((place) => {
+  const derived = presentationDerivedCoordinates[place.placeId];
+  if (!derived || place.coordinates) return place;
+  return {
+    ...place,
+    coordinates: { latitude: derived.latitude, longitude: derived.longitude },
+    coordinateSource: {
+      label: "Centroid derived from the supplied August 1941 historical administration polygon",
+      url: null,
+      accessed: "2026-07-16",
+      sourceRecordId: derived.sourceRecordId,
+    },
+    coordinateConfidence: "unknown",
+    resolutionStatus: "partially_resolved",
+  } satisfies Place;
+});
 const basePlaces = new Map(allPlaces.map((place) => [place.placeId, place]));
 
 function clean(value: unknown): string | null {
@@ -607,8 +639,10 @@ const mapData: MapViewModel = (() => {
   return {
     places: [...places, ...ehriPlaces],
     routes,
-    persons: persons.map((person) => ({ ...person, story: stories.get(person.id) })),
-    groups,
+    persons: persons
+      .map((person) => ({ ...person, story: stories.get(person.id) }))
+      .sort((left, right) => left.label.localeCompare(right.label, "ro")),
+    groups: groups.slice().sort((left, right) => left.label.localeCompare(right.label, "ro")),
     dossiers,
     eventTypes: [...eventTypes].sort(),
     unresolvedMentions,

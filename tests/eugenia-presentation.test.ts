@@ -60,6 +60,22 @@ describe("verified Eugenia Presentation Map dataset", () => {
     expect(returnRoute?.notes).toContain("source table does not supply a return date");
   });
 
+  it("sorts people alphabetically and gives region-only Transnistria rows a derived map endpoint", () => {
+    const labels = data.persons.map((person) => person.label);
+    expect(labels).toEqual([...labels].sort((left, right) => left.localeCompare(right, "ro")));
+
+    const transnistriaRoutes = data.routes.filter((route) => route.destinationName.includes("Transnistria"));
+    expect(transnistriaRoutes.length).toBe(4);
+    expect(data.places.find((place) => place.id === "PL-CORE-TRANSNISTRIA")?.coordinates).toEqual({
+      latitude: 47.6245710692,
+      longitude: 29.8991366689,
+    });
+    for (const route of transnistriaRoutes) {
+      const personRoutes = data.routes.filter((candidate) => candidate.personId === route.personId);
+      expect(personRoutes.at(-1)?.destinationName).toBe("Dorohoi");
+    }
+  });
+
   it("does not expose the old verified-transcript wording in dossier labels", () => {
     expect(data.dossiers.every((dossier) => !dossier.label.includes("verified transcript"))).toBe(true);
     expect(data.dossiers.find((dossier) => dossier.id === "EUG-P-2527")?.label).toBe("Dossier 2527");

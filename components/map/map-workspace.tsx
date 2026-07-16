@@ -477,7 +477,9 @@ function routeProgressCollection(
   const point = routePointAtProgress(path, easedProgress);
   const before = routePointAtProgress(path, Math.max(0, easedProgress - 0.025));
   const after = routePointAtProgress(path, Math.min(1, easedProgress + 0.025));
-  const angle = Math.atan2(after[1] - before[1], after[0] - before[0]) * (180 / Math.PI);
+  // The arrow image points east at 0°. MapLibre rotates icons clockwise, so
+  // invert the geographic latitude delta to keep the tip aligned with travel.
+  const angle = -Math.atan2(after[1] - before[1], after[0] - before[0]) * (180 / Math.PI);
   return {
     type: "FeatureCollection",
     features: [{
@@ -488,11 +490,7 @@ function routeProgressCollection(
         coordinates: point,
       },
       properties: {
-        color: route.routeStatus === "partial"
-          ? "#a54f32"
-          : route.routeStatus === "inferred"
-            ? "#7e6b8d"
-            : "#236353",
+        color: "#236353",
         routeStatus: route.routeStatus,
         angle,
       },
@@ -738,6 +736,7 @@ export function MapWorkspace({
   const [historicalSnapshotReloadToken, setHistoricalSnapshotReloadToken] = useState(0);
   const [presentationPanelOpen, setPresentationPanelOpen] = useState(false);
   const [presentationPeoplePanelOpen, setPresentationPeoplePanelOpen] = useState(true);
+  const [presentationTimelineOpen, setPresentationTimelineOpen] = useState(true);
   const presentationPanelOpenRef = useRef(presentationPanelOpen);
   const presentationPeoplePanelOpenRef = useRef(presentationPeoplePanelOpen);
   const [presentationOpenFamilyId, setPresentationOpenFamilyId] = useState<string | null>(null);
@@ -1118,22 +1117,23 @@ export function MapWorkspace({
             type: "line",
             source: "research-routes",
             filter: ["==", ["get", "routeStatus"], "partial"],
-            layout: { "line-cap": "butt", "line-join": "round" },
-            paint: { "line-color": "#a54f32", "line-width": 4, "line-dasharray": [2, 2], "line-opacity": 0.9 },
+            layout: { "line-cap": "round", "line-join": "round" },
+            paint: { "line-color": "#236353", "line-width": 4, "line-opacity": 0.9 },
           });
           map.addLayer({
             id: "routes-inferred",
             type: "line",
             source: "research-routes",
             filter: ["==", ["get", "routeStatus"], "inferred"],
-            paint: { "line-color": "#7e6b8d", "line-width": 3, "line-dasharray": [0.5, 2.5], "line-opacity": 0.75 },
+            layout: { "line-cap": "round", "line-join": "round" },
+            paint: { "line-color": "#236353", "line-width": 4, "line-opacity": 0.9 },
           });
           map.addImage("route-arrow-explicit", routeArrow("#236353"));
-          map.addImage("route-arrow-partial", routeArrow("#a54f32"));
-          map.addImage("route-arrow-inferred", routeArrow("#7e6b8d"));
+          map.addImage("route-arrow-partial", routeArrow("#236353"));
+          map.addImage("route-arrow-inferred", routeArrow("#236353"));
           map.addImage("route-progress-arrow-explicit", routeArrow("#236353"));
-          map.addImage("route-progress-arrow-partial", routeArrow("#a54f32"));
-          map.addImage("route-progress-arrow-inferred", routeArrow("#7e6b8d"));
+          map.addImage("route-progress-arrow-partial", routeArrow("#236353"));
+          map.addImage("route-progress-arrow-inferred", routeArrow("#236353"));
 
           map.addLayer({
             id: "route-direction",
@@ -1704,8 +1704,13 @@ export function MapWorkspace({
       }
       grouped.set(label, people);
     }
-    return [...grouped.entries()].map(([label, people]) => ({ label, people }));
-  }, [data.persons, selectedPlace]);
+    return [...grouped.entries()]
+      .sort(([left], [right]) => left.localeCompare(right, language))
+      .map(([label, people]) => ({
+        label,
+        people: people.sort((left, right) => left.label.localeCompare(right.label, language)),
+      }));
+  }, [data.persons, language, selectedPlace]);
   const selectPersonFromMap = useCallback((personId: string) => {
     setFilters((current) => ({ ...current, person: personId, group: "", place: "" }));
     setPresentationViewport("story");
@@ -1737,7 +1742,9 @@ export function MapWorkspace({
         description: route.notes,
         sourceLabel: route.sourceLabel,
       }));
-    const connections = [...(directContext?.connections ?? []), ...routeConnections];
+    const connections = [...(directContext?.connections ?? []), ...routeConnections].filter(
+      (connection) => !connection.description?.startsWith("Presentation endpoint: Dorohoi."),
+    );
     // A source-bound event and the route endpoint derived from the same
     // evidence can have different IDs. The public summary should show that
     // evidence once while retaining genuinely different dates/descriptions.
@@ -1753,8 +1760,8 @@ export function MapWorkspace({
     ])).values()];
     return {
       personId: selectedPerson.id,
-      roles: [...new Set([...(directContext?.roles ?? []), ...routeConnections.flatMap((connection) => connection.roles)])],
-      eventTypes: [...new Set([...(directContext?.eventTypes ?? []), ...routeConnections.flatMap((connection) => connection.eventTypes)])],
+      roles: [...new Set(connections.flatMap((connection) => connection.roles))],
+      eventTypes: [...new Set(connections.flatMap((connection) => connection.eventTypes))],
       dossierIds: [...new Set([...(directContext?.dossierIds ?? []), ...(selectedPerson.dossierId ? [selectedPerson.dossierId] : [])])],
       connections: uniqueConnections,
     };
@@ -2090,7 +2097,9 @@ export function MapWorkspace({
     </div>
   ) : null;
   const groupedPresentationPersonIds = new Set(data.groups.flatMap((group) => group.personIds));
-  const ungroupedPresentationPeople = data.persons.filter((person) => !groupedPresentationPersonIds.has(person.id));
+  const ungroupedPresentationPeople = data.persons
+    .filter((person) => !groupedPresentationPersonIds.has(person.id))
+    .sort((left, right) => left.label.localeCompare(right.label, "ro"));
   const normalizedPresentationPersonQuery = presentationPersonQuery.trim().toLocaleLowerCase("ro");
   const presentationGroups = data.groups.filter((group) => {
     if (!normalizedPresentationPersonQuery) return true;
@@ -2098,7 +2107,7 @@ export function MapWorkspace({
       || data.persons.some(
         (person) => group.personIds.includes(person.id) && person.label.toLocaleLowerCase("ro").includes(normalizedPresentationPersonQuery),
       );
-  });
+  }).sort((left, right) => left.label.localeCompare(right.label, "ro"));
   const filteredUngroupedPresentationPeople = ungroupedPresentationPeople.filter((person) =>
     !normalizedPresentationPersonQuery
       || person.label.toLocaleLowerCase("ro").includes(normalizedPresentationPersonQuery),
@@ -2308,13 +2317,13 @@ export function MapWorkspace({
   ) : null;
 
   const presentationTimeline = presentationMapConfig.timeline ? (
-    <section className="presentation-map__timeline absolute right-2 bottom-2 left-2 z-20 border border-[#bdb7aa] bg-[#fffdf8]/95 p-1.5 shadow-[0_10px_24px_rgba(22,42,35,0.16)] backdrop-blur-md sm:right-3 sm:bottom-3 sm:left-3" data-testid="presentation-timeline">
+    <section className={`presentation-map__timeline absolute right-2 bottom-2 left-2 z-20 border border-[#bdb7aa] bg-[#fffdf8]/95 p-1 shadow-[0_10px_24px_rgba(22,42,35,0.16)] backdrop-blur-md sm:right-3 sm:bottom-3 sm:left-3${presentationTimelineOpen ? "" : " presentation-map__timeline--collapsed"}`} data-testid="presentation-timeline">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <div className="min-w-32"><p className="presentation-card__eyebrow">Route</p><p className="font-editorial text-base font-bold text-[#173f36]">{selectedPerson?.label ?? "Select a person"}</p></div>
+        <div className="flex min-w-32 items-center gap-1.5"><button type="button" className="presentation-icon-button presentation-timeline__toggle" onClick={() => setPresentationTimelineOpen((open) => !open)} aria-expanded={presentationTimelineOpen} aria-label={presentationTimelineOpen ? "Collapse route timeline" : "Expand route timeline"}>{presentationTimelineOpen ? "−" : "+"}</button><div><p className="presentation-card__eyebrow">Route</p><p className="font-editorial text-base font-bold text-[#173f36]">{selectedPerson?.label ?? "Select a person"}</p></div></div>
         <div className="presentation-timeline__track flex min-w-0 grow items-center gap-1.5 overflow-x-auto py-0.5">{selectedPersonRoutes.length ? selectedPersonRoutes.map((route, index) => <div key={route.id} className="presentation-timeline__stop flex min-w-fit items-center gap-1.5"><span className={`grid size-6 place-items-center rounded-full border text-xs font-bold ${timelineStep !== null && index < timelineStep ? "border-[#173f36] bg-[#173f36] text-white" : "border-[#9fa69f] bg-white text-[#56645e]"}`}>{route.sequence}</span><span className="presentation-timeline__place"><strong>{route.destinationName}</strong><small>{mapRouteDateLabel(route, "en")}</small></span>{index < selectedPersonRoutes.length - 1 ? <span className="presentation-timeline__line h-px w-6 bg-[#b9b3a7]" /> : null}</div>) : <p className="text-xs text-[#747f79]">No documented route selected.</p>}</div>
         <div className="flex min-w-fit gap-2"><button type="button" disabled={!filters.person || !selectedPersonRoutes.length || isPlaying} onClick={startRoutePlayback} className="presentation-primary-button">Play once</button><button type="button" disabled={!isPlaying} onClick={() => setIsPlaying(false)} className="presentation-secondary-button">Pause</button><button type="button" onClick={resetView} className="presentation-secondary-button">Reset</button></div>
       </div>
-      {activePlaybackWaypoint ? <div className="presentation-waypoint"><span className="presentation-label">Current documented place</span><strong>{language === "ro" ? activePlaybackWaypoint.labelRo : activePlaybackWaypoint.label}</strong>{activePlaybackRoute?.dateStart || activePlaybackRoute?.dateRaw ? <span>{mapRouteDateLabel(activePlaybackRoute, "en")}</span> : null}{activePlaybackRoute?.notes ? <span>{activePlaybackRoute.notes}</span> : null}</div> : null}
+      {presentationTimelineOpen && activePlaybackWaypoint ? <div className="presentation-waypoint"><span className="presentation-label">Current documented place</span><strong>{language === "ro" ? activePlaybackWaypoint.labelRo : activePlaybackWaypoint.label}</strong>{activePlaybackRoute?.dateStart || activePlaybackRoute?.dateRaw ? <span>{mapRouteDateLabel(activePlaybackRoute, "en")}</span> : null}{activePlaybackRoute?.notes ? <span>{activePlaybackRoute.notes}</span> : null}</div> : null}
     </section>
   ) : null;
 
@@ -2436,14 +2445,14 @@ export function MapWorkspace({
               }}
             >
               <option value="">{t("common.all")}</option>
-              {data.persons.map((person) => <option key={person.id} value={person.id}>{person.label}</option>)}
+              {data.persons.slice().sort((left, right) => left.label.localeCompare(right.label, language)).map((person) => <option key={person.id} value={person.id}>{person.label}</option>)}
             </select>
           </label>
           <label className="block">
             <span className="mb-1 block text-[8px] font-black tracking-[0.12em] text-[#66736d] uppercase">{t("map.group")}</span>
             <select className={controlClass} value={filters.group} onChange={(event) => updateFilter("group", event.target.value)}>
               <option value="">{t("common.all")}</option>
-              {data.groups.map((group) => <option key={group.id} value={group.id}>{group.label}</option>)}
+              {data.groups.slice().sort((left, right) => left.label.localeCompare(right.label, language)).map((group) => <option key={group.id} value={group.id}>{group.label}</option>)}
             </select>
           </label>
           <label className="block">
@@ -2750,7 +2759,7 @@ export function MapWorkspace({
             <dl className="mt-4 space-y-2 border-y border-[#ded8cc] py-3 text-xs leading-5">
               <div><dt className="inline font-bold">Date: </dt><dd className="inline">{mapRouteDateLabel(selectedRoute, language)}</dd></div>
               <div><dt className="inline font-bold">Transport: </dt><dd className="inline">{selectedRoute.transportRaw ?? "Not supplied"}</dd></div>
-              <div><dt className="inline font-bold">Line style: </dt><dd className="inline">{selectedRoute.routeStatus === "explicit" ? "solid" : "dashed"}</dd></div>
+              <div><dt className="inline font-bold">Line style: </dt><dd className="inline">solid presentation route</dd></div>
             </dl>
             {selectedRoute.notes ? <p className="mt-3 text-xs leading-5 text-[#61706a]">{selectedRoute.notes}</p> : null}
             <p className="mt-3 break-all text-[9px] leading-4 text-[#838b87]">{selectedRoute.sourceLabel}</p>
@@ -2822,9 +2831,8 @@ export function MapWorkspace({
             </div>
             <div className="mt-5 space-y-3 border-t border-[#ddd7cb] pt-4">
               <p className="text-[9px] font-black tracking-[0.13em] text-[#756347] uppercase">Route grammar</p>
-              <div className="flex items-center gap-3 text-[10px]"><span className="h-1 w-12 bg-[#236353]" /> Explicit movement</div>
-              <div className="flex items-center gap-3 text-[10px]"><span className="w-12 border-t-2 border-dashed border-[#a54f32]" /> Partial movement</div>
-              <div className="flex items-center gap-3 text-[10px]"><span className="w-12 border-t-2 border-dotted border-[#7e6b8d]" /> Inferred, off by default</div>
+              <div className="flex items-center gap-3 text-[10px]"><span className="h-1 w-12 bg-[#236353]" /> Movement route</div>
+              <p className="pt-1 text-[9px] leading-4 text-[#7d8682]">Explicit, partial and inferred status remains available in the details; all routes use the same solid visual design.</p>
               <p className="pt-2 text-[9px] leading-4 text-[#7d8682]">Lines join evidence endpoints; they do not claim exact historic roads.</p>
             </div>
           </div>

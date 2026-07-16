@@ -1769,6 +1769,15 @@ body:has(.map-workspace) .site-footer {
   bottom: 0.5rem;
   left: 0.5rem;
   padding: 0.35rem;
+  min-height: 0;
+}
+
+.presentation-map-workspace .presentation-map__timeline--collapsed {
+  min-height: 0;
+}
+
+.presentation-timeline__toggle {
+  flex: 0 0 auto;
 }
 
 .presentation-timeline__track {
@@ -1799,17 +1808,23 @@ body:has(.map-workspace) .site-footer {
 }
 
 .presentation-map-workspace .presentation-waypoint {
-  grid-template-columns: auto auto 1fr;
+  display: flex;
   align-items: baseline;
   gap: 0.3rem 0.55rem;
+  max-height: 1.8rem;
   margin-top: 0.3rem;
   border-left-width: 2px;
+  overflow: hidden;
   padding: 0.25rem 0.4rem;
+  white-space: nowrap;
 }
 
 .presentation-map-workspace .presentation-waypoint strong,
 .presentation-map-workspace .presentation-waypoint > span:last-child {
+  overflow: hidden;
   font-size: 0.68rem !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .presentation-map-workspace .maplibregl-ctrl-top-right {
