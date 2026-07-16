@@ -76,6 +76,20 @@ describe("verified Eugenia Presentation Map dataset", () => {
     }
   });
 
+  it("bridges unresolved intermediary stops between known route endpoints and returns to Dorohoi", () => {
+    const ciobotaru = data.routes.filter((route) => route.personName === "Ciobotaru Marcu");
+    expect(ciobotaru.map((route) => route.destinationName)).toEqual([
+      "Mohyliv-Podilskyi (Moghilev)",
+      "Dorohoi",
+    ]);
+    expect(ciobotaru[0]?.routeStatus).toBe("partial");
+
+    for (const personName of ["Cojocaru Sloim", "Roizen Bety"]) {
+      const routes = data.routes.filter((route) => route.personName === personName);
+      expect(routes.at(-1)?.destinationName).toBe("Dorohoi");
+    }
+  });
+
   it("does not expose the old verified-transcript wording in dossier labels", () => {
     expect(data.dossiers.every((dossier) => !dossier.label.includes("verified transcript"))).toBe(true);
     expect(data.dossiers.find((dossier) => dossier.id === "EUG-P-2527")?.label).toBe("Dossier 2527");

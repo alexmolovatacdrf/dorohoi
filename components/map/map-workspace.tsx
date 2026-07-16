@@ -906,17 +906,6 @@ export function MapWorkspace({
     [data.places, filters.person, filters.group, filters.place, filters.dossier, filters.eventType, filters.confidence, filters.fromYear, filters.toYear, layers],
   );
 
-  const visibleEhriPlaces = useMemo(
-    () =>
-      data.places.filter((place) => {
-        if (place.layer !== "ehri_local" || !place.coordinates || !layers.localEhri || !layers.campsGhettos) return false;
-        if (filters.place && place.id !== filters.place) return false;
-        if (filters.confidence && place.confidence !== filters.confidence) return false;
-        return true;
-      }),
-    [data.places, filters.confidence, filters.place, layers.campsGhettos, layers.localEhri],
-  );
-
   const preTimelineRoutes = useMemo(
     () =>
       data.routes.filter((route) => {
@@ -945,6 +934,25 @@ export function MapWorkspace({
     const completedRouteIds = new Set(selectedPersonRoutes.slice(0, timelineStep ?? 0).map((route) => route.id));
     return preTimelineRoutes.filter((route) => completedRouteIds.has(route.id) || route.id === activePlaybackRoute?.id);
   }, [activePlaybackRoute?.id, filters.person, preTimelineRoutes, selectedPersonRoutes, timelineStep]);
+
+  const routeEndpointPlaceIds = useMemo(
+    () => new Set(visibleRoutes.flatMap((route) => [route.originId, route.destinationId])),
+    [visibleRoutes],
+  );
+
+  const visibleEhriPlaces = useMemo(
+    () =>
+      data.places.filter((place) => {
+        if (place.layer !== "ehri_local" || !place.coordinates || !layers.campsGhettos) return false;
+        if (filters.place && place.id !== filters.place) return false;
+        if (filters.confidence && place.confidence !== filters.confidence) return false;
+        // A route endpoint remains visible and labelled even when the wider
+        // EHRI overlay is collapsed/off; otherwise intermediary camps vanish
+        // from the very route the visitor is inspecting.
+        return layers.localEhri || routeEndpointPlaceIds.has(place.id);
+      }),
+    [data.places, filters.confidence, filters.place, layers.campsGhettos, layers.localEhri, routeEndpointPlaceIds],
+  );
 
   const familyContextPlaces = useMemo(() => {
     if (!selectedGroup || !layers.familyContext) return [];
@@ -1214,8 +1222,8 @@ export function MapWorkspace({
               "text-size": ["interpolate", ["linear"], ["zoom"], 4, 8, 8, 11],
               "text-offset": [0, 1.15],
               "text-anchor": "top",
-              "text-optional": true,
-              "text-allow-overlap": false,
+              "text-optional": false,
+              "text-allow-overlap": true,
             },
             paint: {
               "text-color": "#244e59",

@@ -513,15 +513,33 @@ const mapData: MapViewModel = (() => {
 
     let routeSequence = 0;
     let lastResolvedPlace = originPlaceId ? basePlaces.get(originPlaceId) ?? null : null;
+    let unresolvedGap = !lastResolvedPlace;
     for (let index = 1; index < stops.length; index += 1) {
-      const previous = stops[index - 1];
       const current = stops[index];
-      const previousPlace = previous.placeId ? basePlaces.get(previous.placeId) : null;
       const currentPlace = current.placeId ? basePlaces.get(current.placeId) : null;
-      if (!previousPlace || !currentPlace) continue;
+      if (!currentPlace?.coordinates) {
+        unresolvedGap = true;
+        continue;
+      }
+      if (!lastResolvedPlace?.coordinates) {
+        lastResolvedPlace = currentPlace;
+        unresolvedGap = false;
+        continue;
+      }
       routeSequence += 1;
-      addRoute(personId, headName, dossierId, previousPlace, currentPlace, current.date, routeSequence, originFallback ? "partial" : "explicit", deportationDetails);
-      if (currentPlace.coordinates) lastResolvedPlace = currentPlace;
+      addRoute(
+        personId,
+        headName,
+        dossierId,
+        lastResolvedPlace,
+        currentPlace,
+        current.date,
+        routeSequence,
+        originFallback || unresolvedGap ? "partial" : "explicit",
+        deportationDetails,
+      );
+      lastResolvedPlace = currentPlace;
+      unresolvedGap = false;
     }
 
     const dorohoi = basePlaces.get("PL-CORE-DOROHOI") ?? null;
