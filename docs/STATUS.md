@@ -30,6 +30,18 @@ clearer treatment beneath the translucent historical polygons. Raw Romanian
 documentary wording remains source-bound until a reviewed translation layer is
 approved.
 
+The current verified Presentation source is
+`data/normalized/eugenia-presentation.json`: 20 real rows from
+`Tabel_Verde_Comparativ_16072026_0835.xlsx`. Its importer includes only the 15
+columns with a solid red fill in Row 1. The two Family members columns are
+preserved separately, matched conservatively and shown under each dossier
+person; the dossier disclosure line contains only `Dossier <number>`.
+
+An empty `Deported from` uses the recorded birth place as the documented
+presentation fallback. Intermediary and destination values are kept in source
+order. Segments are drawn only between consecutive places with existing
+coordinates; unresolved raw places remain visible in the ordered story/timeline.
+
 ## Presentation-only collaboration deployment
 
 A separate Vercel project, `dosare-dorohoi-presentation`, now provides a
@@ -60,7 +72,7 @@ movement lanes are now used by the Research Map route layer as well.
 The MapLibre compass/pitch arrow was removed; only zoom controls remain. The
 presentation status box that had been behind the left control panel is hidden
 from the public canvas because its information is already available in the
-controls and layer status. Historical polygon opacity starts at 28% and is
+controls and layer status. Historical polygon opacity starts at 18% and is
 controlled directly below the historical-layer toggle so basemap detail stays
 readable. Selecting a person fits the map to all of that person's documented
 route endpoints and places with an eased camera transition.
@@ -81,30 +93,10 @@ demo adapter also normalizes its internal dossier references so the documented
 head and mentioned people appear under the same family entry and their routes
 remain selectable individually.
 
-The Presentation Map now exposes a clearly labelled test-data switcher. The
-Project data option uses the normalized collections. The Claude demo option
-uses the derived fixture at `data/demo/claude-map-demo.json`, containing 48
-persons, 11 dossiers, 15 prototype places and 26 route segments from the
-embedded `Platforma_WJC (10).html` sample. Its map adapter adds the separate
-385-record EHRI overlay without assigning those records to Claude persons.
-The fixture remains isolated from normalized person research data and retains
-the source filename and SHA-256 for traceability.
-
-The Presentation Map now has a third test-data tab, `Eugenia data`, at
-`/presentation/map?dataset=eugenia`. Its fixture is generated from the supplied
-`Export_Dosare_Eugenia.xlsx` and `Export_Dosare_Eugenia.json` files. The complete
-Excel `Eugenia_brut` sheet (52 rows) and the JSON's 16 verified dossier bundles
-(65 structured people, 27 victims and scan-checked corrections) remain separate
-inside `data/demo/eugenia-map-demo.json`. The adapter exposes all 52 table rows
-and the verified dossier families in the right-side directory.
-
-This demo source does not write to `data/source/` or `data/normalized/`. It
-resolves only unambiguous Dorohoi and Mohyliv-Podilskyi mentions against the
-existing gazetteer, keeps compound/uncertain names as unresolved raw mentions,
-and creates routes only when both endpoints and person ownership are explicit.
-The EHRI overlay remains an independent 385-place layer. Imported demo IDs do
-not link to `/persons/:id` until the records are deliberately normalized and
-identity-linked.
+The Presentation Map no longer exposes a dataset switcher. It uses only the
+verified Eugenia table above; the former Project, Claude and old Eugenia demo
+fixtures are not loaded by Presentation. The Claude fixture remains available
+in the advanced Research Map at `/map?dataset=claude-demo`.
 
 The Research Map now exposes the same Project data / Claude demo switcher. Its
 default remains the normalized regional project data; `/map?dataset=claude-demo`

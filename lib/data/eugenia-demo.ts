@@ -378,7 +378,7 @@ const mapData: MapViewModel = (() => {
 
   for (const dossier of imported.dossiers) {
     const dossierId = `EUG-D-${dossier.dosar}`;
-    dossiers.push({ id: dossierId, label: `Dossier ${dossier.dosar} · verified transcript` });
+    dossiers.push({ id: dossierId, label: `Dossier ${dossier.dosar}` });
     const idsByRawName = new Map<string, string>();
     const groupPersonIds: string[] = [];
     const headSource = dossier.persoane.find((person) => person.rol === "declarant") ?? dossier.persoane[0];

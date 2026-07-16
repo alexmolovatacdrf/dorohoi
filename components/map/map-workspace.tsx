@@ -1931,7 +1931,7 @@ export function MapWorkspace({
                 {person.label}
               </button>
             ))}
-            {selectedPersonDossier ? <p className="presentation-family-card__meta">Internal record: {selectedPersonDossier.label}</p> : null}
+            {selectedPersonDossier ? <p className="presentation-family-card__meta">{selectedPersonDossier.label}</p> : null}
           </div>
         </details>
       ) : null}
@@ -2136,7 +2136,7 @@ export function MapWorkspace({
                     <span>{person.label}</span><span className="presentation-person-option__role">{person.roles[0] ?? "mentioned person"}</span>
                   </button>
                 ))}
-                {dossier ? <p className="presentation-family-card__meta">Internal record: {dossier.label}</p> : null}
+                {dossier ? <p className="presentation-family-card__meta">{dossier.label}</p> : null}
               </div>
             </details>
           ) : (

@@ -19,12 +19,19 @@ Etichetele interfeței și datele formatate sunt în engleză. Numele, localită
 și formulările documentare brute rămân păstrate ca sursă; nu sunt traduse
 automat fără revizuire.
 
+La 16 iulie 2026, sursa Presentation a fost înlocuită cu tabelul verificat
+`Tabel_Verde_Comparativ_16072026_0835.xlsx`. Sunt incluse 20 de rânduri reale și
+doar cele 15 coloane marcate cu roșu în Row 1. Coloanele Family members —
+Eugenia și Family members — transcriere sunt confruntate conservator; diferențele
+de nume rămân vizibile, iar ambele texte brute apar în povestea persoanei.
+
 ## Starea Git
 
 - Branch: `feature/public-presentation-map`
-- HEAD: `2b3bf01` (`feat: simplify Eugenia presentation pilot`)
-- Worktree: clean after the implementation checkpoint; nu au fost folosite reset, clean,
-  checkout/restore destructiv și nu au fost șterse date existente.
+- HEAD: `bf2d279` (`feat: simplify Eugenia presentation pilot`)
+- Worktree: conține modificări locale necomise pentru fontul global și tabelul
+  verificat Eugenia; nu au fost folosite reset, clean, checkout/restore
+  destructiv și nu au fost șterse date existente.
 - Nu au fost folosite reset, clean, checkout/restore destructiv și nu au fost șterse date existente.
 
 Checkpoint-urile relevante, în ordine:
@@ -120,7 +127,7 @@ not the private review link on the Hobby plan.
 - Panoul `Context` din Research Map include acum directorul comun `Families and mentioned people`, cu căutare și secțiuni dropdown pentru persoanele menționate. Capul/declarantul nu este repetat în lista de membri.
 - Listele de persoane, familii și secțiunile aferente folosesc acum spațiere compactă în ambele moduri de hartă, cu rânduri mai scurte și mai puțin spațiu lateral.
 - Directorul `Families and mentioned people` este acum el însuși un dropdown vizibil în ambele hărți: triunghiul `▸` închide lista, iar `▾` o extinde. Listele interne ale persoanelor menționate folosesc aceeași convenție.
-- Cardul fiecărei familii nu mai repetă rândul `People mentioned in this dossier`. Numărul și triunghiul sunt pe rândul capului/declarantului; la extindere apar numele individuale și linia `Internal record`. Cardul de detalii al persoanei selectate folosește aceeași structură compactă.
+- Cardul fiecărei familii nu mai repetă rândul `People mentioned in this dossier`. Numărul și triunghiul sunt pe rândul capului/declarantului; la extindere apar numele individuale și doar linia `Dossier <number>`. Cardul de detalii al persoanei selectate folosește aceeași structură compactă.
 - Datele afișate în hartă folosesc `formatIsoDate`, `formatDateRange` și
   `formatYearMonth` cu limba activă: engleză în `en-GB`, română în `ro-RO`.
 - Un al doilea click pe aceeași localitate, rută sau zonă istorică elimină
@@ -166,28 +173,29 @@ Regenerarea fixture-ului, doar dacă sursa este prezentă și după o verificare
 node scripts/presentation/derive-claude-demo-map.mjs > data/demo/claude-map-demo.json
 ```
 
-## Datele din exportul Eugenia
+## Datele verificate din tabelul verde Eugenia
 
-Fixture-ul folosit de Presentation pilot este `data/demo/eugenia-map-demo.json`.
-Legacy `?dataset=eugenia` URLs continue to resolve to the same pilot. Fixture-ul
-`data/demo/eugenia-map-demo.json` păstrează 52 de rânduri din foaia Excel
-`Eugenia_brut` și 16 dosare verificate din JSON, cu 65 de persoane structurate,
-27 victime și corecturile scan-check. Adaptorul nu le amestecă automat și nu
-le leagă încă de ruta `/persons/:id`.
+Fixture-ul folosit de Presentation pilot este
+`data/normalized/eugenia-presentation.json`, generat de
+`scripts/presentation/prepare-eugenia-presentation.py` din:
 
-Regenerarea este documentată în `docs/PRESENTATION_MAP.md` și folosește:
+`/mnt/c/Users/Alex Molovata/Downloads/Tabel_Verde_Comparativ_16072026_0835.xlsx`
+
+Sunt 20 de rânduri și 15 coloane, selectate după fill-ul roșu solid din Row 1.
+Fiecare rând este un dosar/persoană selectabil(ă); persoanele menționate din
+ambele coloane Family members apar sub dosarul respectiv. Un `Deported from`
+gol folosește locul nașterii ca fallback documentat. Localitățile intermediare
+și cele din `Deported to Transnistria` păstrează ordinea scrisă. Dacă o
+localitate nu are coordonate în gazetteer, rămâne mențiune brută nerezolvată și
+nu primește coordonate inventate.
+
+Regenerare:
 
 ```bash
-python3 scripts/presentation/prepare-eugenia-demo.py \
-  --xlsx /mnt/c/Users/Alex\ Molovata/Downloads/Export_Dosare_Eugenia.xlsx \
-  --json /mnt/c/Users/Alex\ Molovata/Downloads/Export_Dosare_Eugenia.json \
-  --output data/demo/eugenia-map-demo.json
+python3 scripts/presentation/prepare-eugenia-presentation.py \
+  --xlsx /mnt/c/Users/Alex\ Molovata/Downloads/Tabel_Verde_Comparativ_16072026_0835.xlsx \
+  --output data/normalized/eugenia-presentation.json
 ```
-
-În hartă sunt mapate conservator doar Dorohoi și Mohyliv-Podilskyi când
-mențiunea este neambiguă; compusele rămân în layerul unresolved. Sunt desenate
-doar traseele cu ambele capete și persoana explicită în sursă. EHRI rămâne un
-overlay separat cu 385 de puncte.
 
 ## Verificări deja trecute
 

@@ -55,48 +55,43 @@ the normalized project collection; `/map?dataset=claude-demo` loads the isolated
 Claude fixture into the advanced research interface without mixing it into
 `data/normalized/`.
 
-### Eugenia export
+### Verified Eugenia table
 
-The Presentation pilot is backed by `data/demo/eugenia-map-demo.json`, generated from
-the two supplied Downloads files. It retains both layers of the export instead
-of treating them as interchangeable:
+The Presentation pilot is now backed only by
+`data/normalized/eugenia-presentation.json`, generated from
+`Tabel_Verde_Comparativ_16072026_0835.xlsx`. The importer keeps the source hash,
+worksheet, row numbers and selected-column metadata. It includes the 20 real
+rows in the workbook and only the 15 columns whose Row 1 fill is solid red:
 
-- `Export_Dosare_Eugenia.xlsx` contributes all 52 rows from `Eugenia_brut`;
-- `Export_Dosare_Eugenia.json` contributes 16 dossier records, 65 structured
-  people, 27 victims and the scan-checked correction notes;
-- all 52 Eugenia table rows remain selectable in the right-hand family/person
-  directory, while the 16 verified dossiers expose their structured family
-  members and victims separately;
-- the fixture stores the original source filenames and SHA-256 values in its
-  metadata. The Excel source hash is
-  `537699f5f4a007fbbb69736feb6ab5bea060c96aea1816de766cf2e97ad01c74`; the
-  JSON source hash is
-  `c8c804b118e980921b3a5c228ddce4daa3d7533c195a7d05393da7240a943bab`.
+- dossier number, name, surname, gender, date and place of birth;
+- `Deported from`, intermediary deportation and its date;
+- `Deported to Transnistria` and its date;
+- deportation details, both Family members columns and Other sufferings.
 
-The deployable fixture can be rebuilt, without touching `data/source/`, with:
+The fixture can be regenerated without touching `data/source/`:
 
 ```bash
-python3 scripts/presentation/prepare-eugenia-demo.py \
-  --xlsx /mnt/c/Users/Alex\ Molovata/Downloads/Export_Dosare_Eugenia.xlsx \
-  --json /mnt/c/Users/Alex\ Molovata/Downloads/Export_Dosare_Eugenia.json \
-  --output data/demo/eugenia-map-demo.json
+python3 scripts/presentation/prepare-eugenia-presentation.py \
+  --xlsx /mnt/c/Users/Alex\ Molovata/Downloads/Tabel_Verde_Comparativ_16072026_0835.xlsx \
+  --output data/normalized/eugenia-presentation.json
 ```
 
-The map adapter resolves only unambiguous Dorohoi and Mohyliv-Podilskyi
-mentions against the existing curated gazetteer. Compound names such as
-`Sargorod Jud. Moghilău` and `Zvorastea, Dorohoi` remain raw/unresolved rather
-than being silently collapsed into another place. The 385-place EHRI layer is
-available independently under More layers. Routes are created only when the
-source gives both endpoints and the movement belongs to the selected person;
-the statement in dossier 2526 about the wife and children is therefore not
-drawn as Isidor's route. Unresolved labour locations and uncertain place
-readings remain available through the unresolved layer.
+Each table row is one selectable dossier person. The two Family members
+columns are confronted conservatively: matching readings are combined, while
+different names remain visible as alternative source readings and both raw
+column values remain in the person story. The right-hand directory therefore
+shows the table person once and the mentioned people below that dossier.
 
-The imported Eugenia records are a presentation/demo source, not yet part of
-`data/normalized/`. The verified JSON and Excel rows remain visibly distinct so
-future identity linking across dossiers can be reviewed rather than inferred
-from a name alone. The demo source does not link to `/persons/:id` research
-records because those imported IDs are not yet in the normalized bundle.
+For route construction, an empty `Deported from` value uses the recorded birth
+place as the explicitly documented presentation fallback. Intermediary and
+destination values are split in their written order. A route segment is drawn
+only when both consecutive places have coordinates in the existing project
+gazetteer; other raw places remain visible as unresolved ordered timeline
+mentions. No coordinate or relative's route is invented.
+
+The presentation adapter does not import the former 16-dossier/52-row demo
+fixture. The old file remains in the repository for historical reproducibility,
+but it is not loaded by `/presentation/map`.
 
 ## Presentation-only review deployment
 

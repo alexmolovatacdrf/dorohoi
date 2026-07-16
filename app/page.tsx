@@ -86,7 +86,7 @@ export default function OverviewPage() {
                     y={Number(y) - 14}
                     fill="#dbe5e1"
                     fontSize="12"
-                    fontFamily="Arial"
+                    fontFamily="Inter, Segoe UI Variable, Segoe UI, system-ui, sans-serif"
                     letterSpacing="1.2"
                     textAnchor={Number(x) > 480 ? "end" : "start"}
                   >
