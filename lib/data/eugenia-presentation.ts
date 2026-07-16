@@ -302,10 +302,15 @@ function splitPlaces(value: unknown): string[] {
 }
 
 function cleanPresentationPlaceLabel(value: string): string {
-  return value
+  const cleaned = value
+    .replace(/^(?:ghetto|concentration camp|camp)\s+/iu, "")
     .replace(/\s*\([^)]*\)\s*$/u, "")
     .replace(/\s+(?:concentration camp|camp|ghetto|historical region|regiune istorică)$/iu, "")
     .trim();
+  const canonical = normalizedText(cleaned);
+  if (canonical === "edineti") return "Edineț";
+  if (canonical === "scharhorod") return "Sharhorod";
+  return cleaned;
 }
 
 function presentationPlaceLabel(place: Place, language: "en" | "ro" = "en"): string {
@@ -540,7 +545,7 @@ const mapData: MapViewModel = (() => {
       const place = basePlaces.get(birthPlaceId);
       if (place) {
         addContext(birthPlaceId, personId, dossierId, "birth place", "birth", birthDate, null, `${personId}-birth`);
-        addTimeline(personId, { id: `${personId}-birth`, placeId: birthPlaceId, placeName: place.displayNames.en, placeNameRo: place.displayNames.ro, date: birthDate, label: "Birth / origin", description: null, sourceLabel });
+        addTimeline(personId, { id: `${personId}-birth`, placeId: birthPlaceId, placeName: presentationPlaceLabel(place), placeNameRo: presentationPlaceLabel(place, "ro"), date: birthDate, label: "Birth / origin", description: null, sourceLabel });
       }
     } else if (birthRaw) {
       addUnresolved(`${personId}-birth-place`, birthRaw, "birth place (raw)", personId, dossierId);
@@ -556,7 +561,7 @@ const mapData: MapViewModel = (() => {
     for (const [index, stop] of stops.slice(1).entries()) {
       const place = stop.placeId ? basePlaces.get(stop.placeId) : null;
       const label = stop.kind === "intermediary" ? "Intermediary deportation" : "Deportation destination";
-      const stopDate = index === 0 ? destinationDate ?? stop.date : stop.date;
+      const stopDate = stop.kind === "intermediary" ? intermediateDate : destinationDate ?? stop.date;
       if (place) {
         addContext(place.placeId, personId, dossierId, label.toLocaleLowerCase("en"), "deportation", stopDate, deportationDetails, `${personId}-stop-${index + 1}`);
       } else {
@@ -565,8 +570,8 @@ const mapData: MapViewModel = (() => {
       addTimeline(personId, {
         id: `${personId}-route-stop-${index + 1}`,
         placeId: stop.placeId,
-        placeName: place?.displayNames.en ?? stop.raw,
-        placeNameRo: place?.displayNames.ro ?? stop.raw,
+        placeName: place ? presentationPlaceLabel(place) : stop.raw,
+        placeNameRo: place ? presentationPlaceLabel(place, "ro") : stop.raw,
         date: stopDate,
         label,
         description: deportationDetails,
@@ -589,7 +594,7 @@ const mapData: MapViewModel = (() => {
         unresolvedGap = false;
         continue;
       }
-      const routeDate = routeSequence === 0 ? destinationDate ?? current.date : current.date;
+      const routeDate = current.kind === "intermediary" ? current.date : destinationDate ?? current.date;
       routeSequence += 1;
       addRoute(
         personId,

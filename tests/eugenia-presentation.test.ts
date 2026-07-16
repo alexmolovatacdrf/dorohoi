@@ -100,8 +100,23 @@ describe("verified Eugenia Presentation Map dataset", () => {
       ["Târgu Jiu", "Mohyliv-Podilskyi"],
       ["Mohyliv-Podilskyi", "Dorohoi"],
     ]);
-    expect(routes[0]?.dateRaw).toBe("01/10/1941");
+    expect(routes[0]?.dateRaw).toBe("01/06/1941");
+    expect(routes[1]?.dateRaw).toBe("01/10/1941");
     expect(routes[0]?.routeStatus).toBe("explicit");
+  });
+
+  it("uses intermediary dates before the Transnistria deportation date", () => {
+    const goldenberg = data.routes
+      .filter((route) => route.personName === "Goldenberg Roza")
+      .sort((left, right) => left.sequence - right.sequence);
+    const zissman = data.routes
+      .filter((route) => route.personName === "Zissman Eva")
+      .sort((left, right) => left.sequence - right.sequence);
+
+    expect(goldenberg.map((route) => route.dateRaw)).toEqual(["12/11/1941", null]);
+    expect(zissman.map((route) => route.dateRaw)).toEqual(["01/07/1941", "01/10/1941", null]);
+    expect(data.routes.some((route) => route.personName === "Cohn Eti" && route.destinationName === "Sharhorod")).toBe(true);
+    expect(data.routes.some((route) => route.destinationName === "Edineț")).toBe(true);
   });
 
   it("does not expose the old verified-transcript wording in dossier labels", () => {

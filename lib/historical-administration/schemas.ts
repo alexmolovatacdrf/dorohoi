@@ -46,7 +46,7 @@ export const HISTORICAL_PRESENTATION_NAME_COLORS = {
   Italy: "#86605a",
   Slovakia: "#b18d68",
   "Vichy France": "#987466",
-  Transnistria: "#dc4d2f",
+  Transnistria: "#d6a52c",
   "Reichskommissariat Ukraine": "#6b4c75",
   "Soviet Union": "#b33342",
 } as const;

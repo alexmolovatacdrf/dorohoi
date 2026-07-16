@@ -287,21 +287,21 @@ function historicalPopupContent(
 
   const name = document.createElement("p");
   name.className = "historical-map-popup__name";
-  name.textContent = displayRawHistoricalValue(properties.Name);
+  name.textContent = historicalMapLabel(properties);
 
-  const foreignPower = document.createElement("p");
-  foreignPower.className = "historical-map-popup__detail";
-  foreignPower.textContent = `${historicalDetailLabel("Foreign_Po")}: ${displayRawHistoricalValue(properties.Foreign_Po)}`;
-
-  const headOfState = document.createElement("p");
-  headOfState.className = "historical-map-popup__detail";
-  headOfState.textContent = `${historicalDetailLabel("Head_of_St")}: ${displayRawHistoricalValue(properties.Head_of_St)}`;
-
-  const government = document.createElement("p");
-  government.className = "historical-map-popup__detail";
-  government.textContent = `${historicalDetailLabel("Govt_in_Ex")}: ${displayRawHistoricalValue(properties.Govt_in_Ex)}`;
-
-  root.append(name, dateLabel, foreignPower, headOfState, government);
+  root.append(name, dateLabel);
+  for (const [field, value] of [
+    ["Foreign_Po", properties.Foreign_Po],
+    ["Head_of_St", properties.Head_of_St],
+    ["Govt_in_Ex", properties.Govt_in_Ex],
+  ] as const) {
+    if (!hasHistoricalSourceValue(value)) continue;
+    root.append(popupTextElement(
+      "p",
+      `${historicalDetailLabel(field)}: ${value}`,
+      "historical-map-popup__detail",
+    ));
+  }
   return root;
 }
 
@@ -331,6 +331,17 @@ function historicalMapLabel(properties: HistoricalFeatureProperties): string {
     : displayRawHistoricalValue(properties.Name);
 }
 
+function hasHistoricalSourceValue(value: string): boolean {
+  const normalized = value.trim().toLocaleLowerCase("en");
+  return Boolean(normalized) && normalized !== "<null>" && normalized !== "null";
+}
+
+function historicalLabelOffset(name: string): [number, number] {
+  if (name === "Romania") return [0, -1.15];
+  if (name === "Transnistria") return [0, -0.85];
+  return [0, 0];
+}
+
 function historicalFeatureLabelCoordinate(
   feature: HistoricalFeatureCollection["features"][number],
 ): [number, number] | null {
@@ -341,10 +352,12 @@ function historicalFeatureLabelCoordinate(
   if (!points.length) return null;
   const longitudes = points.map(([longitude]) => longitude);
   const latitudes = points.map(([, latitude]) => latitude);
-  return [
+  const center: [number, number] = [
     (Math.min(...longitudes) + Math.max(...longitudes)) / 2,
     (Math.min(...latitudes) + Math.max(...latitudes)) / 2,
   ];
+  const [longitudeOffset, latitudeOffset] = historicalLabelOffset(feature.properties.Name);
+  return [center[0] + longitudeOffset, center[1] + latitudeOffset];
 }
 
 function hasWebGl2(): boolean {
@@ -417,6 +430,10 @@ function routeEndpointPairKey(route: MapRouteDatum): string {
 }
 
 function routeCurveOffset(route: MapRouteDatum, routes: MapRouteDatum[]): number {
+  // Darabani is close to Dorohoi. A stronger southward presentation bend
+  // keeps the documented Darabani → Târgu Jiu segment visually separate from
+  // the Dorohoi marker without changing either endpoint.
+  if (route.originName === "Darabani" && route.destinationName === "Târgu Jiu") return 2.2;
   const siblings = routes
     .filter((candidate) => routeEndpointPairKey(candidate) === routeEndpointPairKey(route))
     .sort((left, right) => left.sequence - right.sequence || left.id.localeCompare(right.id));
@@ -1649,21 +1666,11 @@ export function MapWorkspace({
       label.textContent = language === "ro" ? place.labelRo : place.label;
       const [labelX, labelY] = mapLabelOffset(place.id);
       label.style.transform = `translate(${labelX}px, ${labelY}px)`;
-      const personContext = filters.person
-        ? place.personContexts.find((context) => context.personId === filters.person)
-        : null;
-      const eventDate = personContext?.connections.find((connection) => connection.date)?.date;
-      const dateLabel = eventDate ? document.createElement("span") : null;
-      if (dateLabel && eventDate) {
-        dateLabel.className = "research-map-marker__date";
-        dateLabel.textContent = formatDateRange(eventDate, language);
-      }
       const pin = document.createElement("span");
       pin.className = `research-map-marker__pin${place.layer === "ehri_local" ? " research-map-marker__pin--ehri" : ""}`;
       pin.style.backgroundColor = placeColor(place);
       pin.textContent = placeMarkerSymbol(place);
       element.append(label);
-      if (dateLabel) element.append(dateLabel);
       element.append(pin);
       element.addEventListener("click", (event) => {
         event.stopPropagation();
@@ -2012,12 +2019,12 @@ export function MapWorkspace({
     </>
   ) : selectedHistorical ? (
     <>
-      <h2 className="presentation-card__title">{displayRawHistoricalValue(selectedHistorical.Name)}</h2>
+      <h2 className="presentation-card__title">{historicalMapLabel(selectedHistorical)}</h2>
       <p className="presentation-card__eyebrow">{formatYearMonth(selectedHistorical.yearMonth, language)} · supplied {formatIsoDate(selectedHistorical.snapshotDate, language)}</p>
       <dl className="presentation-card__details">
-        <div><dt>{historicalDetailLabel("Foreign_Po")}</dt><dd>{displayRawHistoricalValue(selectedHistorical.Foreign_Po)}</dd></div>
-        <div><dt>{historicalDetailLabel("Head_of_St")}</dt><dd>{displayRawHistoricalValue(selectedHistorical.Head_of_St)}</dd></div>
-        <div><dt>{historicalDetailLabel("Govt_in_Ex")}</dt><dd>{displayRawHistoricalValue(selectedHistorical.Govt_in_Ex)}</dd></div>
+        {hasHistoricalSourceValue(selectedHistorical.Foreign_Po) ? <div><dt>{historicalDetailLabel("Foreign_Po")}</dt><dd>{selectedHistorical.Foreign_Po}</dd></div> : null}
+        {hasHistoricalSourceValue(selectedHistorical.Head_of_St) ? <div><dt>{historicalDetailLabel("Head_of_St")}</dt><dd>{selectedHistorical.Head_of_St}</dd></div> : null}
+        {hasHistoricalSourceValue(selectedHistorical.Govt_in_Ex) ? <div><dt>{historicalDetailLabel("Govt_in_Ex")}</dt><dd>{selectedHistorical.Govt_in_Ex}</dd></div> : null}
       </dl>
     </>
   ) : selectedPerson ? (
@@ -2824,7 +2831,7 @@ export function MapWorkspace({
               </StatusBadge>
             </div>
             <h3 className="font-editorial mt-1 text-2xl leading-7 font-bold text-[#173f36]">
-              {displayRawHistoricalValue(selectedHistorical.Name)}
+              {historicalMapLabel(selectedHistorical)}
             </h3>
             <p className="mt-2 text-[9px] font-black tracking-[0.12em] text-[#76536f] uppercase">
               {formatYearMonth(selectedHistorical.yearMonth, language)} · supplied {formatIsoDate(selectedHistorical.snapshotDate, language)}
@@ -2833,10 +2840,10 @@ export function MapWorkspace({
               Historical state or territory name followed by the supplied authority fields.
             </p>
             <dl className="mt-4 space-y-2 border-y border-[#ded8cc] py-3 text-[10px] leading-4">
-              <div><dt className="font-bold text-[#4c5954]">Name</dt><dd className="break-words">{displayRawHistoricalValue(selectedHistorical.Name)}</dd></div>
-              <div><dt className="font-bold text-[#4c5954]">{historicalDetailLabel("Foreign_Po")}</dt><dd className="break-words">{displayRawHistoricalValue(selectedHistorical.Foreign_Po)}</dd></div>
-              <div><dt className="font-bold text-[#4c5954]">{historicalDetailLabel("Head_of_St")}</dt><dd className="break-words">{displayRawHistoricalValue(selectedHistorical.Head_of_St)}</dd></div>
-              <div><dt className="font-bold text-[#4c5954]">{historicalDetailLabel("Govt_in_Ex")}</dt><dd className="break-words">{displayRawHistoricalValue(selectedHistorical.Govt_in_Ex)}</dd></div>
+              <div><dt className="font-bold text-[#4c5954]">Name</dt><dd className="break-words">{selectedHistorical.Name}</dd></div>
+              {hasHistoricalSourceValue(selectedHistorical.Foreign_Po) ? <div><dt className="font-bold text-[#4c5954]">{historicalDetailLabel("Foreign_Po")}</dt><dd className="break-words">{selectedHistorical.Foreign_Po}</dd></div> : null}
+              {hasHistoricalSourceValue(selectedHistorical.Head_of_St) ? <div><dt className="font-bold text-[#4c5954]">{historicalDetailLabel("Head_of_St")}</dt><dd className="break-words">{selectedHistorical.Head_of_St}</dd></div> : null}
+              {hasHistoricalSourceValue(selectedHistorical.Govt_in_Ex) ? <div><dt className="font-bold text-[#4c5954]">{historicalDetailLabel("Govt_in_Ex")}</dt><dd className="break-words">{selectedHistorical.Govt_in_Ex}</dd></div> : null}
             </dl>
             <div className="mt-3 flex flex-wrap gap-1.5">
               <StatusBadge tone="blue">source row {selectedHistorical.sourceFeatureIndex}</StatusBadge>
