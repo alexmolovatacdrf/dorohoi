@@ -26,7 +26,14 @@ describe("verified Eugenia Presentation Map dataset", () => {
   });
 
   it("uses birth place when Deported from is blank and preserves unresolved raw places", () => {
-    expect(data.unresolvedMentions.some((mention) => mention.valueRaw === "Radauti" && mention.role === "deportation origin (raw)")).toBe(true);
+    const fallbackPeople = ["Roizen Tili", "Roizen Bety", "Ancel Maria", "Zissman Eva"];
+    for (const personName of fallbackPeople) {
+      expect(data.routes.some((route) => route.personName === personName && route.routeStatus === "partial")).toBe(true);
+    }
+    expect(data.routes.some((route) => route.personName === "Roizen Tili" && route.originName === "Rădăuți")).toBe(true);
+    expect(data.routes.some((route) => route.personName === "Roizen Bety" && route.originName === "Dumbrăveni")).toBe(true);
+    expect(data.routes.some((route) => route.personName === "Ancel Maria" && route.originName === "Herța")).toBe(true);
+    expect(data.routes.some((route) => route.personName === "Zissman Eva" && route.originName === "Rădăuți-Prut")).toBe(true);
     expect(data.routes.some((route) => route.personName === "Poplicher Iancu" && route.originName === "Dorohoi")).toBe(true);
     expect(data.unresolvedMentions.some((mention) => mention.valueRaw === "Tropova")).toBe(true);
   });

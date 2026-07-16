@@ -1,4 +1,5 @@
 import eugeniaPresentation from "@/data/normalized/eugenia-presentation.json";
+import eugeniaPresentationPlaces from "@/data/normalized/eugenia-presentation-places.json";
 import normalizedPlaces from "@/data/normalized/places.json";
 import type { DateRange, Place } from "@/lib/domain/schemas";
 import type {
@@ -53,7 +54,66 @@ export const EUGENIA_PRESENTATION_SOURCE = {
 } as const;
 
 const sourceLabel = `${EUGENIA_PRESENTATION_SOURCE.sourceFile} · red Row 1 columns only`;
-const allPlaces = normalizedPlaces as Place[];
+const importedPresentationPlaces = eugeniaPresentationPlaces as unknown as {
+  metadata: {
+    coordinateSource: string;
+    accessed: string;
+  };
+  places: Array<{
+    id: string;
+    rawNames: string[];
+    label: string;
+    coordinates: { latitude: number; longitude: number };
+    sourceUrl: string;
+  }>;
+};
+
+const explicitPresentationPlaces: Place[] = importedPresentationPlaces.places.map((place) => ({
+  id: place.id,
+  dossierId: null,
+  sourceRefs: [{
+    sourceFile: place.sourceUrl,
+    sourceDataset: "curated_gazetteer",
+    documentId: null,
+    dossierId: null,
+    pagePdf: null,
+    pagePrinted: null,
+    field: "presentation settlement coordinates",
+    sourceRecordId: place.id,
+    fragmentRaw: place.label,
+  }],
+  raw: { originalName: place.rawNames[0] ?? place.label, variants: place.rawNames },
+  normalized: {
+    normalizedName: place.label,
+    displayNames: { en: place.label, ro: place.label },
+    resolutionStatus: "resolved",
+    coordinateSource: importedPresentationPlaces.metadata.coordinateSource,
+  },
+  confidence: "unknown",
+  assertionStatus: "explicit",
+  reviewState: "not_required",
+  alternativeReadings: [],
+  placeId: place.id,
+  originalName: place.rawNames[0] ?? place.label,
+  normalizedName: place.label,
+  displayNames: { en: place.label, ro: place.label },
+  variants: place.rawNames,
+  placeType: "settlement",
+  coordinates: place.coordinates,
+  coordinateSource: {
+    label: importedPresentationPlaces.metadata.coordinateSource,
+    url: place.sourceUrl,
+    accessed: importedPresentationPlaces.metadata.accessed,
+    sourceRecordId: place.id,
+  },
+  coordinateConfidence: "unknown",
+  resolutionStatus: "resolved",
+  layer: "core",
+  externalDatasetId: null,
+  relatedPlaceIds: [],
+}));
+
+const allPlaces = [...(normalizedPlaces as Place[]), ...explicitPresentationPlaces];
 const basePlaces = new Map(allPlaces.map((place) => [place.placeId, place]));
 
 function clean(value: unknown): string | null {
@@ -131,10 +191,18 @@ for (const place of allPlaces) {
   }
 }
 
+// The table's "Edinet" spelling corresponds to the supplied EHRI record
+// "Edineţi concentration camp". This is an orthographic source-name alias,
+// not a new place or an inferred route stop.
+const sourcePlaceAliases = new Map([["edinet", "edineti"]]);
+
 function placeIdForRaw(value: unknown, mode: "any" | "settlement" = "any"): string | null {
   const text = clean(value);
   if (!text) return null;
-  const candidates = (placeCandidates.get(normalizedText(text)) ?? []).filter((place) =>
+  const lookupKeys = [normalizedText(text), sourcePlaceAliases.get(normalizedText(text))].filter(
+    (key): key is string => Boolean(key),
+  );
+  const candidates = [...new Set(lookupKeys.flatMap((key) => placeCandidates.get(key) ?? []))].filter((place) =>
     mode === "any" || place.placeType === "settlement" || place.placeType === "historical_region" || place.layer === "core",
   );
   const place = [...candidates].sort((left, right) => {

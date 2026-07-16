@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "description": "Explicit settlement coordinates used to render place values from the verified Eugenia presentation table. Coordinates locate the named settlement; they do not infer an undocumented route.",
+    "coordinateSource": "OpenStreetMap-derived locality records via Mapcarta and the OpenStreetMap Wiki",
+    "accessed": "2026-07-16",
+    "purpose": "presentation route rendering"
+  },
+  "places": [
+    {
+      "id": "PL-PRESENTATION-RADAUTI",
+      "rawNames": ["Radauti", "Rădăuți"],
+      "label": "Rădăuți",
+      "coordinates": {"latitude": 47.8372, "longitude": 25.9205},
+      "sourceUrl": "https://wiki.openstreetmap.org/wiki/Ro%3ARomania/Jude%C8%9Bul_Suceava/R%C4%83d%C4%83u%C8%9Bi"
+    },
+    {
+      "id": "PL-PRESENTATION-DUMBRAVENI-SUCEAVA",
+      "rawNames": ["Dumbraveni", "Dumbrăveni", "Dumbrăveni, Suceava"],
+      "label": "Dumbrăveni",
+      "coordinates": {"latitude": 47.65995, "longitude": 26.42247},
+      "sourceUrl": "https://mapcarta.com/13703078"
+    },
+    {
+      "id": "PL-PRESENTATION-HERTA",
+      "rawNames": ["Herta", "Herța", "Hertsa"],
+      "label": "Herța",
+      "coordinates": {"latitude": 48.15, "longitude": 26.2666667},
+      "sourceUrl": "https://fr.wikipedia.org/wiki/Hertsa"
+    },
+    {
+      "id": "PL-PRESENTATION-RADAUTI-PRUT",
+      "rawNames": ["Radauti Prut", "Rădăuți-Prut", "Rădăuți Prut"],
+      "label": "Rădăuți-Prut",
+      "coordinates": {"latitude": 48.23777, "longitude": 26.80638},
+      "sourceUrl": "https://mapcarta.com/de/W75538804"
+    }
+  ]
+}
