@@ -338,26 +338,58 @@ function hasHistoricalSourceValue(value: string): boolean {
 
 function historicalLabelOffset(name: string): [number, number] {
   if (name === "Romania") return [0, -1.15];
-  // Keep the long public title inside the yellow Transnistria polygon and
-  // away from the route's Transnistria endpoint.
-  if (name === "Transnistria") return [1.05, 0.45];
   return [0, 0];
+}
+
+// The historical source polygons for these countries include distant islands,
+// so a bounding-box centre would place their names over the sea. These anchors
+// follow the mainland/territory label positions used by ordinary map labels.
+const historicalLabelPositionOverrides: Record<string, [number, number]> = {
+  Portugal: [-8.281, 39.557],
+  Spain: [-3.475, 39.888],
+  Malta: [14.419, 35.898],
+  // Same longitude as the previous placement; only move the title lower.
+  Transnistria: [30.84, 47.5],
+};
+
+function ringAreaAndCentroid(ring: Array<[number, number]>): {
+  area: number;
+  centroid: [number, number];
+} {
+  let twiceArea = 0;
+  let longitudeSum = 0;
+  let latitudeSum = 0;
+  for (let index = 0; index < ring.length - 1; index += 1) {
+    const [longitude, latitude] = ring[index] ?? [0, 0];
+    const [nextLongitude, nextLatitude] = ring[index + 1] ?? [longitude, latitude];
+    const cross = longitude * nextLatitude - nextLongitude * latitude;
+    twiceArea += cross;
+    longitudeSum += (longitude + nextLongitude) * cross;
+    latitudeSum += (latitude + nextLatitude) * cross;
+  }
+  if (Math.abs(twiceArea) < 1e-9) {
+    const [longitude, latitude] = ring[0] ?? [0, 0];
+    return { area: 0, centroid: [longitude, latitude] };
+  }
+  return {
+    area: Math.abs(twiceArea) / 2,
+    centroid: [longitudeSum / (3 * twiceArea), latitudeSum / (3 * twiceArea)],
+  };
 }
 
 function historicalFeatureLabelCoordinate(
   feature: HistoricalFeatureCollection["features"][number],
 ): [number, number] | null {
-  const rings = feature.geometry.type === "Polygon"
-    ? [feature.geometry.coordinates[0]]
-    : feature.geometry.coordinates.map((polygon) => polygon[0]);
-  const points = rings.flat().filter((point): point is [number, number] => point.length >= 2);
-  if (!points.length) return null;
-  const longitudes = points.map(([longitude]) => longitude);
-  const latitudes = points.map(([, latitude]) => latitude);
-  const center: [number, number] = [
-    (Math.min(...longitudes) + Math.max(...longitudes)) / 2,
-    (Math.min(...latitudes) + Math.max(...latitudes)) / 2,
-  ];
+  const override = historicalLabelPositionOverrides[feature.properties.Name];
+  if (override) return override;
+  const polygons = feature.geometry.type === "Polygon"
+    ? [feature.geometry.coordinates]
+    : feature.geometry.coordinates;
+  const candidates = polygons
+    .map((polygon) => ringAreaAndCentroid(polygon[0] ?? []))
+    .sort((left, right) => right.area - left.area);
+  const center = candidates[0]?.centroid;
+  if (!center) return null;
   const [longitudeOffset, latitudeOffset] = historicalLabelOffset(feature.properties.Name);
   return [center[0] + longitudeOffset, center[1] + latitudeOffset];
 }
