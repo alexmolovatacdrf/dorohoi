@@ -338,7 +338,9 @@ function hasHistoricalSourceValue(value: string): boolean {
 
 function historicalLabelOffset(name: string): [number, number] {
   if (name === "Romania") return [0, -1.15];
-  if (name === "Transnistria") return [0, -0.85];
+  // Keep the long public title inside the yellow Transnistria polygon and
+  // away from the route's Transnistria endpoint.
+  if (name === "Transnistria") return [1.05, 0.45];
   return [0, 0];
 }
 
