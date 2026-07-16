@@ -487,7 +487,7 @@ const mapData: MapViewModel = (() => {
       });
       eventTypes.add("forced_labour");
     }
-    groups.push({ id: dossierId, label: `${dossier.nume} ${dossier.prenume} · dossier ${dossier.dosar}`, personIds: [...new Set(groupPersonIds)], kind: "family" });
+    groups.push({ id: dossierId, label: `${dossier.nume} ${dossier.prenume}`, personIds: [...new Set(groupPersonIds)], kind: "family" });
   }
 
   for (const [index, row] of imported.eugeniaRows.entries()) {
@@ -523,7 +523,7 @@ const mapData: MapViewModel = (() => {
       null,
     );
     addPerson({ id: personId, label: name, dossierId, roles: ["Eugenia table person"], story }, story);
-    groups.push({ id: dossierId, label: `${name} · Eugenia table · ${rawDossierId}`, personIds: [personId], kind: "family" });
+    groups.push({ id: dossierId, label: name, personIds: [personId], kind: "family" });
     if (originId) addContext(originId, personId, dossierId, "birth place", "birth", birthDate, null);
     else if (originRaw) addUnresolved(`${personId}-birth-place`, originRaw, "birth place (raw)", personId, dossierId);
     const tableRouteDate = toDateRange(row["Date of deportation to Transnistria"]);

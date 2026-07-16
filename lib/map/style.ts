@@ -39,7 +39,7 @@ const researchGrid: FeatureCollection<LineString, GeoJsonProperties> = {
  * Glyphs and sprites are not required: raster labels are part of the tiles and
  * project symbols are generated locally.
  */
-export function createResearchMapStyle(): StyleSpecification {
+export function createResearchMapStyle(presentation = false): StyleSpecification {
   return {
     version: 8,
     name: "Dosare Dorohoi resilient research map",
@@ -69,11 +69,14 @@ export function createResearchMapStyle(): StyleSpecification {
         type: "raster",
         source: BASEMAP_SOURCE_ID,
         paint: {
-          "raster-opacity": 0.88,
-          "raster-saturation": -0.28,
-          "raster-contrast": -0.06,
+          // The public pilot keeps the ordinary OSM labels, roads and rivers
+          // readable beneath the translucent historical polygons. Research
+          // Map retains its quieter paper treatment.
+          "raster-opacity": presentation ? 0.98 : 0.88,
+          "raster-saturation": presentation ? -0.02 : -0.28,
+          "raster-contrast": presentation ? 0.02 : -0.06,
           "raster-brightness-min": 0.1,
-          "raster-brightness-max": 0.96,
+          "raster-brightness-max": presentation ? 1 : 0.96,
           "raster-fade-duration": 0,
         },
       },

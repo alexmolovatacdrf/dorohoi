@@ -6,16 +6,29 @@ Both use the shared `MapWorkspace` MapLibre component; the explicit
 `mode="presentation"` selects the public dataset, controls, layout and camera
 defaults without duplicating the map renderer.
 
-## Test datasets
+## 2026-07-16 pilot simplification
 
-The presentation page has a visible test-data switcher:
+For the Eugenia pilot, `/presentation/map` exposes only the Eugenia fixture.
+The Project and Claude demo datasets remain available in the advanced Research
+Map and are not shown as Presentation tabs. Legacy `?dataset=project` and
+`?dataset=claude-demo` URLs resolve to the Eugenia pilot as well.
 
-- `/presentation/map?dataset=project` uses the current normalized, evidence-bound
-  project collections;
-- `/presentation/map?dataset=claude-demo` uses the separate map fixture derived
-  from the embedded data in `Platforma_WJC (10).html`.
-- `/presentation/map?dataset=eugenia` uses the supplied Eugenia export as a
-  third, separately labelled dataset tab next to Project data and Claude demo.
+The pilot is English-only at the interface level. Names, places and raw
+documentary wording remain source-bound; they are not silently overwritten by
+machine translation. Structured labels and dates are presented in English,
+while a reviewed translation layer can be added when the corrected Eugenia
+table is supplied.
+
+The ordinary OpenStreetMap raster layer remains the map base:
+`https://tile.openstreetmap.org/{z}/{x}/{y}.png`. Presentation mode uses a
+clearer raster treatment and starts with historical polygon opacity at 18%, so
+roads, rivers and settlement labels remain visible.
+
+## Research/demo fixtures
+
+The Claude fixture remains available only in Research Map at
+`/map?dataset=claude-demo`. It uses the separate map fixture derived from the
+embedded data in `Platforma_WJC (10).html`.
 
 The Claude fixture contains 48 persons, 11 dossiers, 15 prototype places and
 26 route segments. The map adapter adds the separate 385-record local EHRI
@@ -44,7 +57,7 @@ Claude fixture into the advanced research interface without mixing it into
 
 ### Eugenia export
 
-The Eugenia tab is backed by `data/demo/eugenia-map-demo.json`, generated from
+The Presentation pilot is backed by `data/demo/eugenia-map-demo.json`, generated from
 the two supplied Downloads files. It retains both layers of the export instead
 of treating them as interchangeable:
 
@@ -101,7 +114,7 @@ public assets. Sensitive material must not be placed in this static deployment.
 
 The current protected review deployment is:
 
-`https://dosare-dorohoi-presentation-3ae8u6vd1.vercel.app/presentation/map?dataset=project`
+`https://dosare-dorohoi-presentation-3ae8u6vd1.vercel.app/presentation/map`
 
 On the Hobby plan, share the unique deployment URL above rather than the
 stable `*.vercel.app` project alias. The unique URL is the one covered by
@@ -112,21 +125,28 @@ account.
 
 The presentation mode uses
 `/data/historical-administration-full/manifest.json`. Its initial historical
-view fits the practical Europe camera window `[-11.0, 35.0, 62.5, 72.0]`, from
-Portugal to the Ekaterinburg/Perm area, and loads August 1941 by default. The
-historical layer itself retains the complete source extent; only the initial
-public camera is bounded for useful viewing. Changing the month changes one
-selected snapshot; the browser never loads all 88 monthly files. Project
-routes, places and markers are registered above the historical polygons.
+view fits the Romania–Moldavia–Transnistria working area
+`[20.0, 43.0, 32.0, 50.8]`; Europe view still exposes the practical full
+window from Portugal to the western Urals. The historical layer itself retains
+the complete source extent; only the initial public camera is bounded for
+useful viewing. Changing the month changes one selected snapshot; the browser
+never loads all 88 monthly files. Project routes, places and markers are
+registered above the historical polygons.
 
 The visible controls are intentionally limited to:
 
-- person/story selector;
+- person selector and family directory;
 - month/year and polygon opacity;
 - historical context and modern basemap;
 - persons, routes and important places;
 - collapsed-by-default EHRI and unresolved-place layers;
-- EN/RO site language control, reset, full screen and hide-interface controls.
+- reset, full screen and hide-interface controls.
+
+The left settings panel is closed on first load. The right people panel and
+the bottom route timeline are compact overlays so the map remains the dominant
+surface. The timeline shows the event date beside each documented destination;
+dates use the English format and preserve month/year precision when a day is
+not supplied.
 
 The public map does not expose dossiers, event type or confidence filters. The
 research map retains those capabilities under its collapsed Advanced filters

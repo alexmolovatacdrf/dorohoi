@@ -17,6 +17,19 @@ local EHRI registry, exposes the resulting evidence through typed selectors,
 and presents it through searchable research pages and an interactive MapLibre
 workspace. No database or source-data write-back has been introduced.
 
+## Current Eugenia pilot presentation
+
+The `/presentation/map` route now exposes only the Eugenia presentation
+fixture. Project data and Claude demo remain available through the advanced
+Research Map, not through Presentation tabs. The pilot uses an English-only,
+compact shell titled **Public Historical Atlas · Jews Repatriated to Dorohoi**:
+the settings panel starts closed, the people panel and route timeline are
+reduced, and the initial camera opens on Romania, Moldavia and Transnistria.
+The presentation basemap is the standard OpenStreetMap raster layer with a
+clearer treatment beneath the translucent historical polygons. Raw Romanian
+documentary wording remains source-bound until a reviewed translation layer is
+approved.
+
 ## Presentation-only collaboration deployment
 
 A separate Vercel project, `dosare-dorohoi-presentation`, now provides a
@@ -26,7 +39,7 @@ full-Europe historical assets, redirects other application routes back to
 Presentation Map, and hides the advanced global navigation. The current unique
 deployment URL is protected by Vercel Authentication:
 
-`https://dosare-dorohoi-presentation-3ae8u6vd1.vercel.app/presentation/map?dataset=project`
+`https://dosare-dorohoi-presentation-3ae8u6vd1.vercel.app/presentation/map`
 
 The stable project alias is not the private sharing URL on Hobby; use the
 unique deployment URL and the collaborator's invited Vercel account.

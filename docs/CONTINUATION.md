@@ -1,13 +1,28 @@
 # Dosare Dorohoi — continuation handoff
 
-Last saved: 2026-07-15
+Last saved: 2026-07-16
 
 Acest document păstrează punctul de continuare pentru următoarea sesiune. Contextul conversației nu trebuie reconstruit doar din memorie: starea de lucru, deciziile și pașii următori sunt consemnate aici și în istoricul Git.
+
+## Latest pilot pass — 2026-07-16
+
+Presentation Map este pregătită pentru prototipul Eugenia: `/presentation/map`
+încarcă numai fixture-ul Eugenia, fără taburile Project data sau Claude demo.
+Headerul este compact și în engleză (`Public Historical Atlas · Jews
+Repatriated to Dorohoi`), panoul stâng este închis implicit, iar panoul drept și
+timeline-ul au fost reduse pentru a lăsa harta dominantă. Camera inițială este
+zona România–Basarabia–Transnistria; Europe view rămâne disponibil. Timeline-ul
+afișează data sub destinația fiecărui segment. Basemap-ul este rasterul standard
+OpenStreetMap, cu o variantă mai lizibilă în Presentation.
+
+Etichetele interfeței și datele formatate sunt în engleză. Numele, localitățile
+și formulările documentare brute rămân păstrate ca sursă; nu sunt traduse
+automat fără revizuire.
 
 ## Starea Git
 
 - Branch: `feature/public-presentation-map`
-- HEAD: `da26516` (`docs: record Eugenia deployment URLs`)
+- HEAD: `2b3bf01` (`feat: simplify Eugenia presentation pilot`)
 - Worktree: clean after the implementation checkpoint; nu au fost folosite reset, clean,
   checkout/restore destructiv și nu au fost șterse date existente.
 - Nu au fost folosite reset, clean, checkout/restore destructiv și nu au fost șterse date existente.
@@ -46,25 +61,19 @@ npm run dev -- --hostname 127.0.0.1
 
 URL-uri:
 
-- Presentation Map cu datele proiectului: `http://127.0.0.1:3000/presentation/map?dataset=project`
-- Presentation Map cu fixture-ul derivat din Claude: `http://127.0.0.1:3000/presentation/map?dataset=claude-demo`
-- Presentation Map cu exportul Eugenia: `http://127.0.0.1:3000/presentation/map?dataset=eugenia`
+- Presentation Map pilot Eugenia: `http://127.0.0.1:3000/presentation/map`
 - Research Map: `http://127.0.0.1:3000/map`
 
 Vercel Production după ultimul deploy:
 
 - protected unique deployment: `https://dosare-dorohoi-platform-chatgpt-pzr8huq8m.vercel.app`
-- Presentation Map project: `https://dosare-dorohoi-platform-chatgpt-pzr8huq8m.vercel.app/presentation/map?dataset=project`
-- Presentation Map Claude: `https://dosare-dorohoi-platform-chatgpt-pzr8huq8m.vercel.app/presentation/map?dataset=claude-demo`
-- Presentation Map Eugenia: `https://dosare-dorohoi-platform-chatgpt-pzr8huq8m.vercel.app/presentation/map?dataset=eugenia`
+- Presentation Map pilot Eugenia: `https://dosare-dorohoi-platform-chatgpt-pzr8huq8m.vercel.app/presentation/map`
 - Research Map Claude: `https://dosare-dorohoi-platform-chatgpt-pzr8huq8m.vercel.app/map?dataset=claude-demo`
 
 Separate gradual-review deployment for Eugenia:
 
 - Vercel project: `dosare-dorohoi-presentation`
-- protected unique URL: `https://dosare-dorohoi-presentation-3ae8u6vd1.vercel.app/presentation/map?dataset=project`
-- Claude demo variant on the same protected deployment: `https://dosare-dorohoi-presentation-3ae8u6vd1.vercel.app/presentation/map?dataset=claude-demo`
-- Eugenia data variant on the same protected deployment: `https://dosare-dorohoi-presentation-3ae8u6vd1.vercel.app/presentation/map?dataset=eugenia`
+- protected unique URL: `https://dosare-dorohoi-presentation-3ae8u6vd1.vercel.app/presentation/map`
 - stable alias (do not share as the private link on Hobby): `https://dosare-dorohoi-presentation.vercel.app`
 
 The separate project has `PRESENTATION_ONLY=true` and Vercel Authentication
@@ -80,8 +89,8 @@ not the private review link on the Hobby plan.
 ## Ce este implementat acum
 
 - `/map` rămâne Research Map-ul avansat, cu dataset-ul regional și funcționalitățile de cercetare.
-- `/presentation/map` este experiența publică simplificată și folosește dataset-ul istoric full Europe.
-- Presentation Map are panou de setări în stânga și panou separat pentru persoane/familii în dreapta.
+- `/presentation/map` este experiența publică simplificată și folosește numai fixture-ul Eugenia împreună cu dataset-ul istoric full Europe.
+- Presentation Map are panou de setări în stânga și panou separat pentru persoane/familii în dreapta; setările din stânga sunt închise implicit în pilot.
 - Panoul din stânga păstrează setările de vizualizare: view Europe/Project region, luna, layere, opacitatea stratului istoric, legendă, reset, fullscreen și ascunderea interfeței.
 - Panoul din dreapta afișează familiile/dosarele, capul familiei/declarantul primul și persoanele menționate sub acesta. Fiecare persoană este selectabilă separat.
 - Numărul dosarului este afișat discret ca identificator intern, nu ca titlu principal.
@@ -94,9 +103,8 @@ not the private review link on the Hobby plan.
 - Popup-ul istoric nu mai apare la hover. Apare doar la click normal sau click dreapta și poate fi închis.
 - Opacitatea istorică are control separat, cu valoare implicită redusă pentru a păstra lizibile orașele, râurile și basemap-ul.
 - Footer-ul este ascuns pe paginile de hartă, astfel încât să nu ocupe permanent spațiu din viewport.
-- Fixture-ul Claude este comutat prin `?dataset=claude-demo`; nu este amestecat în `data/normalized/`.
-- Tab-ul activ al dataset-ului este acum corelat corect cu URL-ul; `?dataset=project` afișează clar Project data.
-- Europe view, Project region și Selected story au stare vizuală explicită, iar panoul arată eticheta „Active view”.
+- Fixture-ul Claude rămâne izolat în Research Map prin `?dataset=claude-demo`; nu este amestecat în `data/normalized/` și nu mai este expus în Presentation pilot.
+- Europe view, Project region și Selected story au stare vizuală explicită; pilotul pornește în zona România–Basarabia–Transnistria.
 - Zoom-ul este mutat în afara panoului drept pe desktop și deasupra timeline-ului pe mobil.
 - Lista familiei afișează capul/declarantul o singură dată; persoanele menționate sunt într-un `<details>` închis implicit.
 - Antetul sticky al ambelor panouri păstrează butonul de închidere accesibil în timpul scroll-ului.
@@ -120,7 +128,7 @@ not the private review link on the Hobby plan.
   disponibil.
 - Research Map acceptă acum `?dataset=claude-demo`, păstrând `/map` fără
   parametri pe datele normalizate ale proiectului.
-- Animația comună are 4,6 secunde pe segment și este activă în ambele moduri;
+- Animația comună are 5,6 secunde pe segment și este activă în ambele moduri;
   Research Map folosește aceeași curbă, săgeată și bilă de progres ca
   Presentation Map.
 - Layerul EHRI/More Layers nu mai este ascuns când este selectată o persoană;
@@ -160,7 +168,8 @@ node scripts/presentation/derive-claude-demo-map.mjs > data/demo/claude-map-demo
 
 ## Datele din exportul Eugenia
 
-Al treilea tab din Presentation Map este `?dataset=eugenia`. Fixture-ul
+Fixture-ul folosit de Presentation pilot este `data/demo/eugenia-map-demo.json`.
+Legacy `?dataset=eugenia` URLs continue to resolve to the same pilot. Fixture-ul
 `data/demo/eugenia-map-demo.json` păstrează 52 de rânduri din foaia Excel
 `Eugenia_brut` și 16 dosare verificate din JSON, cu 65 de persoane structurate,
 27 victime și corecturile scan-check. Adaptorul nu le amestecă automat și nu
@@ -211,12 +220,13 @@ unei localități listează persoanele asociate și deschide această fișă la 
 pe nume. Fixture-ul Claude păstrează profilul și cronologia din
 `Platforma_WJC (10).html`; câmpurile goale nu sunt completate artificial. În
 panoul din dreapta al Presentation Map se află și legenda publică compactă.
-Playwright nu a putut porni în mediul ultimei sesiuni deoarece Chrome/Chromium
-nu este instalat; build-ul și verificarea HTTP locală au trecut.
+Playwright nu a putut finaliza verificarea vizuală în mediul curent: Chromium
+este descărcat, dar nu pornește fără biblioteca de sistem `libasound.so.2`.
+Build-ul și verificările automate au trecut.
 
 Verificarea curentă suplimentară:
 
-- `curl -I http://127.0.0.1:3000/presentation/map?dataset=claude-demo` — HTTP 200
+- `curl -I http://127.0.0.1:3000/presentation/map` — verificare de rută locală
 - `curl -I http://127.0.0.1:3000/map?dataset=claude-demo` — HTTP 200
 - `npm audit --json` — 0 vulnerabilități
 
@@ -235,7 +245,7 @@ Observație: `npm run build` poate rescrie automat importul din `next-env.d.ts` 
 
 1. Verifică `git status`, HEAD și serverul local.
 2. Deschide ambele dataset-uri din URL-urile de mai sus.
-3. Deschide tabul `Eugenia data`, caută `Popsingher Iancu`, extinde dosarul 2526
+3. Deschide Presentation Map, caută `Popsingher Iancu`, extinde familia 2526
    și verifică diferența dintre persoanele structurate și rândul tabelului.
 4. În Claude demo, extinde prima familie, selectează `Goldemberg Roza` sau `Hoisie Bercu`, verifică traseul din panoul drept și apasă `Play route`.
 5. Confirmă vizual că traseul este desenat progresiv, lent, o singură dată și că markerul de progres se deplasează.
@@ -248,7 +258,7 @@ Observație: `npm run build` poate rescrie automat importul din `next-env.d.ts` 
 
 ## Lucru rămas / atenționări
 
-- Mai trebuie făcută verificarea vizuală completă în browser după ultimele modificări de panou și interacțiuni. Playwright este instalat ca CLI, dar mediul actual nu are Chrome/Chromium disponibil (`/opt/google/chrome/chrome`); instalarea automată a Chrome a eșuat deoarece cere sudo.
+- Mai trebuie făcută verificarea vizuală completă în browser după ultimele modificări de panou și interacțiuni. Chromium este instalat în cache, dar mediul nu are `libasound.so.2`.
 - Trebuie salvate/confirmate screenshot-urile finale pentru Presentation Map Europe view, persoană selectată, interfață ascunsă, Research Map și mobil.
 - Trebuie confirmat în browser că toate layerele Presentation Map și Research Map (basemap, persoane, trasee, locuri, EHRI și unresolved) se afișează corect cu ambele surse de date.
 - Trebuie verificat vizual un caz real cu două mișcări inverse între aceleași localități pentru a confirma că benzile nu se suprapun în MapLibre.

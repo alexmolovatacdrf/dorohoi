@@ -17,6 +17,18 @@ const navItems = [
 export function SiteHeader({ presentationOnly = false }: { presentationOnly?: boolean }) {
   const pathname = usePathname();
   const { language, setLanguage, t } = useLanguage();
+  const isPresentationRoute = presentationOnly || pathname.startsWith("/presentation/map");
+
+  if (isPresentationRoute) {
+    return (
+      <header className="site-header presentation-site-header">
+        <div className="presentation-site-header__inner">
+          <span className="presentation-site-header__kicker">Public Historical Atlas</span>
+          <span className="presentation-site-header__title">Jews Repatriated to Dorohoi</span>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="site-header sticky top-0 z-50 border-b border-white/10 bg-[#153a32]/96 text-[#f8f2e6] shadow-[0_10px_30px_rgba(17,42,35,0.18)] backdrop-blur-xl">

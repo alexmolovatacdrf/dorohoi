@@ -43,4 +43,16 @@ describe("resilient research map style", () => {
     expect(first).not.toHaveProperty("glyphs");
     expect(first).not.toHaveProperty("sprite");
   });
+
+  it("keeps the Presentation Map basemap readable beneath historical polygons", () => {
+    const style = createResearchMapStyle(true);
+    const raster = style.layers.find((layer) => layer.id === BASEMAP_LAYER_ID);
+
+    expect(raster?.type).toBe("raster");
+    expect(raster?.paint).toMatchObject({
+      "raster-opacity": 0.98,
+      "raster-saturation": -0.02,
+      "raster-contrast": 0.02,
+    });
+  });
 });
