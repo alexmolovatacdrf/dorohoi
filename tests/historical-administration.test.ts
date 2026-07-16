@@ -312,6 +312,15 @@ describe("European Borders WWII full presentation derivative", () => {
     expect(manifest.scope).toBe("full");
     expect(manifest.processing.extentMode).toBe("full_source");
     expect(manifest.presentationVocabulary?.field).toBe("presentationCategory");
+    expect(manifest.presentationVocabulary?.legend.map((entry) => entry.value)).toEqual([
+      "sovereign_state",
+      "neutral_state",
+      "german_allied_state",
+      "romanian_occupied",
+      "german_occupied",
+      "soviet_controlled",
+      "unresolved_other",
+    ]);
     expect(manifest.snapshots).toHaveLength(88);
     expect(manifest.territorialChanges.scope).toBe("full");
     for (const entry of manifest.snapshots) {

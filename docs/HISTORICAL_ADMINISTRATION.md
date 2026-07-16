@@ -199,8 +199,9 @@ coordinate rounding and no rectangular geographic crop. Polygon validity is
 checked after conversion, and raw attributes remain on every feature.
 
 The full manifest derives the public vocabulary `presentationCategory` from
-the unchanged raw `Name` and `Foreign_Po` values. The public legend groups
-features as sovereign/state territory, Romanian-occupied or administered,
+the unchanged raw `Name` and `Foreign_Po` values. The public legend now keeps
+neutral state territory visually distinct from German-allied / Axis-aligned
+state territory, alongside sovereign/state, Romanian-occupied or administered,
 German-occupied or administered, Soviet-controlled, and unresolved/other.
 Raw `Name`, `Foreign_Po`, `Head_of_St` and `Govt_in_Ex` remain available in the
 details panel. The derived category is a traceable display classification, not

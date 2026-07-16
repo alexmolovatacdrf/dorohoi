@@ -25,7 +25,9 @@ export const HISTORICAL_CATEGORY_COLORS = {
   german_soviet_occupied: "#69617c",
 } as const;
 export const HISTORICAL_PRESENTATION_CATEGORY_COLORS = {
-  sovereign_state: "#c8bfa9",
+  sovereign_state: "#b8c4c3",
+  neutral_state: "#c8b98b",
+  german_allied_state: "#b07852",
   romanian_occupied: "#c87945",
   german_occupied: "#76536f",
   soviet_controlled: "#5f7894",
@@ -39,6 +41,8 @@ export const historicalExtentModeSchema = z.enum([
 ]);
 export const historicalPresentationCategorySchema = z.enum([
   "sovereign_state",
+  "neutral_state",
+  "german_allied_state",
   "romanian_occupied",
   "german_occupied",
   "soviet_controlled",

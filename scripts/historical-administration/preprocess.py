@@ -108,7 +108,9 @@ CATEGORY_LEGEND = (
 # vocabulary, never a replacement for Name or Foreign_Po. The exact rules are
 # emitted in the full-extent manifest and the raw values remain on every feature.
 PRESENTATION_CATEGORY_LEGEND = (
-    ("sovereign_state", "Sovereign or state territory", "#c8bfa9"),
+    ("sovereign_state", "Sovereign or state territory", "#b8c4c3"),
+    ("neutral_state", "Neutral state territory", "#c8b98b"),
+    ("german_allied_state", "German-allied / Axis-aligned state", "#b07852"),
     ("romanian_occupied", "Romanian-occupied / administered", "#c87945"),
     ("german_occupied", "German-occupied / administered", "#76536f"),
     ("soviet_controlled", "Soviet-controlled territory", "#5f7894"),
@@ -118,10 +120,12 @@ PRESENTATION_CATEGORY_LEGEND = (
 PRESENTATION_SOVEREIGN_RAW_VALUES = {
     "Allied",
     "Allies",
-    "Axis",
-    "Axis-aligned",
     "Belligerent",
     "Neutral",
+}
+PRESENTATION_GERMAN_ALLIED_RAW_VALUES = {
+    "Axis",
+    "Axis-aligned",
     "War with Soviet Union",
 }
 PRESENTATION_GERMAN_RAW_VALUES = {
@@ -516,6 +520,10 @@ def presentation_category(name_raw: str, foreign_power_raw: str) -> str:
         return "romanian_occupied"
     if foreign_power_raw in PRESENTATION_GERMAN_RAW_VALUES:
         return "german_occupied"
+    if foreign_power_raw in PRESENTATION_GERMAN_ALLIED_RAW_VALUES:
+        return "german_allied_state"
+    if foreign_power_raw == "Neutral":
+        return "neutral_state"
     if foreign_power_raw in PRESENTATION_SOVEREIGN_RAW_VALUES:
         return "sovereign_state"
     return "unresolved_other"
@@ -1282,11 +1290,13 @@ def build_full(
             "presentationVocabulary": {
                 "field": "presentationCategory",
                 "sourceFields": ["Name", "Foreign_Po"],
-                "method": "Public display grouping only. Soviet Union is matched by exact raw Name; Romanian and German groupings use exact listed raw Foreign_Po strings; the remaining documented state-status values are grouped as sovereign/state territory; every other raw combination remains unresolved/other.",
+                "method": "Public display grouping only. Soviet Union is matched by exact raw Name; Romanian and German occupation groupings use exact listed raw Foreign_Po strings; Neutral and German-allied / Axis-aligned values have distinct public categories; remaining documented state-status values are grouped as sovereign/state territory; every other raw combination remains unresolved/other.",
                 "rules": {
                     "sovietControlledExactNames": ["Soviet Union"],
                     "romanianOccupiedExactForeignPowerValues": ["Romanian-occupied"],
                     "germanOccupiedExactForeignPowerValues": sorted(PRESENTATION_GERMAN_RAW_VALUES),
+                    "germanAlliedExactForeignPowerValues": sorted(PRESENTATION_GERMAN_ALLIED_RAW_VALUES),
+                    "neutralExactForeignPowerValues": ["Neutral"],
                     "sovereignStateExactForeignPowerValues": sorted(PRESENTATION_SOVEREIGN_RAW_VALUES),
                     "fallback": "unresolved_other",
                 },
