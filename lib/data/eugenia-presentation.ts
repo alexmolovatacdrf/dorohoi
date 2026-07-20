@@ -201,6 +201,62 @@ const allPlaces = [
 });
 const basePlaces = new Map(allPlaces.map((place) => [place.placeId, place]));
 
+const romanianMonths: Record<string, number> = {
+  ianuarie: 1,
+  ian: 1,
+  februarie: 2,
+  feb: 2,
+  martie: 3,
+  mar: 3,
+  aprilie: 4,
+  apr: 4,
+  mai: 5,
+  iunie: 6,
+  iun: 6,
+  iulie: 7,
+  iul: 7,
+  august: 8,
+  aug: 8,
+  septembrie: 9,
+  septembri: 9,
+  sept: 9,
+  sep: 9,
+  octombrie: 10,
+  oct: 10,
+  noiembrie: 11,
+  noembrie: 11,
+  nov: 11,
+  decembrie: 12,
+  dec: 12,
+};
+
+const englishMonths: Record<string, number> = {
+  january: 1,
+  jan: 1,
+  february: 2,
+  feb: 2,
+  march: 3,
+  mar: 3,
+  april: 4,
+  apr: 4,
+  may: 5,
+  june: 6,
+  jun: 6,
+  july: 7,
+  jul: 7,
+  august: 8,
+  aug: 8,
+  september: 9,
+  sept: 9,
+  sep: 9,
+  october: 10,
+  oct: 10,
+  november: 11,
+  nov: 11,
+  december: 12,
+  dec: 12,
+};
+
 function clean(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
@@ -220,7 +276,7 @@ function yearDate(year: string, raw: string): DateRange {
   return { raw, start: `${year}-01-01`, end: `${year}-12-31`, precision: "year" };
 }
 
-function toDateRange(value: unknown): DateRange | null {
+export function parsePresentationDate(value: unknown): DateRange | null {
   const raw = clean(value);
   if (!raw) return null;
 
@@ -236,8 +292,69 @@ function toDateRange(value: unknown): DateRange | null {
     return { raw, start: date, end: date, precision: "day" };
   }
 
+  const numericMonthYear = raw.match(/\b(\d{1,2})[./-](19\d{2}|20\d{2})\b/);
+  if (numericMonthYear) {
+    const month = Number(numericMonthYear[1]);
+    if (month >= 1 && month <= 12) {
+      return {
+        raw,
+        start: `${numericMonthYear[2]}-${String(month).padStart(2, "0")}-01`,
+        end: null,
+        precision: "month",
+      };
+    }
+  }
+
+  const numericYearMonth = raw.match(/\b(19\d{2}|20\d{2})[./-](\d{1,2})\b/);
+  if (numericYearMonth) {
+    const month = Number(numericYearMonth[2]);
+    if (month >= 1 && month <= 12) {
+      return {
+        raw,
+        start: `${numericYearMonth[1]}-${String(month).padStart(2, "0")}-01`,
+        end: null,
+        precision: "month",
+      };
+    }
+  }
+
+  const english = raw.match(/\b([A-Za-z]+)\s+(\d{1,2}),?\s+(19\d{2}|20\d{2})\b/i);
+  const romanian = raw.match(/\b(\d{1,2})\s+([A-Za-zăâîșţțĂÂÎȘŢȚ]+)\s+(19\d{2}|20\d{2})\b/i);
+  const yearMonth = raw.match(/\b([A-Za-zăâîșţțĂÂÎȘŢȚ]+)\s+(19\d{2}|20\d{2})\b/i);
+  const monthName = english?.[1] ?? romanian?.[2] ?? yearMonth?.[1];
+  const year = english?.[3] ?? romanian?.[3] ?? yearMonth?.[2];
+  const monthKey = monthName
+    ?.normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("ro");
+  const month = monthKey ? romanianMonths[monthKey] ?? englishMonths[monthKey] : undefined;
+  if (month && year) {
+    const day = english?.[2] ?? romanian?.[1];
+    if (day) {
+      const date = `${year}-${String(month).padStart(2, "0")}-${day.padStart(2, "0")}`;
+      return { raw, start: date, end: date, precision: "day" };
+    }
+    return {
+      raw,
+      start: `${year}-${String(month).padStart(2, "0")}-01`,
+      end: null,
+      precision: "month",
+    };
+  }
+
   const onlyYear = raw.match(/\b(19\d{2}|20\d{2})\b/);
   return onlyYear ? yearDate(onlyYear[1], raw) : { raw, start: null, end: null, precision: "unknown" };
+}
+
+type PresentationMovementEventType = "deportation" | "evacuation";
+
+function presentationMovementEventType(details: string | null): PresentationMovementEventType {
+  const text = normalizedText(details ?? "");
+  if (/\bdeport/.test(text)) return "deportation";
+  if (/\bevacu/.test(text)) return "evacuation";
+  // The supplied route columns document deportations by default. An
+  // evacuation is used only when the source wording explicitly says so.
+  return "deportation";
 }
 
 function personSex(value: unknown): "male" | "female" | "unknown" {
@@ -631,7 +748,7 @@ const mapData: MapViewModel = (() => {
     const dossierId = `EUG-P-${rawDossier}`;
     const headName = tableName(row);
     const personId = `eugenia-presentation-${rawDossier}-head`;
-    const birthDate = toDateRange(row["Date of Birth — Eugenia"]);
+    const birthDate = parsePresentationDate(row["Date of Birth — Eugenia"]);
     const birthRaw = tableValue(row, "Place of birth — Eugenia");
     const birthPlaceId = placeIdForRaw(birthRaw, "settlement");
     const deportedFromRaw = tableValue(row, "Deported from — Eugenia");
@@ -639,9 +756,10 @@ const mapData: MapViewModel = (() => {
     const originFallback = !deportedFromRaw;
     const intermediateRaw = splitPlaces(row["Intermediary deportation — Eugenia"]);
     const destinationRaw = splitPlaces(row["Deported to Transnistria — Eugenia"]);
-    const intermediateDate = toDateRange(row["Date of intermediary deportation — Eugenia"]);
-    const destinationDate = toDateRange(row["Date of deportation to Transnistria — Eugenia"]);
+    const intermediateDate = parsePresentationDate(row["Date of intermediary deportation — Eugenia"]);
+    const destinationDate = parsePresentationDate(row["Date of deportation to Transnistria — Eugenia"]);
     const deportationDetails = tableValue(row, "Deportation details — Eugenia");
+    const movementEventType = presentationMovementEventType(deportationDetails);
     const mentioned = mergeFamilyMentions(row, headName);
     const familyPeople: string[] = [personId];
 
@@ -712,12 +830,13 @@ const mapData: MapViewModel = (() => {
     }
 
     if (!originPlaceId && originRaw) addUnresolved(`${personId}-deportation-origin`, originRaw, "deportation origin (raw)", personId, dossierId);
+    const movementLabel = movementEventType === "evacuation" ? "Evacuation" : "Deportation";
     for (const [index, stop] of stops.slice(1).entries()) {
       const place = stop.placeId ? basePlaces.get(stop.placeId) : null;
-      const label = stop.kind === "intermediary" ? "Intermediary deportation" : "Deportation destination";
+      const label = stop.kind === "intermediary" ? `Intermediary ${movementLabel.toLocaleLowerCase("en")}` : `${movementLabel} destination`;
       const stopDate = stop.kind === "intermediary" ? intermediateDate : destinationDate ?? stop.date;
       if (place) {
-        addContext(place.placeId, personId, dossierId, label.toLocaleLowerCase("en"), "deportation", stopDate, deportationDetails, `${personId}-stop-${index + 1}`);
+        addContext(place.placeId, personId, dossierId, label.toLocaleLowerCase("en"), movementEventType, stopDate, deportationDetails, `${personId}-stop-${index + 1}`);
       } else {
         addUnresolved(`${personId}-route-stop-${index + 1}`, stop.raw, `${label.toLocaleLowerCase("en")} (raw)`, personId, dossierId);
       }
@@ -760,6 +879,7 @@ const mapData: MapViewModel = (() => {
         routeSequence,
         originFallback || unresolvedGap ? "partial" : "explicit",
         deportationDetails,
+        [movementEventType],
       );
       lastResolvedPlace = currentPlace;
       unresolvedGap = false;

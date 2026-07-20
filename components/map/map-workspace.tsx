@@ -576,16 +576,45 @@ function presentationRouteColorExpression(): ExpressionSpecification {
 }
 
 function presentationRouteWidthExpression(): ExpressionSpecification {
+  const scaledWidth = (baseWidth: number): ExpressionSpecification => [
+    "interpolate",
+    ["linear"],
+    ["get", "sharedPersonCount"],
+    1,
+    baseWidth,
+    2,
+    baseWidth + 1,
+    4,
+    baseWidth + 2.5,
+    8,
+    baseWidth + 4,
+  ] as ExpressionSpecification;
   return [
     "match",
     ["get", "transportMode"],
     "train",
-    wjcDesignTokens.route.standardWidth,
+    scaledWidth(wjcDesignTokens.route.standardWidth),
     "walking",
-    wjcDesignTokens.route.standardWidth,
+    scaledWidth(wjcDesignTokens.route.standardWidth),
     "return",
-    wjcDesignTokens.route.returnWidth,
-    wjcDesignTokens.route.unknownWidth,
+    scaledWidth(wjcDesignTokens.route.returnWidth),
+    scaledWidth(wjcDesignTokens.route.unknownWidth),
+  ] as ExpressionSpecification;
+}
+
+function sharedRouteWidthExpression(baseWidth: number): ExpressionSpecification {
+  return [
+    "interpolate",
+    ["linear"],
+    ["get", "sharedPersonCount"],
+    1,
+    baseWidth,
+    2,
+    baseWidth + 1,
+    4,
+    baseWidth + 2.5,
+    8,
+    baseWidth + 4,
   ] as ExpressionSpecification;
 }
 
@@ -653,6 +682,29 @@ function curvedRouteCoordinates(
   return points;
 }
 
+function mergeSharedRoutes(routes: MapRouteDatum[]): MapRouteDatum[] {
+  const grouped = new Map<string, MapRouteDatum[]>();
+  for (const route of routes) {
+    const key = `${route.originId}::${route.destinationId}`;
+    const candidates = grouped.get(key) ?? [];
+    candidates.push(route);
+    grouped.set(key, candidates);
+  }
+
+  return [...grouped.values()].flatMap((candidates) => {
+    const people = new Set(candidates.map((route) => route.personId));
+    // A repeated segment belonging to one person remains separate so the
+    // playback timeline does not lose a documented stop or date.
+    if (candidates.length < 2 || people.size !== candidates.length) return candidates;
+    const first = candidates[0];
+    return [{
+      ...first,
+      sharedPersonCount: people.size,
+      sharedRouteIds: candidates.map((route) => route.id),
+    }];
+  });
+}
+
 function routePointAtProgress(points: Array<[number, number]>, progress: number): [number, number] {
   const boundedProgress = Math.max(0, Math.min(1, progress));
   const position = boundedProgress * (points.length - 1);
@@ -680,12 +732,15 @@ function routeCollection(
   partialProgress = 1,
   usePresentationCurves = true,
   curveRoutes: MapRouteDatum[] = routes,
+  mergeShared = false,
 ): FeatureCollection<LineString, GeoJsonProperties> {
+  const displayRoutes = mergeShared ? mergeSharedRoutes(routes) : routes;
+  const displayCurveRoutes = mergeShared ? displayRoutes : curveRoutes;
   return {
     type: "FeatureCollection",
-    features: routes.map((route) => {
+    features: displayRoutes.map((route) => {
       const coordinates = usePresentationCurves
-        ? curvedRouteCoordinates(route, routeCurveOffset(route, curveRoutes))
+        ? curvedRouteCoordinates(route, routeCurveOffset(route, displayCurveRoutes))
         : route.coordinates;
       const visibleCoordinates = route.id === partialRouteId
         ? coordinates.slice(0, Math.max(2, Math.ceil(easeInOutCubic(partialProgress) * (coordinates.length - 1)) + 1))
@@ -704,6 +759,8 @@ function routeCollection(
           transportRaw: route.transportRaw,
           transportMode: route.transportMode ?? "unknown",
           transportBasis: route.transportBasis,
+          sharedPersonCount: route.sharedPersonCount ?? 1,
+          sharedRouteIds: route.sharedRouteIds ?? [route.id],
         },
       };
     }),
@@ -811,7 +868,7 @@ function publicPlaceCategoryLabel(category: MapPlaceDatum["categories"][number])
     case "origin":
       return "Birth, origin or residence";
     case "evacuation_deportation":
-      return "Evacuation or deportation";
+      return "Deportation";
     case "forced_labour":
       return "Forced labour";
     case "death":
@@ -834,7 +891,7 @@ function publicLocationTypeLabel(place: MapPlaceDatum): string {
     case "station": return "Station / embarkation point";
     case "gate": return "Gate / crossing";
     case "death": return "Place of death";
-    case "destination": return "Deportation destination";
+    case "destination": return publicPlaceMovementLabel(place) === "Evacuation" ? "Evacuation destination" : "Deportation destination";
     case "unresolved": return "Unresolved place";
     default: return "Mentioned locality";
   }
@@ -849,11 +906,19 @@ function publicPlaceContextLabelForValues(roles: string[], eventTypes: string[])
   if (/deces|death|mort|loss/.test(value)) return "Death or loss";
   if (/lagar|lagăr|ghetou|ghetto|camp|intern/.test(value)) return "Camp, ghetto or internment";
   if (/munca|muncă|forced|work/.test(value)) return "Forced labour";
-  if (/deport|evac/.test(value)) return "Evacuation or deportation";
+  if (/deport/.test(value)) return "Deportation";
+  if (/evac/.test(value)) return "Evacuation";
   if (/intoarc|întoarc|return|repatri/.test(value)) return "Return or repatriation";
   if (/route origin|route destination/.test(value)) return "Movement / route endpoint";
   if (/nastere|naștere|birth|origin|domiciliu|residence|locuire/.test(value)) return "Birth, origin or residence";
   return "Other documented connection";
+}
+
+function publicPlaceMovementLabel(place: MapPlaceDatum): "Deportation" | "Evacuation" {
+  const value = [...place.roles, ...place.eventTypes].join(" ").toLocaleLowerCase("ro");
+  if (/deport/.test(value)) return "Deportation";
+  if (/evac/.test(value)) return "Evacuation";
+  return "Deportation";
 }
 
 function publicPlaceConnectionLabel(connection: MapPlacePersonConnection): string {
@@ -1228,18 +1293,27 @@ export function MapWorkspace({
     [visibleRoutes],
   );
 
+  const routeHistoryPlaceIds = useMemo(() => {
+    const routes = filters.person ? selectedPersonRoutes : selectedGroup ? selectedGroupRoutes : [];
+    return new Set(routes.flatMap((route) => [route.originId, route.destinationId]));
+  }, [filters.person, selectedGroup, selectedGroupRoutes, selectedPersonRoutes]);
+
   const visibleEhriPlaces = useMemo(
     () =>
       data.places.filter((place) => {
         if (place.layer !== "ehri_local" || !place.coordinates || !layers.campsGhettos) return false;
+        // EHRI is contextual data, not a second continent-wide place layer.
+        // Keep it empty in the all-people view and reveal only supplied EHRI
+        // places that are route endpoints for the selected person/group.
+        if (!filters.person && !selectedGroup) return false;
+        if (!layers.localEhri) return false;
         if (filters.place && place.id !== filters.place) return false;
         if (filters.confidence && place.confidence !== filters.confidence) return false;
-        // A route endpoint remains visible and labelled even when the wider
-        // EHRI overlay is collapsed/off; otherwise intermediary camps vanish
-        // from the very route the visitor is inspecting.
-        return layers.localEhri || routeEndpointPlaceIds.has(place.id);
+        // EHRI is shown only for the selected person's or family's documented
+        // route history, never as a continent-wide contextual overlay.
+        return routeHistoryPlaceIds.has(place.id);
       }),
-    [data.places, filters.confidence, filters.place, layers.campsGhettos, layers.localEhri, routeEndpointPlaceIds],
+    [data.places, filters.confidence, filters.person, filters.place, layers.campsGhettos, layers.localEhri, routeHistoryPlaceIds, selectedGroup],
   );
 
   const familyContextPlaces = useMemo(() => {
@@ -1402,7 +1476,7 @@ export function MapWorkspace({
               "fill-color": historicalFillColorExpression(mode),
               "fill-opacity": 0.48,
             },
-          });
+          }, BASEMAP_LAYER_ID);
           map.addLayer({
             id: HISTORICAL_LINE_LAYER_ID,
             type: "line",
@@ -1416,7 +1490,7 @@ export function MapWorkspace({
                 ? { "line-dasharray": ["match", ["get", "Name"], "Transnistria", ["literal", [...wjcDesignTokens.historical.transnistriaDashArray]], ["literal", [1, 0]]] as ExpressionSpecification }
                 : {}),
             },
-          });
+          }, BASEMAP_LAYER_ID);
           const routePaint = isPresentation
             ? {
                 "line-color": presentationRouteColorExpression(),
@@ -1424,7 +1498,7 @@ export function MapWorkspace({
                 "line-opacity": 0.9,
                 "line-dasharray": presentationRouteDashExpression(),
               }
-            : { "line-color": "#236353", "line-width": 4, "line-opacity": 0.9 };
+            : { "line-color": "#236353", "line-width": sharedRouteWidthExpression(4), "line-opacity": 0.9 };
           map.addLayer({
             id: "routes-explicit",
             type: "line",
@@ -1678,6 +1752,7 @@ export function MapWorkspace({
         timelineProgress,
         true,
         filters.person ? selectedPersonRoutes : visibleRoutes,
+        !filters.person,
       ),
     );
     (map.getSource("route-progress") as GeoJSONSource).setData(
@@ -1700,20 +1775,21 @@ export function MapWorkspace({
   useEffect(() => {
     const map = mapRef.current;
     if (!mapReady || !map || !map.getLayer(BASEMAP_LAYER_ID)) return;
+    const historicalUnderlay = layers.historicalAdministration;
     const paint = basemapVariant === "standard"
-      ? { opacity: isPresentation ? 0.98 : 0.88, saturation: isPresentation ? -0.02 : -0.28, contrast: isPresentation ? 0.02 : -0.06, brightnessMin: 0.1, brightnessMax: isPresentation ? 1 : 0.96 }
+      ? { opacity: historicalUnderlay ? (isPresentation ? 0.72 : 0.68) : (isPresentation ? 0.98 : 0.88), saturation: isPresentation ? -0.02 : -0.28, contrast: isPresentation ? 0.02 : -0.06, brightnessMin: 0.1, brightnessMax: isPresentation ? 1 : 0.96 }
       : basemapVariant === "light"
-        ? { opacity: 0.82, saturation: -0.72, contrast: -0.08, brightnessMin: 0.24, brightnessMax: 1 }
-        : { opacity: 0.68, saturation: -1, contrast: -0.18, brightnessMin: 0.36, brightnessMax: 0.98 };
-    // Historical opacity belongs to the polygon layer. Do not fade the OSM
-    // raster when the historical layer is enabled: cities, rivers and roads
-    // must remain readable beneath it.
+        ? { opacity: historicalUnderlay ? 0.64 : 0.82, saturation: -0.72, contrast: -0.08, brightnessMin: 0.24, brightnessMax: 1 }
+        : { opacity: historicalUnderlay ? 0.58 : 0.68, saturation: -1, contrast: -0.18, brightnessMin: 0.36, brightnessMax: 0.98 };
+    // The historical polygons sit below the raster basemap so labels, roads
+    // and rivers remain visually on top. Reduced raster opacity lets the
+    // historical colour remain visible without covering that context.
     map.setPaintProperty(BASEMAP_LAYER_ID, "raster-opacity", paint.opacity);
     map.setPaintProperty(BASEMAP_LAYER_ID, "raster-saturation", paint.saturation);
     map.setPaintProperty(BASEMAP_LAYER_ID, "raster-contrast", paint.contrast);
     map.setPaintProperty(BASEMAP_LAYER_ID, "raster-brightness-min", paint.brightnessMin);
     map.setPaintProperty(BASEMAP_LAYER_ID, "raster-brightness-max", paint.brightnessMax);
-  }, [basemapVariant, isPresentation, mapReady]);
+  }, [basemapVariant, isPresentation, layers.historicalAdministration, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -1874,7 +1950,9 @@ export function MapWorkspace({
     }
     const bbox = boundsFromCoordinates(coordinates);
     if (!bbox) return;
-    fitMapToBbox(expandBbox(bbox), 11);
+    // Leave one extra zoom step of breathing room so the outermost route
+    // places remain visible beside the presentation panels and timeline.
+    fitMapToBbox(expandBbox(bbox, 0.32, 0.24), 10);
   }, [data.places, data.routes, filters.person, fitMapToBbox]);
 
   const fitGroupView = useCallback(() => {
@@ -2264,7 +2342,8 @@ export function MapWorkspace({
     ...presentationLegend,
     { value: "origin", label: "Birth, origin or residence", color: wjcDesignTokens.semantic.origin },
     { value: "movement", label: "Documented movement", color: wjcDesignTokens.semantic.deportation },
-    { value: "deportation", label: "Evacuation or deportation", color: wjcDesignTokens.semantic.deportation },
+    { value: "deportation", label: "Deportation", color: wjcDesignTokens.semantic.deportation },
+    { value: "evacuation", label: "Evacuation", color: wjcDesignTokens.semantic.deportation },
     { value: "forced-labour", label: "Forced labour", color: wjcDesignTokens.semantic.labour },
     { value: "death", label: "Death or loss", color: wjcDesignTokens.semantic.death },
     { value: "ehri", label: "EHRI camp or ghetto", color: wjcDesignTokens.semantic.ehri },
@@ -2298,7 +2377,7 @@ export function MapWorkspace({
       <h2 className="presentation-card__title">{language === "ro" ? selectedPlace.labelRo : selectedPlace.label}</h2>
       <p className="presentation-card__body">
         {selectedPlace.categories.length
-          ? selectedPlace.categories.map(publicPlaceCategoryLabel).join(" · ")
+          ? selectedPlace.categories.map((category) => category === "evacuation_deportation" ? publicPlaceMovementLabel(selectedPlace) : publicPlaceCategoryLabel(category)).join(" · ")
           : "Documented place"}
       </p>
       <p className="presentation-card__meta">Place type: {publicLocationTypeLabel(selectedPlace)}</p>
@@ -3100,7 +3179,7 @@ export function MapWorkspace({
               <LayerToggle label="Individual routes" marker="→" checked={layers.individualRoutes} onChange={(value) => updateLayer("individualRoutes", value)} />
               <LayerToggle label="Family / household context" marker="○" checked={layers.familyContext} onChange={(value) => updateLayer("familyContext", value)} note="Gold rings; requires a group filter" />
               <LayerToggle label="Origin places" marker="●" checked={layers.origin} onChange={(value) => updateLayer("origin", value)} />
-              <LayerToggle label="Evacuation & deportation" marker="◆" checked={layers.evacuationDeportation} onChange={(value) => updateLayer("evacuationDeportation", value)} />
+              <LayerToggle label="Deportation places" marker="◆" checked={layers.evacuationDeportation} onChange={(value) => updateLayer("evacuationDeportation", value)} />
               <LayerToggle label="Camps & ghettos" marker="▲" checked={layers.campsGhettos} onChange={(value) => updateLayer("campsGhettos", value)} />
               <LayerToggle label="Forced labour" marker="✚" checked={layers.forcedLabour} onChange={(value) => updateLayer("forcedLabour", value)} />
               <LayerToggle label="Death places" marker="✦" checked={layers.death} onChange={(value) => updateLayer("death", value)} />

@@ -278,6 +278,8 @@ export interface MapRouteDatum {
   transportRaw: string | null;
   transportMode?: "train" | "walking" | "unknown" | "return";
   transportBasis?: string | null;
+  sharedPersonCount?: number;
+  sharedRouteIds?: string[];
   sequence: number;
   sourceLabel: string;
   notes: string | null;

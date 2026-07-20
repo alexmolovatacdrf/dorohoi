@@ -1,6 +1,6 @@
 import eugeniaPresentation from "@/data/normalized/eugenia-presentation.json";
 import { isReadableEhriMapLabel } from "@/lib/data/ehri-labels";
-import { EUGENIA_PRESENTATION_SOURCE, getEugeniaPresentationMapViewModel } from "@/lib/data/eugenia-presentation";
+import { EUGENIA_PRESENTATION_SOURCE, getEugeniaPresentationMapViewModel, parsePresentationDate } from "@/lib/data/eugenia-presentation";
 import { describe, expect, it } from "vitest";
 
 describe("verified Eugenia Presentation Map dataset", () => {
@@ -133,5 +133,26 @@ describe("verified Eugenia Presentation Map dataset", () => {
     expect(data.places.find((place) => place.id === "PL-EHRI-0383")?.label).toBe("Cernăuți");
     expect(data.places.find((place) => place.id === "PL-EHRI-0382")?.label).toBe("Mohyliv-Podilskyi");
     expect(ehri.every((place) => !/\b(?:ghetto|getto|ghetou|camp|lagar|lagăr)\b/i.test(place.label))).toBe(true);
+  });
+
+  it("preserves day precision and does not invent a day for month-only dates", () => {
+    expect(parsePresentationDate("1 November 1941")).toEqual({
+      raw: "1 November 1941",
+      start: "1941-11-01",
+      end: "1941-11-01",
+      precision: "day",
+    });
+    expect(parsePresentationDate("November 1941")).toEqual({
+      raw: "November 1941",
+      start: "1941-11-01",
+      end: null,
+      precision: "month",
+    });
+    expect(parsePresentationDate("noiembrie 1941")).toEqual({
+      raw: "noiembrie 1941",
+      start: "1941-11-01",
+      end: null,
+      precision: "month",
+    });
   });
 });
