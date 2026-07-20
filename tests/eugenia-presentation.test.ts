@@ -154,5 +154,18 @@ describe("verified Eugenia Presentation Map dataset", () => {
       end: null,
       precision: "month",
     });
+    expect(parsePresentationDate("11/1941")).toEqual({
+      raw: "11/1941",
+      start: "1941-11-01",
+      end: null,
+      precision: "month",
+    });
+
+    const monthOnlyRoute = data.routes.find((route) => route.personName === "Alterovici Reiza" && route.destinationName === "Transnistria");
+    expect(monthOnlyRoute?.datePrecision).toBe("month");
+    expect(monthOnlyRoute?.dateRaw).toBe("11/1941");
+    const exactDateRoute = data.routes.find((route) => route.personName === "Cohn Eti" && route.destinationName === "Mohyliv-Podilskyi");
+    expect(exactDateRoute?.datePrecision).toBe("day");
+    expect(exactDateRoute?.dateRaw).toBe("01/10/1941");
   });
 });

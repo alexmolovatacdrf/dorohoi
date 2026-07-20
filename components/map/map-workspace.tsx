@@ -593,12 +593,12 @@ function presentationRouteWidthExpression(): ExpressionSpecification {
     "match",
     ["get", "transportMode"],
     "train",
-    scaledWidth(wjcDesignTokens.route.standardWidth),
+    scaledWidth(wjcDesignTokens.route.standardWidth + 1),
     "walking",
-    scaledWidth(wjcDesignTokens.route.standardWidth),
+    scaledWidth(wjcDesignTokens.route.standardWidth + 1),
     "return",
-    scaledWidth(wjcDesignTokens.route.returnWidth),
-    scaledWidth(wjcDesignTokens.route.unknownWidth),
+    scaledWidth(wjcDesignTokens.route.returnWidth + 1),
+    scaledWidth(wjcDesignTokens.route.unknownWidth + 1.5),
   ] as ExpressionSpecification;
 }
 
@@ -1070,7 +1070,7 @@ export function MapWorkspace({
   const [basemapStatus, setBasemapStatus] = useState<BasemapStatus>("loading");
   const [historicalManifest, setHistoricalManifest] = useState<HistoricalManifest | null>(null);
   const [historicalYearMonth, setHistoricalYearMonth] = useState("1941-08");
-  const [historicalOpacity, setHistoricalOpacity] = useState(0.18);
+  const [historicalOpacity, setHistoricalOpacity] = useState<number>(wjcDesignTokens.basemap.historicalLayerOpacity);
   const [basemapVariant, setBasemapVariant] = useState<BasemapVariant>("standard");
   const [historicalLayerStatus, setHistoricalLayerStatus] = useState<HistoricalLayerStatus>("loading_manifest");
   const [historicalDiagnostic, setHistoricalDiagnostic] = useState<string | null>(null);
@@ -1288,32 +1288,24 @@ export function MapWorkspace({
     return preTimelineRoutes.filter((route) => completedRouteIds.has(route.id) || route.id === activePlaybackRoute?.id);
   }, [activePlaybackRoute?.id, filters.person, preTimelineRoutes, selectedPersonRoutes, timelineStep]);
 
-  const routeEndpointPlaceIds = useMemo(
-    () => new Set(visibleRoutes.flatMap((route) => [route.originId, route.destinationId])),
-    [visibleRoutes],
-  );
-
   const routeHistoryPlaceIds = useMemo(() => {
-    const routes = filters.person ? selectedPersonRoutes : selectedGroup ? selectedGroupRoutes : [];
+    const routes = filters.person ? selectedPersonRoutes : selectedGroup ? selectedGroupRoutes : data.routes;
     return new Set(routes.flatMap((route) => [route.originId, route.destinationId]));
-  }, [filters.person, selectedGroup, selectedGroupRoutes, selectedPersonRoutes]);
+  }, [data.routes, filters.person, selectedGroup, selectedGroupRoutes, selectedPersonRoutes]);
 
   const visibleEhriPlaces = useMemo(
     () =>
       data.places.filter((place) => {
         if (place.layer !== "ehri_local" || !place.coordinates || !layers.campsGhettos) return false;
-        // EHRI is contextual data, not a second continent-wide place layer.
-        // Keep it empty in the all-people view and reveal only supplied EHRI
-        // places that are route endpoints for the selected person/group.
-        if (!filters.person && !selectedGroup) return false;
         if (!layers.localEhri) return false;
         if (filters.place && place.id !== filters.place) return false;
         if (filters.confidence && place.confidence !== filters.confidence) return false;
-        // EHRI is shown only for the selected person's or family's documented
-        // route history, never as a continent-wide contextual overlay.
+        // EHRI is shown only for places linked to a documented route. In the
+        // all-people view this is still a small route-linked subset, never a
+        // continent-wide contextual overlay.
         return routeHistoryPlaceIds.has(place.id);
       }),
-    [data.places, filters.confidence, filters.person, filters.place, layers.campsGhettos, layers.localEhri, routeHistoryPlaceIds, selectedGroup],
+    [data.places, filters.confidence, filters.place, layers.campsGhettos, layers.localEhri, routeHistoryPlaceIds],
   );
 
   const familyContextPlaces = useMemo(() => {
@@ -1777,10 +1769,10 @@ export function MapWorkspace({
     if (!mapReady || !map || !map.getLayer(BASEMAP_LAYER_ID)) return;
     const historicalUnderlay = layers.historicalAdministration;
     const paint = basemapVariant === "standard"
-      ? { opacity: historicalUnderlay ? (isPresentation ? 0.72 : 0.68) : (isPresentation ? 0.98 : 0.88), saturation: isPresentation ? -0.02 : -0.28, contrast: isPresentation ? 0.02 : -0.06, brightnessMin: 0.1, brightnessMax: isPresentation ? 1 : 0.96 }
+      ? { opacity: historicalUnderlay ? (isPresentation ? 0.34 : 0.4) : (isPresentation ? 0.98 : 0.88), saturation: isPresentation ? -0.02 : -0.28, contrast: isPresentation ? 0.02 : -0.06, brightnessMin: 0.1, brightnessMax: isPresentation ? 1 : 0.96 }
       : basemapVariant === "light"
-        ? { opacity: historicalUnderlay ? 0.64 : 0.82, saturation: -0.72, contrast: -0.08, brightnessMin: 0.24, brightnessMax: 1 }
-        : { opacity: historicalUnderlay ? 0.58 : 0.68, saturation: -1, contrast: -0.18, brightnessMin: 0.36, brightnessMax: 0.98 };
+        ? { opacity: historicalUnderlay ? 0.28 : 0.82, saturation: -0.72, contrast: -0.08, brightnessMin: 0.24, brightnessMax: 1 }
+        : { opacity: historicalUnderlay ? 0.24 : 0.68, saturation: -1, contrast: -0.18, brightnessMin: 0.36, brightnessMax: 0.98 };
     // The historical polygons sit below the raster basemap so labels, roads
     // and rivers remain visually on top. Reduced raster opacity lets the
     // historical colour remain visible without covering that context.
@@ -2004,7 +1996,7 @@ export function MapWorkspace({
       const markerSelected = selection?.kind === "place" && selection.id === place.id;
       element.dataset.wjcPriority = String(wjcSymbolPriority(symbolType));
       element.dataset.wjcAnchor = symbolType === "anchor" ? "true" : "false";
-      element.dataset.wjcRouteEndpoint = routeEndpointPlaceIds.has(place.id) ? "true" : "false";
+      element.dataset.wjcRouteEndpoint = routeHistoryPlaceIds.has(place.id) ? "true" : "false";
       const placeLabel = language === "ro" ? place.labelRo : place.label;
       const roleLabel = place.roles.length ? ` · ${place.roles.join(" / ")}` : "";
       element.setAttribute("aria-label", `Inspect ${placeLabel}${roleLabel}`);
@@ -2045,7 +2037,7 @@ export function MapWorkspace({
       coreMarkersRef.current.forEach((marker) => marker.remove());
       coreMarkersRef.current = [];
     };
-  }, [filters.person, isPresentation, language, mapReady, routeEndpointPlaceIds, selection, visibleCorePlaces, visibleEhriPlaces]);
+  }, [filters.person, isPresentation, language, mapReady, routeHistoryPlaceIds, selection, visibleCorePlaces, visibleEhriPlaces]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -2338,16 +2330,28 @@ export function MapWorkspace({
             ? HISTORICAL_PRESENTATION_NAME_COLORS["Reichskommissariat Ukraine"]
             : entry.color,
   }));
-  const publicMapLegend = [
-    ...presentationLegend,
-    { value: "origin", label: "Birth, origin or residence", color: wjcDesignTokens.semantic.origin },
-    { value: "movement", label: "Documented movement", color: wjcDesignTokens.semantic.deportation },
-    { value: "deportation", label: "Deportation", color: wjcDesignTokens.semantic.deportation },
-    { value: "evacuation", label: "Evacuation", color: wjcDesignTokens.semantic.deportation },
-    { value: "forced-labour", label: "Forced labour", color: wjcDesignTokens.semantic.labour },
-    { value: "death", label: "Death or loss", color: wjcDesignTokens.semantic.death },
-    { value: "ehri", label: "EHRI camp or ghetto", color: wjcDesignTokens.semantic.ehri },
-    { value: "unresolved", label: "Unresolved place", color: wjcDesignTokens.semantic.unresolved },
+  type PublicLegendEntry = {
+    value: string;
+    label: string;
+    color: string;
+    group: "historical" | "people" | "routes";
+    swatch: "fill" | "line";
+    pattern?: "solid" | "dashed" | "ticks";
+  };
+  const publicMapLegend: PublicLegendEntry[] = [
+    ...presentationLegend.map((entry) => ({ ...entry, group: "historical" as const, swatch: "fill" as const })),
+    { value: "origin", label: "Birth, origin or residence", color: wjcDesignTokens.semantic.origin, group: "people" as const, swatch: "fill" as const },
+    { value: "movement", label: "Documented movement", color: wjcDesignTokens.semantic.deportation, group: "people" as const, swatch: "fill" as const },
+    { value: "deportation", label: "Deportation", color: wjcDesignTokens.semantic.deportation, group: "people" as const, swatch: "fill" as const },
+    { value: "evacuation", label: "Evacuation", color: wjcDesignTokens.semantic.deportation, group: "people" as const, swatch: "fill" as const },
+    { value: "forced-labour", label: "Forced labour", color: wjcDesignTokens.semantic.labour, group: "people" as const, swatch: "fill" as const },
+    { value: "death", label: "Death or loss", color: wjcDesignTokens.semantic.death, group: "people" as const, swatch: "fill" as const },
+    { value: "ehri", label: "EHRI camp or ghetto", color: wjcDesignTokens.semantic.ehri, group: "people" as const, swatch: "fill" as const },
+    { value: "unresolved", label: "Unresolved place", color: wjcDesignTokens.semantic.unresolved, group: "people" as const, swatch: "fill" as const },
+    { value: "route-train", label: "Train movement · cross-ticks", color: wjcDesignTokens.semantic.deportation, group: "routes" as const, swatch: "line" as const, pattern: "ticks" as const },
+    { value: "route-walking", label: "Walking movement · dashed", color: wjcDesignTokens.semantic.deportation, group: "routes" as const, swatch: "line" as const, pattern: "dashed" as const },
+    { value: "route-unknown", label: "Unresolved transport · solid", color: wjcDesignTokens.semantic.unresolved, group: "routes" as const, swatch: "line" as const, pattern: "solid" as const },
+    { value: "route-return", label: "Return / repatriation", color: wjcDesignTokens.semantic.origin, group: "routes" as const, swatch: "line" as const, pattern: "solid" as const },
   ].filter((entry, index, entries) => entries.findIndex((candidate) => candidate.label === entry.label) === index);
   const selectedPersonPlaceContextCard = selectedPerson && selectedPlace && selectedPersonPlaceContext ? (
     <div className="presentation-place-person-context">
@@ -2774,9 +2778,11 @@ export function MapWorkspace({
           <summary>Map legend</summary>
           <div className="presentation-group__content">
             <p className="presentation-label">Historical administration</p>
-            {publicMapLegend.slice(0, presentationLegend.length || 0).map((entry) => <div key={entry.value} className="presentation-right-legend__item"><span style={{ backgroundColor: entry.color }} aria-hidden="true" />{entry.label}</div>)}
+            {publicMapLegend.filter((entry) => entry.group === "historical").map((entry) => <div key={entry.value} className="presentation-right-legend__item"><span className="presentation-right-legend__swatch" style={{ backgroundColor: entry.color }} aria-hidden="true" />{entry.label}</div>)}
             <p className="presentation-label presentation-right-legend__subheading">People and places</p>
-            {publicMapLegend.slice(presentationLegend.length).map((entry) => <div key={entry.value} className="presentation-right-legend__item"><span style={{ backgroundColor: entry.color }} aria-hidden="true" />{entry.label}</div>)}
+            {publicMapLegend.filter((entry) => entry.group === "people").map((entry) => <div key={entry.value} className="presentation-right-legend__item"><span className="presentation-right-legend__swatch" style={{ backgroundColor: entry.color }} aria-hidden="true" />{entry.label}</div>)}
+            <p className="presentation-label presentation-right-legend__subheading">Route lines</p>
+            {publicMapLegend.filter((entry) => entry.group === "routes").map((entry) => <div key={entry.value} className="presentation-right-legend__item"><span className={`presentation-right-legend__swatch presentation-right-legend__swatch--line presentation-right-legend__swatch--${entry.pattern ?? "solid"}`} style={{ backgroundColor: entry.color, color: entry.color }} aria-hidden="true" />{entry.label}</div>)}
           </div>
         </details>
       ) : null}

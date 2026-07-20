@@ -499,6 +499,22 @@ summary {
   border: 1px solid rgb(23 63 54 / 22%);
 }
 
+.presentation-right-legend__item .presentation-right-legend__swatch--line {
+  width: 1.65rem;
+  height: 0.22rem;
+  border: 0;
+  border-radius: 999px;
+}
+
+.presentation-right-legend__item .presentation-right-legend__swatch--dashed {
+  background-color: transparent !important;
+  border-top: 0.22rem dashed currentColor;
+}
+
+.presentation-right-legend__item .presentation-right-legend__swatch--ticks {
+  background-image: repeating-linear-gradient(90deg, currentColor 0 0.12rem, transparent 0.12rem 0.38rem);
+}
+
 .presentation-right-legend__subheading {
   margin-top: 0.7rem;
   border-top: 1px solid #ded8cc;
