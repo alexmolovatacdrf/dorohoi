@@ -4,6 +4,7 @@ import normalizedPlaces from "@/data/normalized/places.json";
 import type { DateRange, Place } from "@/lib/domain/schemas";
 import { ehriMapLabel } from "@/lib/data/ehri-labels";
 import type {
+  MapLocationType,
   MapPlaceDatum,
   MapPlacePersonConnection,
   MapPersonStory,
@@ -283,7 +284,8 @@ const sourcePlaceAliases = new Map([["edinet", "edineti"]]);
 function placeIdForRaw(value: unknown, mode: "any" | "settlement" = "any"): string | null {
   const text = clean(value);
   if (!text) return null;
-  const lookupKeys = [normalizedText(text), sourcePlaceAliases.get(normalizedText(text))].filter(
+  const withoutType = text.replace(/\s+(?:concentration camp|camp|ghetto|lagar|ghetou)$/iu, "").trim();
+  const lookupKeys = [normalizedText(text), normalizedText(withoutType), sourcePlaceAliases.get(normalizedText(text)), sourcePlaceAliases.get(normalizedText(withoutType))].filter(
     (key): key is string => Boolean(key),
   );
   const candidates = [...new Set(lookupKeys.flatMap((key) => placeCandidates.get(key) ?? []))].filter((place) =>
@@ -317,6 +319,115 @@ function cleanPresentationPlaceLabel(value: string): string {
 function presentationPlaceLabel(place: Place, language: "en" | "ro" = "en"): string {
   if (place.layer === "ehri_local") return ehriMapLabel(place, language);
   return cleanPresentationPlaceLabel(language === "ro" ? place.displayNames.ro : place.displayNames.en);
+}
+
+function textContainsPlace(place: Place, text: string): boolean {
+  const normalized = normalizedText(text);
+  return placeCandidateValues(place)
+    .filter((candidate) => candidate.length >= 4)
+    .some((candidate) => normalized.includes(candidate));
+}
+
+function nearbyTextForPlace(place: Place, rawValue: string, detailText: string): string {
+  const normalizedDetails = normalizedText(detailText);
+  const candidate = placeCandidateValues(place)
+    .filter((value) => value.length >= 4)
+    .sort((left, right) => right.length - left.length)
+    .find((value) => normalizedDetails.includes(value));
+  if (!candidate) return normalizedText(rawValue);
+  const index = normalizedDetails.indexOf(candidate);
+  return normalizedDetails.slice(Math.max(0, index - 42), index + candidate.length + 42);
+}
+
+function textTypeNearPlace(place: Place, rawValue: string, detailText: string): MapLocationType | null {
+  const raw = normalizedText(rawValue);
+  const detail = nearbyTextForPlace(place, rawValue, detailText);
+  const text = `${raw} ${detail}`;
+  if (/(?:ghetto|ghetou|geto|getto)/u.test(text)) return "ghetto";
+  if (/(?:concentration camp|camp|lagar|lagar de)/u.test(text)) return "camp";
+  if (/(?:forced labour|munca fortata|deta[sș]ament)/u.test(text)) return "forced_labour";
+  if (/(?:execution|executie|killing site|loc de ucidere)/u.test(text)) return "execution";
+  if (/(?:gara|gar[aă]|station|imb[aă]rcare)/u.test(text)) return "station";
+  return null;
+}
+
+function presentationPlaceTip(
+  place: Place,
+  rawValue: string,
+  detailText: string,
+  kind: RouteStop["kind"] | "birth",
+): { tipLoc: MapLocationType; basis: string } {
+  if (place.placeId === "PL-CORE-DOROHOI") return { tipLoc: "anchor", basis: "Dorohoi anchor defined by the WJC symbol specification." };
+  if (place.layer === "ehri_local") {
+    return {
+      tipLoc: place.placeType === "ghetto" ? "ghetto" : "camp",
+      basis: "EHRI place type supplied by the local EHRI extract.",
+    };
+  }
+  const textType = textTypeNearPlace(place, rawValue, detailText);
+  if (textType) return { tipLoc: textType, basis: "Derived from the named place and nearby wording in the supplied table text." };
+  if (kind === "birth" || kind === "origin") return { tipLoc: "origin", basis: "Source column identifies the place as the birth/deportation origin." };
+  if (kind === "intermediary" || kind === "destination") return { tipLoc: "destination", basis: "Source route column identifies this as a destination or intermediary stop." };
+  return { tipLoc: "mentioned", basis: "Named in the dossier text without a more specific place type." };
+}
+
+function isBeyondDniester(place: Place): boolean {
+  const name = normalizedText([place.originalName, place.normalizedName ?? "", ...place.variants].join(" "));
+  return /(?:tropova|sargorod|scharhorod|scazinet|peciora|tulcin|stantiv|varasilovka|transnistria)/u.test(name);
+}
+
+// These are names present in the supplied Eugenia table. They are used only
+// to apply the user's transport rule to the current presentation subset;
+// unknown future places remain unknown until their transport is verified.
+const presentationPreDniesterTrainPlaces = new Set([
+  "craiova",
+  "darabani",
+  "dorohoi",
+  "dumbraveni",
+  "dumbraveni suceava",
+  "edinet",
+  "edineti",
+  "herta",
+  "iasi",
+  "mihaileni",
+  "mileanca",
+  "mohyliv podilskyi",
+  "moghilev",
+  "radauti",
+  "radauti prut",
+  "sulita",
+  "targu jiu",
+  "zvorastea",
+]);
+
+function isPresentationPreDniesterTrainPlace(place: Place): boolean {
+  const names = [place.originalName, place.normalizedName ?? "", ...place.variants].map(normalizedText);
+  return names.some((name) => [...presentationPreDniesterTrainPlaces].some((known) => name === known || name.startsWith(`${known} `)));
+}
+
+function isPrutDniesterTransitPlace(place: Place): boolean {
+  const name = normalizedText([place.originalName, place.normalizedName ?? "", ...place.variants].join(" "));
+  return /(?:otaci|ataki|moh?yliv|moghilev)/u.test(name);
+}
+
+function presentationTransport(
+  origin: Place,
+  destination: Place,
+  eventTypes: string[],
+): { mode: MapRouteDatum["transportMode"]; basis: string } {
+  if (eventTypes.includes("return")) {
+    return { mode: "return", basis: "Return/repatriation segment; the source does not state a transport mode." };
+  }
+  if (isBeyondDniester(origin) || isBeyondDniester(destination)) {
+    return { mode: "unknown", basis: "The source does not establish the transport mode beyond the Dniester." };
+  }
+  if (isPrutDniesterTransitPlace(origin) || isPrutDniesterTransitPlace(destination)) {
+    return { mode: "train", basis: "Inferred from the project transport rule: train was predominant between the Prut and the Dniester; verify against the dossier." };
+  }
+  if (isPresentationPreDniesterTrainPlace(origin) && isPresentationPreDniesterTrainPlace(destination)) {
+    return { mode: "train", basis: "Inferred from the project transport rule: routes within present-day Romania and to the Prut used trains; verify against the dossier." };
+  }
+  return { mode: "unknown", basis: "The source does not establish the transport mode." };
 }
 
 const familyRoleWords = new Set([
@@ -420,6 +531,7 @@ const mapData: MapViewModel = (() => {
   const unresolvedMentions: MapViewModel["unresolvedMentions"] = [];
   const usedCorePlaceIds = new Set<string>();
   const eventTypes = new Set<string>();
+  const tipLocByPlaceId = new Map<string, { tipLoc: MapLocationType; basis: string }>();
 
   const addContext = (
     placeId: string,
@@ -455,6 +567,20 @@ const mapData: MapViewModel = (() => {
     stories.get(personId)?.timeline.push(item);
   };
 
+  const registerTipLoc = (
+    rawValue: string,
+    kind: RouteStop["kind"] | "birth",
+    detailText: string,
+  ): Place | null => {
+    const placeId = placeIdForRaw(rawValue);
+    const place = placeId ? basePlaces.get(placeId) ?? null : null;
+    if (!place) return null;
+    const inferred = presentationPlaceTip(place, rawValue, detailText, kind);
+    const existing = tipLocByPlaceId.get(place.placeId);
+    if (!existing || existing.tipLoc === "mentioned") tipLocByPlaceId.set(place.placeId, inferred);
+    return place;
+  };
+
   const addRoute = (
     personId: string,
     personName: string,
@@ -469,6 +595,7 @@ const mapData: MapViewModel = (() => {
   ) => {
     if (!origin.coordinates || !destination.coordinates) return;
     const routeId = `eugenia-presentation-${dossierId}-${sequence}`;
+    const transport = presentationTransport(origin, destination, routeEventTypes);
     routes.push({
       id: routeId,
       personId,
@@ -486,6 +613,8 @@ const mapData: MapViewModel = (() => {
       dateRaw: date?.raw ?? null,
       datePrecision: date?.precision ?? null,
       transportRaw: null,
+      transportMode: transport.mode,
+      transportBasis: transport.basis,
       sequence,
       sourceLabel,
       notes,
@@ -546,6 +675,7 @@ const mapData: MapViewModel = (() => {
     if (birthPlaceId) {
       const place = basePlaces.get(birthPlaceId);
       if (place) {
+        registerTipLoc(birthRaw ?? place.originalName, "birth", deportationDetails ?? "");
         addContext(birthPlaceId, personId, dossierId, "birth place", "birth", birthDate, null, `${personId}-birth`);
         addTimeline(personId, { id: `${personId}-birth`, placeId: birthPlaceId, placeName: presentationPlaceLabel(place), placeNameRo: presentationPlaceLabel(place, "ro"), date: birthDate, label: "Birth / origin", description: null, sourceLabel });
       }
@@ -555,9 +685,31 @@ const mapData: MapViewModel = (() => {
 
     const stops: RouteStop[] = [];
     const originPlaceId = placeIdForRaw(originRaw, "settlement");
+    if (originRaw) registerTipLoc(originRaw, "origin", deportationDetails ?? "");
     stops.push({ raw: originRaw ?? "Unresolved origin", placeId: originPlaceId, date: null, kind: "origin" });
-    for (const raw of intermediateRaw) stops.push({ raw, placeId: placeIdForRaw(raw), date: intermediateDate, kind: "intermediary" });
-    for (const raw of destinationRaw) stops.push({ raw, placeId: placeIdForRaw(raw), date: destinationDate, kind: "destination" });
+    for (const raw of intermediateRaw) {
+      registerTipLoc(raw, "intermediary", deportationDetails ?? "");
+      stops.push({ raw, placeId: placeIdForRaw(raw), date: intermediateDate, kind: "intermediary" });
+    }
+    for (const raw of destinationRaw) {
+      registerTipLoc(raw, "destination", deportationDetails ?? "");
+      stops.push({ raw, placeId: placeIdForRaw(raw), date: destinationDate, kind: "destination" });
+    }
+
+    // A place named only in narrative text is displayed as a mentioned place
+    // when it can be resolved, but it never becomes a route stop by itself.
+    if (deportationDetails) {
+      for (const place of allPlaces) {
+        if (place.layer !== "core" || !place.coordinates || !textContainsPlace(place, deportationDetails)) continue;
+        const inferred = presentationPlaceTip(place, place.originalName, deportationDetails, "destination");
+        if (inferred.tipLoc === "destination") continue;
+        const existing = tipLocByPlaceId.get(place.placeId);
+        if (!existing || existing.tipLoc === "mentioned") tipLocByPlaceId.set(place.placeId, inferred);
+        if (!usedCorePlaceIds.has(place.placeId)) {
+          addContext(place.placeId, personId, dossierId, "mentioned place", "mentioned", null, deportationDetails, `${personId}-text-place-${place.placeId}`);
+        }
+      }
+    }
 
     if (!originPlaceId && originRaw) addUnresolved(`${personId}-deportation-origin`, originRaw, "deportation origin (raw)", personId, dossierId);
     for (const [index, stop] of stops.slice(1).entries()) {
@@ -695,6 +847,8 @@ const mapData: MapViewModel = (() => {
       layer: place.layer,
       confidence: place.confidence,
       resolutionStatus: place.resolutionStatus,
+      tipLoc: tipLocByPlaceId.get(place.placeId)?.tipLoc,
+      tipLocBasis: tipLocByPlaceId.get(place.placeId)?.basis,
       personIds: contexts.map((context) => context.personId),
       eventTypes: placeEventTypes,
       years: [...new Set(contexts.flatMap((context) => context.connections.map((connection) => connection.date?.start?.slice(0, 4)).filter(Boolean).map(Number)))],
@@ -715,6 +869,8 @@ const mapData: MapViewModel = (() => {
     layer: place.layer,
     confidence: place.confidence,
     resolutionStatus: place.resolutionStatus,
+    tipLoc: place.placeType === "ghetto" ? "ghetto" : "camp",
+    tipLocBasis: "EHRI place type supplied by the local EHRI extract.",
     personIds: [],
     eventTypes: [],
     years: [],

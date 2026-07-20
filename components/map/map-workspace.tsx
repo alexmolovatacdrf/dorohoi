@@ -18,7 +18,9 @@ import maplibregl, {
   type Marker,
 } from "maplibre-gl";
 import { presentationMapConfig } from "@/config/presentation-map";
+import { wjcDesignTokens } from "@/config/wjc-design-tokens";
 import { useLanguage } from "@/components/shell/language-provider";
+import { locationTypeForPlace, wjcSymbolSvg, wjcSymbolPriority } from "@/lib/map/wjc-symbols";
 import { StatusBadge, confidenceTone } from "@/components/ui/status-badge";
 import { formatDateRange, formatIsoDate, humanizeSlug } from "@/lib/data/format";
 import type {
@@ -415,7 +417,19 @@ function placeSymbol(place: MapPlaceDatum): string {
   return "●";
 }
 
-function placeColor(place: MapPlaceDatum): string {
+function placeColor(place: MapPlaceDatum, usePresentationTokens = false): string {
+  if (usePresentationTokens) {
+    if (place.layer === "ehri_local") return wjcDesignTokens.semantic.ehri;
+    if (place.tipLoc === "ghetto" || place.tipLoc === "camp") return wjcDesignTokens.semantic.ghetto;
+    if (place.tipLoc === "execution" || place.tipLoc === "death") return wjcDesignTokens.semantic.death;
+    if (place.tipLoc === "forced_labour") return wjcDesignTokens.semantic.labour;
+    if (place.tipLoc === "destination") return wjcDesignTokens.semantic.deportation;
+    if (place.categories.includes("death")) return wjcDesignTokens.semantic.death;
+    if (place.categories.includes("forced_labour")) return wjcDesignTokens.semantic.labour;
+    if (place.categories.includes("evacuation_deportation")) return wjcDesignTokens.semantic.deportation;
+    if (place.categories.includes("origin")) return wjcDesignTokens.semantic.origin;
+    return wjcDesignTokens.semantic.unresolved;
+  }
   if (place.layer === "ehri_local") return "#355b67";
   if (place.categories.includes("death")) return "#8d352c";
   if (place.categories.includes("forced_labour")) return "#7a5a2e";
@@ -440,6 +454,35 @@ function mapLabelOffset(placeId: string): [number, number] {
   return offsets[placeId] ?? [0, 0];
 }
 
+function rectanglesOverlap(left: DOMRect, right: DOMRect): boolean {
+  return left.left < right.right
+    && left.right > right.left
+    && left.top < right.bottom
+    && left.bottom > right.top;
+}
+
+function updatePresentationLabelCollision(map: MapLibreMap, markers: Marker[]): void {
+  const visibleLabels: DOMRect[] = [];
+  const zoom = map.getZoom();
+  const items = markers
+    .map((marker) => {
+      const element = marker.getElement();
+      const label = element.querySelector<HTMLElement>(".research-map-marker__label");
+      return label ? { element, label, priority: Number(element.dataset.wjcPriority ?? 0) } : null;
+    })
+    .filter((item): item is { element: HTMLElement; label: HTMLElement; priority: number } => Boolean(item))
+    .sort((left, right) => right.priority - left.priority);
+
+  for (const item of items) {
+    const alwaysVisible = item.element.dataset.wjcAnchor === "true"
+      || item.element.dataset.wjcRouteEndpoint === "true";
+    const overlaps = visibleLabels.some((rect) => rectanglesOverlap(rect, item.label.getBoundingClientRect()));
+    const show = alwaysVisible || (zoom >= 5 && !overlaps);
+    item.label.style.visibility = show ? "visible" : "hidden";
+    if (show) visibleLabels.push(item.label.getBoundingClientRect());
+  }
+}
+
 function routeArrow(color: string): ImageData {
   const canvas = document.createElement("canvas");
   canvas.width = 24;
@@ -457,6 +500,59 @@ function routeArrow(color: string): ImageData {
   context.fillStyle = color;
   context.fill();
   return context.getImageData(0, 0, canvas.width, canvas.height);
+}
+
+function routeTrainTick(): ImageData {
+  const canvas = document.createElement("canvas");
+  canvas.width = 7;
+  canvas.height = 7;
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("Canvas 2D context is unavailable");
+  context.beginPath();
+  context.moveTo(3.5, 0);
+  context.lineTo(3.5, 7);
+  context.lineWidth = 2;
+  context.strokeStyle = "#ffffff";
+  context.stroke();
+  return context.getImageData(0, 0, canvas.width, canvas.height);
+}
+
+function presentationRouteColorExpression(): ExpressionSpecification {
+  return [
+    "match",
+    ["get", "transportMode"],
+    "train",
+    wjcDesignTokens.semantic.deportation,
+    "walking",
+    wjcDesignTokens.semantic.deportation,
+    "return",
+    wjcDesignTokens.semantic.origin,
+    wjcDesignTokens.semantic.unresolved,
+  ] as ExpressionSpecification;
+}
+
+function presentationRouteWidthExpression(): ExpressionSpecification {
+  return [
+    "match",
+    ["get", "transportMode"],
+    "train",
+    wjcDesignTokens.route.standardWidth,
+    "walking",
+    wjcDesignTokens.route.standardWidth,
+    "return",
+    wjcDesignTokens.route.returnWidth,
+    wjcDesignTokens.route.unknownWidth,
+  ] as ExpressionSpecification;
+}
+
+function presentationRouteDashExpression(): ExpressionSpecification {
+  return [
+    "match",
+    ["get", "transportMode"],
+    "walking",
+    ["literal", [...wjcDesignTokens.route.walkingDashArray]],
+    ["literal", [1, 0]],
+  ] as ExpressionSpecification;
 }
 
 function routeEndpointPairKey(route: MapRouteDatum): string {
@@ -561,6 +657,9 @@ function routeCollection(
           personName: route.personName,
           routeStatus: route.routeStatus,
           confidence: route.confidence,
+          transportRaw: route.transportRaw,
+          transportMode: route.transportMode ?? "unknown",
+          transportBasis: route.transportBasis,
         },
       };
     }),
@@ -591,15 +690,20 @@ function routeProgressCollection(
         coordinates: point,
       },
       properties: {
-        color: "#236353",
+        color: wjcDesignTokens.semantic.unresolved,
         routeStatus: route.routeStatus,
+        transportMode: route.transportMode ?? "unknown",
         angle,
       },
     }],
   };
 }
 
-function pointCollection(places: MapPlaceDatum[], language: "en" | "ro"): FeatureCollection<Point, GeoJsonProperties> {
+function pointCollection(
+  places: MapPlaceDatum[],
+  language: "en" | "ro",
+  usePresentationTokens = false,
+): FeatureCollection<Point, GeoJsonProperties> {
   return {
     type: "FeatureCollection",
     features: places.flatMap((place) => {
@@ -619,7 +723,7 @@ function pointCollection(places: MapPlaceDatum[], language: "en" | "ro"): Featur
             layer: place.layer,
             confidence: place.confidence,
             symbol: place.layer === "ehri_local" ? (place.placeType === "camp" ? "▲" : "■") : placeSymbol(place),
-            color: placeColor(place),
+            color: placeColor(place, usePresentationTokens),
           },
         },
       ];
@@ -675,6 +779,23 @@ function publicPlaceCategoryLabel(category: MapPlaceDatum["categories"][number])
   }
 }
 
+function publicLocationTypeLabel(place: MapPlaceDatum): string {
+  switch (locationTypeForPlace(place)) {
+    case "anchor": return "Dorohoi anchor";
+    case "origin": return "Origin / residence";
+    case "ghetto": return "Ghetto";
+    case "camp": return "Camp";
+    case "execution": return "Execution site";
+    case "forced_labour": return "Forced labour site";
+    case "station": return "Station / embarkation point";
+    case "gate": return "Gate / crossing";
+    case "death": return "Place of death";
+    case "destination": return "Deportation destination";
+    case "unresolved": return "Unresolved place";
+    default: return "Mentioned locality";
+  }
+}
+
 function publicPlaceContextLabel(context: MapPlacePersonContext): string {
   return publicPlaceContextLabelForValues(context.roles, context.eventTypes);
 }
@@ -702,6 +823,16 @@ function mapRouteDateLabel(route: MapRouteDatum, language: "en" | "ro"): string 
     end: route.dateEnd,
     precision: route.datePrecision ?? "unknown",
   }, language);
+}
+
+function presentationTransportLabel(route: MapRouteDatum): string {
+  if (route.transportRaw) return route.transportRaw;
+  switch (route.transportMode) {
+    case "train": return "Train (inferred)";
+    case "walking": return "On foot (inferred)";
+    case "return": return "Return / repatriation (mode not supplied)";
+    default: return "Unknown";
+  }
 }
 
 function popupTextElement<K extends keyof HTMLElementTagNameMap>(
@@ -1211,15 +1342,26 @@ export function MapWorkspace({
               "line-color": "#3f403d",
               "line-opacity": 0.9,
               "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.9, 8, 1.8, 11, 2.4],
+              ...(isPresentation
+                ? { "line-dasharray": ["match", ["get", "Name"], "Transnistria", ["literal", [...wjcDesignTokens.historical.transnistriaDashArray]], ["literal", [1, 0]]] as ExpressionSpecification }
+                : {}),
             },
           });
+          const routePaint = isPresentation
+            ? {
+                "line-color": presentationRouteColorExpression(),
+                "line-width": presentationRouteWidthExpression(),
+                "line-opacity": 0.9,
+                "line-dasharray": presentationRouteDashExpression(),
+              }
+            : { "line-color": "#236353", "line-width": 4, "line-opacity": 0.9 };
           map.addLayer({
             id: "routes-explicit",
             type: "line",
             source: "research-routes",
             filter: ["==", ["get", "routeStatus"], "explicit"],
             layout: { "line-cap": "round", "line-join": "round" },
-            paint: { "line-color": "#236353", "line-width": 4, "line-opacity": 0.9 },
+            paint: routePaint,
           });
           map.addLayer({
             id: "routes-partial",
@@ -1227,7 +1369,7 @@ export function MapWorkspace({
             source: "research-routes",
             filter: ["==", ["get", "routeStatus"], "partial"],
             layout: { "line-cap": "round", "line-join": "round" },
-            paint: { "line-color": "#236353", "line-width": 4, "line-opacity": 0.9 },
+            paint: routePaint,
           });
           map.addLayer({
             id: "routes-inferred",
@@ -1235,7 +1377,7 @@ export function MapWorkspace({
             source: "research-routes",
             filter: ["==", ["get", "routeStatus"], "inferred"],
             layout: { "line-cap": "round", "line-join": "round" },
-            paint: { "line-color": "#236353", "line-width": 4, "line-opacity": 0.9 },
+            paint: routePaint,
           });
           map.addImage("route-arrow-explicit", routeArrow("#236353"));
           map.addImage("route-arrow-partial", routeArrow("#236353"));
@@ -1243,6 +1385,17 @@ export function MapWorkspace({
           map.addImage("route-progress-arrow-explicit", routeArrow("#236353"));
           map.addImage("route-progress-arrow-partial", routeArrow("#236353"));
           map.addImage("route-progress-arrow-inferred", routeArrow("#236353"));
+          if (isPresentation) {
+            map.addImage("route-arrow-train", routeArrow(wjcDesignTokens.semantic.deportation));
+            map.addImage("route-arrow-walking", routeArrow(wjcDesignTokens.semantic.deportation));
+            map.addImage("route-arrow-unknown", routeArrow(wjcDesignTokens.semantic.unresolved));
+            map.addImage("route-arrow-return", routeArrow(wjcDesignTokens.semantic.origin));
+            map.addImage("route-progress-arrow-train", routeArrow(wjcDesignTokens.semantic.deportation));
+            map.addImage("route-progress-arrow-walking", routeArrow(wjcDesignTokens.semantic.deportation));
+            map.addImage("route-progress-arrow-unknown", routeArrow(wjcDesignTokens.semantic.unresolved));
+            map.addImage("route-progress-arrow-return", routeArrow(wjcDesignTokens.semantic.origin));
+            map.addImage("route-train-tick", routeTrainTick());
+          }
 
           map.addLayer({
             id: "route-direction",
@@ -1251,35 +1404,40 @@ export function MapWorkspace({
             layout: {
               "symbol-placement": "line",
               "symbol-spacing": 110,
-              "icon-image": [
-                "match",
-                ["get", "routeStatus"],
-                "partial",
-                "route-arrow-partial",
-                "inferred",
-                "route-arrow-inferred",
-                "route-arrow-explicit",
-              ],
+              "icon-image": isPresentation
+                ? ["match", ["get", "transportMode"], "train", "route-arrow-train", "walking", "route-arrow-walking", "return", "route-arrow-return", "route-arrow-unknown"]
+                : ["match", ["get", "routeStatus"], "partial", "route-arrow-partial", "inferred", "route-arrow-inferred", "route-arrow-explicit"],
               "icon-size": 0.66,
               "icon-rotation-alignment": "map",
               "icon-keep-upright": false,
               "icon-allow-overlap": true,
             },
           });
+          if (isPresentation) {
+            map.addLayer({
+              id: "route-train-ticks",
+              type: "symbol",
+              source: "research-routes",
+              filter: ["==", ["get", "transportMode"], "train"],
+              layout: {
+                "symbol-placement": "line",
+                "symbol-spacing": 16,
+                "icon-image": "route-train-tick",
+                "icon-rotate": 90,
+                "icon-rotation-alignment": "map",
+                "icon-allow-overlap": true,
+                "icon-ignore-placement": true,
+              },
+            });
+          }
           map.addLayer({
             id: "route-progress-arrow",
             type: "symbol",
             source: "route-progress",
             layout: {
-              "icon-image": [
-                "match",
-                ["get", "routeStatus"],
-                "partial",
-                "route-progress-arrow-partial",
-                "inferred",
-                "route-progress-arrow-inferred",
-                "route-progress-arrow-explicit",
-              ],
+              "icon-image": isPresentation
+                ? ["match", ["get", "transportMode"], "train", "route-progress-arrow-train", "walking", "route-progress-arrow-walking", "return", "route-progress-arrow-return", "route-progress-arrow-unknown"]
+                : ["match", ["get", "routeStatus"], "partial", "route-progress-arrow-partial", "inferred", "route-progress-arrow-inferred", "route-progress-arrow-explicit"],
               "icon-size": 0.92,
               "icon-rotate": ["get", "angle"],
               "icon-rotation-alignment": "map",
@@ -1440,9 +1598,9 @@ export function MapWorkspace({
   useEffect(() => {
     const map = mapRef.current;
     if (!mapReady || !map) return;
-    (map.getSource("research-places") as GeoJSONSource).setData(pointCollection(visibleCorePlaces, language));
-    (map.getSource("ehri-places") as GeoJSONSource).setData(pointCollection(visibleEhriPlaces, language));
-    (map.getSource("family-places") as GeoJSONSource).setData(pointCollection(familyContextPlaces, language));
+    (map.getSource("research-places") as GeoJSONSource).setData(pointCollection(visibleCorePlaces, language, isPresentation));
+    (map.getSource("ehri-places") as GeoJSONSource).setData(pointCollection(visibleEhriPlaces, language, isPresentation));
+    (map.getSource("family-places") as GeoJSONSource).setData(pointCollection(familyContextPlaces, language, isPresentation));
     (map.getSource("research-routes") as GeoJSONSource).setData(
       routeCollection(
         visibleRoutes,
@@ -1461,7 +1619,7 @@ export function MapWorkspace({
           )
         : emptyPointCollection,
     );
-  }, [activePlaybackRoute, familyContextPlaces, filters.person, language, mapReady, selectedPersonRoutes, timelineProgress, visibleCorePlaces, visibleEhriPlaces, visibleRoutes]);
+  }, [activePlaybackRoute, familyContextPlaces, filters.person, isPresentation, language, mapReady, selectedPersonRoutes, timelineProgress, visibleCorePlaces, visibleEhriPlaces, visibleRoutes]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -1477,6 +1635,9 @@ export function MapWorkspace({
       : basemapVariant === "light"
         ? { opacity: 0.82, saturation: -0.72, contrast: -0.08, brightnessMin: 0.24, brightnessMax: 1 }
         : { opacity: 0.68, saturation: -1, contrast: -0.18, brightnessMin: 0.36, brightnessMax: 0.98 };
+    // Historical opacity belongs to the polygon layer. Do not fade the OSM
+    // raster when the historical layer is enabled: cities, rivers and roads
+    // must remain readable beneath it.
     map.setPaintProperty(BASEMAP_LAYER_ID, "raster-opacity", paint.opacity);
     map.setPaintProperty(BASEMAP_LAYER_ID, "raster-saturation", paint.saturation);
     map.setPaintProperty(BASEMAP_LAYER_ID, "raster-contrast", paint.contrast);
@@ -1690,6 +1851,12 @@ export function MapWorkspace({
       const element = document.createElement("button");
       element.type = "button";
       element.className = `research-map-marker${place.layer === "ehri_local" ? " research-map-marker--ehri" : ""}`;
+      const symbolType = locationTypeForPlace(place);
+      const symbolColor = placeColor(place, isPresentation);
+      const markerSelected = selection?.kind === "place" && selection.id === place.id;
+      element.dataset.wjcPriority = String(wjcSymbolPriority(symbolType));
+      element.dataset.wjcAnchor = symbolType === "anchor" ? "true" : "false";
+      element.dataset.wjcRouteEndpoint = routeEndpointPlaceIds.has(place.id) ? "true" : "false";
       const placeLabel = language === "ro" ? place.labelRo : place.label;
       const roleLabel = place.roles.length ? ` · ${place.roles.join(" / ")}` : "";
       element.setAttribute("aria-label", `Inspect ${placeLabel}${roleLabel}`);
@@ -1701,9 +1868,13 @@ export function MapWorkspace({
       const [labelX, labelY] = mapLabelOffset(place.id);
       label.style.transform = `translate(${labelX}px, ${labelY}px)`;
       const pin = document.createElement("span");
-      pin.className = `research-map-marker__pin${place.layer === "ehri_local" ? " research-map-marker__pin--ehri" : ""}`;
-      pin.style.backgroundColor = placeColor(place);
-      pin.textContent = placeMarkerSymbol(place);
+      pin.className = `research-map-marker__pin${place.layer === "ehri_local" ? " research-map-marker__pin--ehri" : ""}${isPresentation ? " research-map-marker__pin--symbol" : ""}`;
+      if (isPresentation) {
+        pin.innerHTML = wjcSymbolSvg(symbolType, symbolColor, place.layer === "ehri_local" ? 14 : 18, markerSelected);
+      } else {
+        pin.style.backgroundColor = symbolColor;
+        pin.textContent = placeMarkerSymbol(place);
+      }
       element.append(label);
       element.append(pin);
       element.addEventListener("click", (event) => {
@@ -1726,7 +1897,21 @@ export function MapWorkspace({
       coreMarkersRef.current.forEach((marker) => marker.remove());
       coreMarkersRef.current = [];
     };
-  }, [filters.person, language, mapReady, visibleCorePlaces, visibleEhriPlaces]);
+  }, [filters.person, isPresentation, language, mapReady, routeEndpointPlaceIds, selection, visibleCorePlaces, visibleEhriPlaces]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!isPresentation || !mapReady || !map) return;
+    const update = () => updatePresentationLabelCollision(map, coreMarkersRef.current);
+    map.on("zoomend", update);
+    map.on("moveend", update);
+    const frame = window.requestAnimationFrame(update);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      map.off("zoomend", update);
+      map.off("moveend", update);
+    };
+  }, [isPresentation, mapReady, visibleCorePlaces, visibleEhriPlaces]);
 
   useEffect(() => {
     if (!isPlaying || !filters.person) return;
@@ -1982,13 +2167,13 @@ export function MapWorkspace({
   }));
   const publicMapLegend = [
     ...presentationLegend,
-    { value: "origin", label: "Birth, origin or residence", color: "#b9883b" },
-    { value: "movement", label: "Documented movement", color: "#236353" },
-    { value: "deportation", label: "Evacuation or deportation", color: "#a54f32" },
-    { value: "forced-labour", label: "Forced labour", color: "#7a5a2e" },
-    { value: "death", label: "Death or loss", color: "#8d352c" },
-    { value: "ehri", label: "EHRI camp or ghetto", color: "#355b67" },
-    { value: "unresolved", label: "Unresolved place", color: "#7e6b8d" },
+    { value: "origin", label: "Birth, origin or residence", color: wjcDesignTokens.semantic.origin },
+    { value: "movement", label: "Documented movement", color: wjcDesignTokens.semantic.deportation },
+    { value: "deportation", label: "Evacuation or deportation", color: wjcDesignTokens.semantic.deportation },
+    { value: "forced-labour", label: "Forced labour", color: wjcDesignTokens.semantic.labour },
+    { value: "death", label: "Death or loss", color: wjcDesignTokens.semantic.death },
+    { value: "ehri", label: "EHRI camp or ghetto", color: wjcDesignTokens.semantic.ehri },
+    { value: "unresolved", label: "Unresolved place", color: wjcDesignTokens.semantic.unresolved },
   ].filter((entry, index, entries) => entries.findIndex((candidate) => candidate.label === entry.label) === index);
   const selectedPersonPlaceContextCard = selectedPerson && selectedPlace && selectedPersonPlaceContext ? (
     <div className="presentation-place-person-context">
@@ -2021,6 +2206,7 @@ export function MapWorkspace({
           ? selectedPlace.categories.map(publicPlaceCategoryLabel).join(" · ")
           : "Documented place"}
       </p>
+      <p className="presentation-card__meta">Place type: {publicLocationTypeLabel(selectedPlace)}</p>
       {selectedPersonPlaceContextCard}
       {!selectedPerson && selectedPlacePeople.length ? (
         <div className="presentation-place-people">
@@ -2849,9 +3035,10 @@ export function MapWorkspace({
             <h3 className="font-editorial mt-1 text-2xl leading-7 font-bold text-[#173f36]">{selectedRoute.originName} <span className="text-[#a54f32]">→</span> {selectedRoute.destinationName}</h3>
             <dl className="mt-4 space-y-2 border-y border-[#ded8cc] py-3 text-xs leading-5">
               <div><dt className="inline font-bold">Date: </dt><dd className="inline">{mapRouteDateLabel(selectedRoute, language)}</dd></div>
-              <div><dt className="inline font-bold">Transport: </dt><dd className="inline">{selectedRoute.transportRaw ?? "Not supplied"}</dd></div>
-              <div><dt className="inline font-bold">Line style: </dt><dd className="inline">solid presentation route</dd></div>
+              <div><dt className="inline font-bold">Transport: </dt><dd className="inline">{isPresentation ? presentationTransportLabel(selectedRoute) : selectedRoute.transportRaw ?? "Not supplied"}</dd></div>
+              <div><dt className="inline font-bold">Line style: </dt><dd className="inline">{isPresentation ? selectedRoute.transportMode === "train" ? "train cross-ticks" : selectedRoute.transportMode === "walking" ? "walking dotted" : selectedRoute.transportMode === "return" ? "return solid" : "unknown solid" : "solid presentation route"}</dd></div>
             </dl>
+            {isPresentation && selectedRoute.transportBasis ? <p className="mt-3 text-xs leading-5 text-[#61706a]">{selectedRoute.transportBasis}</p> : null}
             {selectedRoute.notes ? <p className="mt-3 text-xs leading-5 text-[#61706a]">{selectedRoute.notes}</p> : null}
             <p className="mt-3 break-all text-[9px] leading-4 text-[#838b87]">{selectedRoute.sourceLabel}</p>
             {dataSource?.supportsResearchRecords !== false ? <Link href={`/persons/${selectedRoute.personId}`} className="mt-4 flex justify-center bg-[#173f36] px-4 py-2.5 text-[9px] font-black tracking-[0.11em] text-white uppercase">Open person dossier</Link> : null}

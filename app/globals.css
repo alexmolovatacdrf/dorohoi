@@ -1992,3 +1992,217 @@ body:has(.map-workspace) .site-footer {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* WJC design tokens: Presentation Map only. The Research Map keeps its
+   established research-oriented palette and typography. */
+.presentation-page {
+  --wjc-paper: #E7EAEE;
+  --wjc-paper-card: #F3F5F7;
+  --wjc-ink: #141A22;
+  --wjc-ink-muted: #5C6875;
+  --wjc-line: #C9CFD8;
+  --wjc-stamp: #4B3D9E;
+  --wjc-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --wjc-font-serif: 'IBM Plex Serif', Georgia, serif;
+  --wjc-font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  background: var(--wjc-paper);
+  color: var(--wjc-ink);
+  font-family: var(--wjc-font-sans);
+}
+
+.presentation-page .presentation-site-header {
+  background: var(--wjc-stamp);
+  color: var(--wjc-paper-card);
+}
+
+.presentation-page .presentation-site-header__kicker {
+  color: var(--wjc-paper-card);
+  font-family: var(--wjc-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.presentation-page .presentation-site-header__title {
+  color: var(--wjc-paper-card);
+  font-family: var(--wjc-font-mono);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.presentation-page .presentation-map-workspace {
+  color: var(--wjc-ink);
+  font-family: var(--wjc-font-sans);
+}
+
+.presentation-page .presentation-map-workspace .presentation-map__panel,
+.presentation-page .presentation-map-workspace .presentation-map__people,
+.presentation-page .presentation-map-workspace .presentation-map__timeline {
+  border-color: var(--wjc-line) !important;
+  background: var(--wjc-paper-card) !important;
+  color: var(--wjc-ink);
+}
+
+.presentation-page .presentation-map-workspace button,
+.presentation-page .presentation-map-workspace input,
+.presentation-page .presentation-map-workspace select,
+.presentation-page .presentation-map-workspace summary {
+  color: var(--wjc-ink);
+  font-family: var(--wjc-font-sans);
+  font-size: 14px !important;
+}
+
+.presentation-page .presentation-map-workspace .presentation-panel__header,
+.presentation-page .presentation-map-workspace .presentation-people-detail,
+.presentation-page .presentation-map-workspace .presentation-group,
+.presentation-page .presentation-map-workspace .presentation-family-card,
+.presentation-page .presentation-map-workspace .presentation-person-search {
+  border-color: var(--wjc-line);
+}
+
+.presentation-page .presentation-map-workspace .presentation-card__eyebrow,
+.presentation-page .presentation-map-workspace .presentation-label,
+.presentation-page .presentation-map-workspace .presentation-group > summary {
+  color: var(--wjc-ink-muted);
+  font-family: var(--wjc-font-mono);
+  font-size: 12px !important;
+  letter-spacing: 0.08em;
+  line-height: 1.3 !important;
+  text-transform: uppercase;
+}
+
+.presentation-page .presentation-map-workspace .presentation-card__title {
+  color: var(--wjc-ink);
+  font-family: var(--wjc-font-serif);
+  font-size: 24px !important;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.presentation-page .presentation-map-workspace .presentation-card__body {
+  color: var(--wjc-ink);
+  font-family: var(--wjc-font-serif);
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+}
+
+.presentation-page .presentation-map-workspace .presentation-card__meta,
+.presentation-page .presentation-map-workspace .presentation-method,
+.presentation-page .presentation-map-workspace .presentation-attribution,
+.presentation-page .presentation-map-workspace .presentation-history-controls__row,
+.presentation-page .presentation-map-workspace .presentation-family-card__meta,
+.presentation-page .presentation-map-workspace .presentation-family-card__hint,
+.presentation-page .presentation-map-workspace .presentation-person-option__role {
+  color: var(--wjc-ink-muted);
+  font-family: var(--wjc-font-mono);
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+}
+
+.presentation-page .presentation-map-workspace .presentation-family-card__hint {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.presentation-page .presentation-map-workspace .presentation-family-card__summary,
+.presentation-page .presentation-map-workspace .presentation-person-option,
+.presentation-page .presentation-map-workspace .presentation-group-option,
+.presentation-page .presentation-map-workspace .presentation-right-legend__item,
+.presentation-page .presentation-map-workspace .presentation-legend__item {
+  font-size: 14px !important;
+  line-height: 1.4;
+}
+
+.presentation-page .presentation-map-workspace .presentation-secondary-button,
+.presentation-page .presentation-map-workspace .presentation-primary-button,
+.presentation-page .presentation-map-workspace .presentation-link-button,
+.presentation-page .presentation-map-workspace .presentation-map__reopen {
+  border-color: var(--wjc-line);
+  background: var(--wjc-paper-card);
+  color: var(--wjc-ink);
+  font-family: var(--wjc-font-sans);
+  font-size: 14px !important;
+}
+
+.presentation-page .presentation-map-workspace .presentation-primary-button,
+.presentation-page .presentation-map-workspace .presentation-person-option--selected {
+  border-color: var(--wjc-stamp);
+  background: var(--wjc-stamp);
+  color: var(--wjc-paper-card);
+}
+
+.presentation-page .presentation-map-workspace .presentation-icon-button {
+  border-color: var(--wjc-line);
+  color: var(--wjc-ink);
+  font-size: 16px !important;
+}
+
+.presentation-page .presentation-map-workspace .presentation-timeline__place strong,
+.presentation-page .presentation-map-workspace .presentation-waypoint strong {
+  color: var(--wjc-ink);
+  font-family: var(--wjc-font-mono);
+  font-size: 14px !important;
+}
+
+.presentation-page .presentation-map-workspace .presentation-timeline__place small,
+.presentation-page .presentation-map-workspace .research-map-marker__date {
+  color: var(--wjc-ink-muted);
+  font-family: var(--wjc-font-mono);
+  font-size: 12px !important;
+}
+
+.presentation-page .presentation-map-workspace .presentation-map__attribution,
+.presentation-page .presentation-map-workspace .maplibregl-ctrl-attrib {
+  color: var(--wjc-ink-muted);
+  font-family: var(--wjc-font-mono);
+  font-size: 12px !important;
+}
+
+.presentation-page .presentation-map-workspace .historical-map-label,
+.presentation-page .presentation-map-workspace .research-map-marker__label {
+  color: var(--wjc-ink);
+  font-family: var(--wjc-font-mono);
+  font-size: 14px;
+}
+
+.presentation-page .presentation-map-workspace .research-map-marker__label {
+  border: 1px solid var(--wjc-line);
+  border-radius: 2px;
+  background: rgb(255 255 255 / 95%);
+  padding: 0.18rem 0.35rem;
+}
+
+.presentation-page .presentation-map-workspace .research-map-marker--ehri .research-map-marker__label {
+  display: block;
+  max-width: 10rem;
+  border: 1px solid var(--wjc-line);
+  border-radius: 2px;
+  background: rgb(255 255 255 / 95%);
+  padding: 0.18rem 0.35rem;
+  box-shadow: 0 2px 8px rgb(20 26 34 / 12%);
+  color: var(--wjc-ink);
+  font-size: 14px;
+  line-height: 1.1;
+  text-shadow: none;
+}
+
+.presentation-page .presentation-map-workspace .research-map-marker__pin--symbol {
+  width: 18px;
+  height: 18px;
+  border: 0;
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none;
+  color: var(--wjc-ink);
+}
+
+.presentation-page .presentation-map-workspace .research-map-marker--ehri .research-map-marker__pin--symbol {
+  width: 14px;
+  height: 14px;
+  opacity: 0.8;
+}

@@ -213,6 +213,8 @@ export interface MapPlaceDatum {
   labelRo: string;
   coordinates: { latitude: number; longitude: number } | null;
   placeType: Place["placeType"];
+  tipLoc?: MapLocationType;
+  tipLocBasis?: string;
   layer: Place["layer"];
   confidence: Place["confidence"];
   resolutionStatus: Place["resolutionStatus"];
@@ -225,6 +227,20 @@ export interface MapPlaceDatum {
   personContexts: MapPlacePersonContext[];
   sourceLabel: string;
 }
+
+export type MapLocationType =
+  | "origin"
+  | "anchor"
+  | "ghetto"
+  | "camp"
+  | "execution"
+  | "forced_labour"
+  | "station"
+  | "gate"
+  | "death"
+  | "destination"
+  | "unresolved"
+  | "mentioned";
 
 export interface MapPlacePersonContext {
   personId: string;
@@ -260,6 +276,8 @@ export interface MapRouteDatum {
   dateRaw: unknown;
   datePrecision: DateRange["precision"] | null;
   transportRaw: string | null;
+  transportMode?: "train" | "walking" | "unknown" | "return";
+  transportBasis?: string | null;
   sequence: number;
   sourceLabel: string;
   notes: string | null;
