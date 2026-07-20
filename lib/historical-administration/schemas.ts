@@ -241,6 +241,20 @@ const historicalTerritorialChangesSchema: z.ZodType<HistoricalTerritorialChanges
     historicalTerritorialChangesUnionSchema,
   ) as z.ZodType<HistoricalTerritorialChanges>;
 
+const historicalTerritorialPeriodSchema = z.object({
+  Name: z.string(),
+  Foreign_Po: z.string(),
+  Head_of_St: z.string(),
+  Govt_in_Ex: z.string(),
+  presentationCategory: historicalPresentationCategorySchema,
+  start: z.string().regex(/^\d{4}-\d{2}$/),
+  end: z.string().regex(/^\d{4}-\d{2}$/),
+}).passthrough();
+
+export type HistoricalTerritorialPeriod = z.infer<
+  typeof historicalTerritorialPeriodSchema
+>;
+
 const historicalPresentationVocabularySchema = z.object({
   field: z.literal("presentationCategory"),
   sourceFields: z.tuple([z.literal("Name"), z.literal("Foreign_Po")]),
@@ -309,6 +323,7 @@ export type HistoricalManifest = {
   snapshots: HistoricalSnapshotEntry[];
   snapshotByYearMonth: Record<string, string>;
   territorialChanges: HistoricalTerritorialChanges;
+  territorialPeriods?: HistoricalTerritorialPeriod[];
   sourceAssertions: Record<string, unknown>;
 };
 
@@ -363,6 +378,7 @@ const historicalManifestBaseSchema: z.ZodType<HistoricalManifest> = z.object({
     snapshots: z.array(historicalSnapshotEntrySchema).min(1),
     snapshotByYearMonth: z.record(z.string(), z.string()),
     territorialChanges: historicalTerritorialChangesSchema,
+    territorialPeriods: z.array(historicalTerritorialPeriodSchema).optional(),
     sourceAssertions: z.record(z.string(), z.unknown()),
 }) as z.ZodType<HistoricalManifest>;
 

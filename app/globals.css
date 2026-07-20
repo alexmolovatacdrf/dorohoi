@@ -1073,6 +1073,22 @@ summary {
   font-size: 0.8125rem !important;
 }
 
+.presentation-history-step-button {
+  border: 1px solid #c9bba5;
+  background: #fff;
+  padding: 0.15rem 0.35rem;
+  color: #52605a;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.presentation-history-step-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
 .presentation-label strong {
   float: right;
   color: #243a32;

@@ -323,6 +323,17 @@ describe("European Borders WWII full presentation derivative", () => {
     ]);
     expect(manifest.snapshots).toHaveLength(88);
     expect(manifest.territorialChanges.scope).toBe("full");
+    const transnistriaPeriods = (manifest.territorialPeriods ?? []).filter(
+      (period) => period.Name === "Transnistria",
+    );
+    expect(transnistriaPeriods).toContainEqual(
+      expect.objectContaining({
+        Name: "Transnistria",
+        Foreign_Po: "Romanian-occupied",
+        start: "1941-08",
+        end: "1944-03",
+      }),
+    );
     for (const entry of manifest.snapshots) {
       const parsed = historicalFeatureCollectionSchema.parse(
         JSON.parse(

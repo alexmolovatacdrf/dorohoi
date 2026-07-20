@@ -942,6 +942,82 @@ def validate_source_assertions(source_dir: Path) -> dict[str, Any]:
     }
 
 
+def historical_territorial_periods(source_dir: Path) -> list[dict[str, str]]:
+    """Summarize consecutive monthly intervals for unchanged source attributes.
+
+    The monthly GeoJSON remains the browser's selected-month data. This compact
+    manifest metadata lets the details panel explain the full interval for a
+    territory without downloading every monthly snapshot.
+    """
+
+    row_cache: dict[str, list[dict[str, Any]]] = {}
+
+    def rows(year_month: str) -> list[dict[str, Any]]:
+        if year_month in row_cache:
+            return row_cache[year_month]
+        candidates = [
+            path
+            for path in source_dir.glob("*.dbf")
+            if path.stem != "Territorial_Changes"
+            and parse_snapshot_stem(path.stem)[0] == year_month
+        ]
+        if len(candidates) != 1:
+            raise ValueError(f"Expected one DBF for {year_month}")
+        reader = reader_for(candidates[0].with_suffix(""), require_shx=True)
+        result = [record.as_dict() for record in reader.iterRecords()]
+        reader.close()
+        row_cache[year_month] = result
+        return result
+
+    periods: list[dict[str, str]] = []
+    active_period_by_key: dict[tuple[str, ...], int] = {}
+    previous_month: str | None = None
+    for year_month in expected_year_months():
+        current_period_by_key: dict[tuple[str, ...], int] = {}
+        for row in rows(year_month):
+            raw = {field: str(row.get(field) or "") for field in REQUIRED_MONTHLY_FIELDS}
+            key = (
+                raw["Name"],
+                raw["Foreign_Po"],
+                raw["Head_of_St"],
+                raw["Govt_in_Ex"],
+                presentation_category(raw["Name"], raw["Foreign_Po"]),
+            )
+            if key in current_period_by_key:
+                continue
+            period_index = (
+                active_period_by_key.get(key)
+                if previous_month is not None
+                else None
+            )
+            if period_index is None:
+                period_index = len(periods)
+                periods.append(
+                    {
+                        **raw,
+                        "presentationCategory": key[-1],
+                        "start": year_month,
+                        "end": year_month,
+                    }
+                )
+            else:
+                periods[period_index]["end"] = year_month
+            current_period_by_key[key] = period_index
+        active_period_by_key = current_period_by_key
+        previous_month = year_month
+
+    periods.sort(
+        key=lambda period: (
+            period["Name"],
+            period["start"],
+            period["Foreign_Po"],
+            period["Head_of_St"],
+            period["Govt_in_Ex"],
+        )
+    )
+    return periods
+
+
 def relative_url(path: Path, output_dir: Path) -> str:
     relative = path.relative_to(output_dir).as_posix()
     return f"/data/historical-administration/{relative}"
@@ -998,6 +1074,7 @@ def build(
     source_dir = extract_archive(archive_path, external_dir, source_manifest["archive"]["sha256"])
     snapshots, territorial_stem = inventory_snapshots(source_dir)
     source_assertions = validate_source_assertions(source_dir)
+    territorial_periods = historical_territorial_periods(source_dir)
 
     transformer = Transformer.from_crs(
         SOURCE_CRS,
@@ -1119,6 +1196,7 @@ def build(
                 "bytes": len(territorial_payload),
                 **territorial_report,
             },
+            "territorialPeriods": territorial_periods,
             "sourceAssertions": source_assertions,
         }
         manifest_payload = write_stable_json(staging / "manifest.json", manifest)
@@ -1156,6 +1234,7 @@ def build_full(
     )
     snapshots, territorial_stem = inventory_snapshots(source_dir)
     source_assertions = validate_source_assertions(source_dir)
+    territorial_periods = historical_territorial_periods(source_dir)
     transformer = Transformer.from_crs(
         SOURCE_CRS,
         TARGET_CRS,
@@ -1321,6 +1400,7 @@ def build_full(
                     if key != "geometryRepairs"
                 },
             },
+            "territorialPeriods": territorial_periods,
             "sourceAssertions": source_assertions,
         }
         manifest_payload = write_stable_json(staging / "manifest.json", manifest)
@@ -1372,6 +1452,23 @@ def verify_output(output_dir: Path) -> None:
     print(f"Verified {len(manifest['snapshots'])} monthly files and Territorial_Changes in {output_dir}")
 
 
+def update_period_metadata(output_dir: Path, periods: list[dict[str, str]]) -> None:
+    """Add source-derived territorial periods without rewriting GeoJSON files."""
+
+    manifest_path = output_dir / "manifest.json"
+    manifest = load_json(manifest_path)
+    manifest["territorialPeriods"] = periods
+    manifest_payload = write_stable_json(manifest_path, manifest)
+    checksum_path = output_dir / "derived.sha256"
+    lines = [
+        line
+        for line in checksum_path.read_text(encoding="ascii").splitlines()
+        if not line.endswith("  manifest.json")
+    ]
+    lines.append(f"{hashlib.sha256(manifest_payload).hexdigest()}  manifest.json")
+    checksum_path.write_text("\n".join(lines) + "\n", encoding="ascii")
+
+
 def parse_args() -> argparse.Namespace:
     source_manifest = load_json(SOURCE_MANIFEST)
     parser = argparse.ArgumentParser(description=__doc__)
@@ -1395,6 +1492,11 @@ def parse_args() -> argparse.Namespace:
         help="Build or verify the regional derivative, the uncropped full derivative, or both",
     )
     parser.add_argument("--verify-output", action="store_true", help="Verify committed derivatives without reading the source archive")
+    parser.add_argument(
+        "--update-period-metadata",
+        action="store_true",
+        help="Update compact source-derived territorial periods without rewriting monthly GeoJSON",
+    )
     return parser.parse_args()
 
 
@@ -1408,6 +1510,24 @@ def main() -> None:
         return
     archive = args.archive.resolve()
     external = args.external_dir.resolve()
+    if args.update_period_metadata:
+        source_manifest = load_json(SOURCE_MANIFEST)
+        verify_archive(archive, source_manifest)
+        source_dir = extract_archive(
+            archive,
+            external,
+            source_manifest["archive"]["sha256"],
+        )
+        periods = historical_territorial_periods(source_dir)
+        if args.scope in ("regional", "all"):
+            regional_output = args.output_dir.resolve()
+            update_period_metadata(regional_output, periods)
+            verify_output(regional_output)
+        if args.scope in ("full", "all"):
+            full_output = args.full_output_dir.resolve()
+            update_period_metadata(full_output, periods)
+            verify_output(full_output)
+        return
     if args.scope in ("regional", "all"):
         regional_output = args.output_dir.resolve()
         build(archive, external, regional_output)

@@ -52,6 +52,7 @@ import {
   type HistoricalFeatureCollection,
   type HistoricalFeatureProperties,
   type HistoricalManifest,
+  type HistoricalTerritorialPeriod,
 } from "@/lib/historical-administration/schemas";
 import {
   BASEMAP_LAYER_ID,
@@ -279,13 +280,17 @@ function errorDetails(error: unknown): string {
 function historicalPopupContent(
   properties: HistoricalFeatureProperties,
   language: "en" | "ro",
+  manifest: HistoricalManifest | null,
 ): HTMLDivElement {
   const root = document.createElement("div");
   root.className = "historical-map-popup";
 
   const dateLabel = document.createElement("p");
   dateLabel.className = "historical-map-popup__date";
-  dateLabel.textContent = `${formatYearMonth(properties.yearMonth, language)} · supplied ${formatIsoDate(properties.snapshotDate, language)}`;
+  const periodLabel = historicalPeriodLabel(historicalPeriodForProperties(manifest, properties), language);
+  dateLabel.textContent = periodLabel
+    ? `Period: ${periodLabel} · snapshot ${formatYearMonth(properties.yearMonth, language)} · supplied ${formatIsoDate(properties.snapshotDate, language)}`
+    : `${formatYearMonth(properties.yearMonth, language)} · supplied ${formatIsoDate(properties.snapshotDate, language)}`;
 
   const name = document.createElement("p");
   name.className = "historical-map-popup__name";
@@ -331,6 +336,45 @@ function historicalMapLabel(properties: HistoricalFeatureProperties): string {
   return displayRawHistoricalValue(properties.Name) === "Transnistria"
     ? "Government of Transnistria"
     : displayRawHistoricalValue(properties.Name);
+}
+
+function historicalPeriodForProperties(
+  manifest: HistoricalManifest | null,
+  properties: HistoricalFeatureProperties,
+): HistoricalTerritorialPeriod | null {
+  const candidates = (manifest?.territorialPeriods ?? []).filter((period) =>
+    period.Name === properties.Name
+    && period.Foreign_Po === properties.Foreign_Po
+    && period.Head_of_St === properties.Head_of_St
+    && period.Govt_in_Ex === properties.Govt_in_Ex,
+  );
+  return candidates.find(
+    (period) => period.start <= properties.yearMonth && period.end >= properties.yearMonth,
+  ) ?? candidates[0] ?? null;
+}
+
+function historicalPeriodLabel(
+  period: HistoricalTerritorialPeriod | null,
+  language: "en" | "ro",
+): string | null {
+  if (!period) return null;
+  const start = formatYearMonth(period.start, language);
+  const end = formatYearMonth(period.end, language);
+  return start === end ? start : `${start} – ${end}`;
+}
+
+function historicalSnapshotYearMonthForDate(
+  manifest: HistoricalManifest,
+  date: string | null,
+): string {
+  const target = date?.match(/^(\d{4}-\d{2})/)?.[1];
+  if (!target) return manifest.temporalCoverage.defaultYearMonth;
+  const exact = manifest.snapshots.find((snapshot) => snapshot.yearMonth === target);
+  if (exact) return exact.yearMonth;
+  const earlier = [...manifest.snapshots]
+    .reverse()
+    .find((snapshot) => snapshot.yearMonth < target);
+  return earlier?.yearMonth ?? manifest.snapshots[0].yearMonth;
 }
 
 function hasHistoricalSourceValue(value: string): boolean {
@@ -953,6 +997,7 @@ export function MapWorkspace({
   const historicalPopupRef = useRef<maplibregl.Popup | null>(null);
   const placePopupRef = useRef<maplibregl.Popup | null>(null);
   const languageRef = useRef(language);
+  const historicalManifestRef = useRef<HistoricalManifest | null>(null);
   const selectionRef = useRef<Selection>(null);
   const [mapReady, setMapReady] = useState(false);
   const [mapLifecycle, setMapLifecycle] = useState<MapLifecycle>("initializing");
@@ -1028,6 +1073,10 @@ export function MapWorkspace({
   }, [language]);
 
   useEffect(() => {
+    historicalManifestRef.current = historicalManifest;
+  }, [historicalManifest]);
+
+  useEffect(() => {
     selectionRef.current = selection;
   }, [selection]);
 
@@ -1076,6 +1125,12 @@ export function MapWorkspace({
   const selectedPersonRoutes = useMemo(
     () => data.routes.filter((route) => route.personId === filters.person).sort((left, right) => left.sequence - right.sequence),
     [data.routes, filters.person],
+  );
+  const firstPersonDeportationDate = useMemo(
+    () => selectedPersonRoutes.find(
+      (route) => !route.eventTypes.includes("return") && route.dateStart,
+    )?.dateStart ?? null,
+    [selectedPersonRoutes],
   );
   const selectedGroupRoutes = useMemo(
     () => selectedGroup
@@ -1248,6 +1303,21 @@ export function MapWorkspace({
     void loadManifest();
     return () => controller.abort();
   }, [historicalReloadToken, isPresentation]);
+
+  useEffect(() => {
+    if (!isPresentation || !historicalManifest) return;
+    const targetYearMonth = filters.person
+      ? historicalSnapshotYearMonthForDate(historicalManifest, firstPersonDeportationDate)
+      : historicalManifest.temporalCoverage.defaultYearMonth;
+    let cancelled = false;
+    window.queueMicrotask(() => {
+      if (cancelled) return;
+      setHistoricalYearMonth((current) => current === targetYearMonth ? current : targetYearMonth);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [filters.person, firstPersonDeportationDate, historicalManifest, isPresentation]);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -1501,7 +1571,7 @@ export function MapWorkspace({
               offset: 12,
             })
               .setLngLat(event.lngLat)
-              .setDOMContent(historicalPopupContent(properties, languageRef.current))
+              .setDOMContent(historicalPopupContent(properties, languageRef.current, historicalManifestRef.current))
               .addTo(map);
           };
           map.on("mouseenter", HISTORICAL_FILL_LAYER_ID, () => { map.getCanvas().style.cursor = "pointer"; });
@@ -1941,9 +2011,30 @@ export function MapWorkspace({
     return () => window.cancelAnimationFrame(frame);
   }, [filters.person, isPlaying, selectedPersonRoutes.length, timelineStep]);
 
+  useEffect(() => {
+    if (!isPresentation || !historicalManifest || !filters.person || !activePlaybackRoute) return;
+    if (activePlaybackRoute.eventTypes.includes("return")) return;
+    const targetYearMonth = historicalSnapshotYearMonthForDate(
+      historicalManifest,
+      activePlaybackRoute.dateStart,
+    );
+    let cancelled = false;
+    window.queueMicrotask(() => {
+      if (cancelled) return;
+      setHistoricalYearMonth((current) => current === targetYearMonth ? current : targetYearMonth);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [activePlaybackRoute, filters.person, historicalManifest, isPresentation]);
+
   const selectedPlace = selection?.kind === "place" ? data.places.find((place) => place.id === selection.id) : null;
   const selectedRoute = selection?.kind === "route" ? data.routes.find((route) => route.id === selection.id) : null;
   const selectedHistorical = selection?.kind === "historical" ? selection.properties : null;
+  const selectedHistoricalPeriod = selectedHistorical
+    ? historicalPeriodForProperties(historicalManifest, selectedHistorical)
+    : null;
+  const selectedHistoricalPeriodText = historicalPeriodLabel(selectedHistoricalPeriod, language);
   const selectedPlacePeople = useMemo(() => {
     if (!selectedPlace) return [];
     const peopleById = new Map(data.persons.map((person) => [person.id, person]));
@@ -2109,6 +2200,7 @@ export function MapWorkspace({
     setIsPlaying(false);
     setSelection(null);
     setStoryPersonId(null);
+    if (historicalManifest) setHistoricalYearMonth(historicalManifest.temporalCoverage.defaultYearMonth);
     if (isPresentation) {
       fitMapToBbox(targetViewport === "europe" ? PRESENTATION_EUROPE_BBOX : PRESENTATION_DEFAULT_BBOX, 8);
     }
@@ -2136,6 +2228,9 @@ export function MapWorkspace({
     setIsPlaying(false);
     setTimelineStep(null);
     setTimelineProgress(0);
+    if (historicalManifest && !filters.person) {
+      setHistoricalYearMonth(historicalManifest.temporalCoverage.defaultYearMonth);
+    }
     if (!isPresentation) return;
     if (filters.person) {
       setPresentationViewport("story");
@@ -2240,7 +2335,10 @@ export function MapWorkspace({
   ) : selectedHistorical ? (
     <>
       <h2 className="presentation-card__title">{historicalMapLabel(selectedHistorical)}</h2>
-      <p className="presentation-card__eyebrow">{formatYearMonth(selectedHistorical.yearMonth, language)} · supplied {formatIsoDate(selectedHistorical.snapshotDate, language)}</p>
+      <p className="presentation-card__eyebrow">
+        {selectedHistoricalPeriodText ? `Period: ${selectedHistoricalPeriodText} · ` : ""}
+        Snapshot: {formatYearMonth(selectedHistorical.yearMonth, language)} · supplied {formatIsoDate(selectedHistorical.snapshotDate, language)}
+      </p>
       <dl className="presentation-card__details">
         {hasHistoricalSourceValue(selectedHistorical.Foreign_Po) ? <div><dt>{historicalDetailLabel("Foreign_Po")}</dt><dd>{selectedHistorical.Foreign_Po}</dd></div> : null}
         {hasHistoricalSourceValue(selectedHistorical.Head_of_St) ? <div><dt>{historicalDetailLabel("Head_of_St")}</dt><dd>{selectedHistorical.Head_of_St}</dd></div> : null}
@@ -2524,7 +2622,31 @@ export function MapWorkspace({
                   </select>
                 </label>
                 <input aria-label="Presentation historical timeline" type="range" min={0} max={historicalManifest.snapshots.length - 1} step={1} value={selectedHistoricalIndex} onChange={(event) => { const snapshot = historicalManifest.snapshots[Number(event.target.value)]; if (snapshot) { setHistoricalYearMonth(snapshot.yearMonth); setSelection(null); } }} className="mt-3 w-full accent-[#76536f]" data-testid="presentation-month-range" />
-                <div className="presentation-history-controls__row"><span>{formatIsoDate(selectedHistoricalSnapshot.snapshotDate, language)}</span><span>{selectedHistoricalSnapshot.status === "primary" ? "Primary" : "Limited"}</span></div>
+                <div className="presentation-history-controls__row">
+                  <button
+                    type="button"
+                    disabled={selectedHistoricalIndex === 0}
+                    onClick={() => {
+                      setHistoricalYearMonth(historicalManifest.snapshots[selectedHistoricalIndex - 1]?.yearMonth ?? historicalYearMonth);
+                      setSelection(null);
+                    }}
+                    className="presentation-history-step-button"
+                  >
+                    Previous
+                  </button>
+                  <span>{formatIsoDate(selectedHistoricalSnapshot.snapshotDate, language)}</span>
+                  <button
+                    type="button"
+                    disabled={selectedHistoricalIndex === historicalManifest.snapshots.length - 1}
+                    onClick={() => {
+                      setHistoricalYearMonth(historicalManifest.snapshots[selectedHistoricalIndex + 1]?.yearMonth ?? historicalYearMonth);
+                      setSelection(null);
+                    }}
+                    className="presentation-history-step-button"
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             ) : historicalLayerStatus === "loading_manifest" || historicalLayerStatus === "loading_snapshot" ? <p role="status" className="presentation-method">Loading the selected month only…</p> : historicalLayerStatus === "failed" ? <div role="alert" className="presentation-warning">{historicalDiagnostic}<button type="button" className="presentation-secondary-button mt-2" onClick={() => historicalManifest ? setHistoricalSnapshotReloadToken((value) => value + 1) : setHistoricalReloadToken((value) => value + 1)}>Retry historical layer</button></div> : null}
           </div>
@@ -3055,7 +3177,8 @@ export function MapWorkspace({
               {historicalMapLabel(selectedHistorical)}
             </h3>
             <p className="mt-2 text-[9px] font-black tracking-[0.12em] text-[#76536f] uppercase">
-              {formatYearMonth(selectedHistorical.yearMonth, language)} · supplied {formatIsoDate(selectedHistorical.snapshotDate, language)}
+              {selectedHistoricalPeriodText ? `Period: ${selectedHistoricalPeriodText} · ` : ""}
+              Snapshot: {formatYearMonth(selectedHistorical.yearMonth, language)} · supplied {formatIsoDate(selectedHistorical.snapshotDate, language)}
             </p>
             <p className="mt-2 text-[9px] leading-4 text-[#6c746f]">
               Historical state or territory name followed by the supplied authority fields.
