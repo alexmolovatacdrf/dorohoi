@@ -435,3 +435,31 @@ or an eligible Password Protection add-on. The exact setting is in Vercel
 Dashboard → Project → Settings → Deployment Protection. See the official
 [Deployment Protection documentation](https://vercel.com/docs/deployment-protection)
 and [Vercel Authentication documentation](https://vercel.com/docs/deployment-protection/methods-to-protect-deployments/vercel-authentication).
+
+## Session checkpoint — 21 July 2026
+
+The latest code checkpoint is commit `965f530` (`fix: enable EHRI layer by
+default in presentation map`) on `feature/public-presentation-map`. The
+Presentation Map initializes `localEhri` as enabled, so the EHRI layer is
+already checked when `/presentation/map` opens. The Research Map keeps its
+previous default, with the local EHRI overlay disabled until selected.
+
+The Presentation Map continues to show the route-linked EHRI places rather
+than every unrelated record in the 385-record EHRI registry; this preserves a
+readable map while making all EHRI places relevant to the displayed project
+routes available immediately. No source data was changed.
+
+The production deployment is Ready at:
+
+`https://dosare-dorohoi-platform-chatgpt.vercel.app/presentation/map`
+
+The latest deployment URL is
+`https://dosare-dorohoi-platform-chatgpt-kgqz0dtse.vercel.app`.
+
+Verification after the change: 56 tests passed, typecheck passed, lint passed
+and production build passed. The only existing uncommitted worktree content
+is the audit folder `artifacts/production-review/`; it was not modified or
+committed. On continuation, first inspect `git status`, then continue from
+this checkpoint. If the next request concerns EHRI coverage, distinguish
+between enabling the layer (already done) and changing the existing
+route-linked visibility filter (a separate data/UX decision).
