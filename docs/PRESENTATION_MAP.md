@@ -246,6 +246,17 @@ attribute popup and the selected-detail panel.
 
 ## Shared people and route presentation
 
+### Historical place-name display policy
+
+Public route and place labels use the historical/documentary form used by the
+project sources where that form is established: `Moghilev`, `Șargorod`,
+`Peciora`, `Scazineț` and `Tulcin`. The current official or modern form is
+retained as a normalized identity and search variant, not silently substituted
+for the historical label. Place type is a separate field, so the map says
+`Șargorod`, not `Șargorod Ghetto`. EHRI raw names and provenance remain
+available in the research data. This policy applies to route-linked EHRI
+records as well as core places.
+
 The right-side `Families and mentioned people` directory is available in both
 map modes. It uses the same person-centred grouping: the documented head or
 declarant appears as the family entry, while people mentioned in that dossier

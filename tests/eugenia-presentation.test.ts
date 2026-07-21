@@ -46,7 +46,7 @@ describe("verified Eugenia Presentation Map dataset", () => {
     expect(bacaluRoutes.map((route) => route.destinationName)).toEqual([
       "Moghilev",
       "Scazineț",
-      "Pecioara",
+      "Peciora",
       "Tulcin",
     ]);
     expect(bacaluRoutes.map((route) => route.sequence)).toEqual([1, 2, 3, 4]);
@@ -116,7 +116,7 @@ describe("verified Eugenia Presentation Map dataset", () => {
 
     expect(goldenberg.map((route) => route.dateRaw)).toEqual(["12/11/1941", null]);
     expect(zissman.map((route) => route.dateRaw)).toEqual(["01/07/1941", "01/10/1941", null]);
-    expect(data.routes.some((route) => route.personName === "Cohn Eti" && route.destinationName === "Sharhorod")).toBe(true);
+    expect(data.routes.some((route) => route.personName === "Cohn Eti" && route.destinationName === "Șargorod")).toBe(true);
     expect(data.routes.some((route) => route.destinationName === "Edineț")).toBe(true);
   });
 
@@ -132,6 +132,11 @@ describe("verified Eugenia Presentation Map dataset", () => {
     expect(data.places.find((place) => place.id === "PL-EHRI-0233")?.label).toBe("Rădăuți-Prut");
     expect(data.places.find((place) => place.id === "PL-EHRI-0383")?.label).toBe("Cernăuți");
     expect(data.places.find((place) => place.id === "PL-EHRI-0382")?.label).toBe("Moghilev");
+    expect(data.places.find((place) => place.id === "PL-EHRI-0384")?.label).toBe("Șargorod");
+    expect(data.places.find((place) => place.id === "PL-EHRI-0082")?.label).toBe("Peciora");
+    expect(data.places.find((place) => place.id === "PL-EHRI-0065")?.label).toBe("Scazineț");
+    expect(data.places.find((place) => place.id === "PL-EHRI-0380")?.label).toBe("Tulcin");
+    expect(data.places.find((place) => place.id === "PL-EHRI-0038")?.label).toBe("Edineț");
     expect(ehri.every((place) => !/\b(?:ghetto|getto|ghetou|camp|lagar|lagăr)\b/i.test(place.label))).toBe(true);
   });
 

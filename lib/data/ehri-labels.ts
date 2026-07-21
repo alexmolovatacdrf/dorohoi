@@ -22,7 +22,11 @@ const EHRI_PUBLIC_LABEL_OVERRIDES: Record<string, string> = {
   "PL-EHRI-0233": "Rădăuți-Prut",
   "PL-EHRI-0382": "Moghilev",
   "PL-EHRI-0383": "Cernăuți",
-  "PL-EHRI-0384": "Sharhorod",
+  "PL-EHRI-0384": "Șargorod",
+  "PL-EHRI-0065": "Scazineț",
+  "PL-EHRI-0082": "Peciora",
+  "PL-EHRI-0380": "Tulcin",
+  "PL-EHRI-0038": "Edineț",
 };
 
 const nonLatinScriptPattern = /[\u0370-\u03ff\u0400-\u052f\u0590-\u05ff]/u;
