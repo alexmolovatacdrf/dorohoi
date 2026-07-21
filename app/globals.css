@@ -139,10 +139,14 @@ summary {
   background: #fffdf8;
   padding: 0.8rem;
   box-shadow: 0 12px 30px rgb(22 42 35 / 20%);
+  max-width: min(330px, calc(100vw - 1.5rem));
 }
 
 .map-place-popup {
-  min-width: 13rem;
+  width: min(19rem, calc(100vw - 2rem));
+  min-width: 18rem;
+  max-height: min(55vh, 30rem);
+  overflow: hidden;
   color: #52645c;
 }
 
@@ -221,31 +225,140 @@ summary {
   font-weight: 800;
 }
 
+.map-place-popup__summary {
+  margin-top: 0.25rem;
+  color: #68766e;
+  font-size: 0.68rem !important;
+  line-height: 1.3 !important;
+}
+
+.map-place-popup__search {
+  width: 100%;
+  min-height: 2rem !important;
+  margin-top: 0.45rem;
+  border: 1px solid #c9c4b7;
+  border-radius: 0;
+  background: #fff;
+  padding: 0.25rem 0.45rem;
+  color: #173f36;
+  font-size: 0.75rem !important;
+}
+
+.map-place-popup__search::placeholder {
+  color: #68766e;
+}
+
 .map-place-popup__people {
   display: grid;
   gap: 0.15rem;
+  max-height: min(34vh, 18rem);
   margin-top: 0.35rem;
+  overflow-y: auto;
+  padding-right: 0.2rem;
 }
 
-.map-place-popup__people-group {
-  margin-top: 0.35rem;
-  color: #76536f;
-  font-size: 0.625rem !important;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.map-place-popup__empty {
+  margin: 0.35rem 0;
+  color: #68766e;
+  font-size: 0.72rem !important;
 }
 
 .map-place-popup__person-button {
-  display: block;
+  display: flex;
+  min-height: 1.8rem !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
   width: 100%;
-  padding: 0.35rem 0.4rem;
+  border: 0;
+  border-radius: 0;
+  padding: 0.2rem 0.35rem;
   color: #315c50;
-  font-size: 0.75rem !important;
+  font-size: 0.72rem !important;
   text-align: left;
-  text-decoration: underline;
-  text-decoration-color: #b6c6bd;
-  text-underline-offset: 0.15em;
+  text-decoration: none;
+}
+
+.map-place-popup__person-name {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.map-place-popup__person-badges {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.15rem;
+}
+
+.map-place-popup__badge {
+  border: 1px solid #c7d6ce;
+  border-radius: 999px;
+  padding: 0.08rem 0.25rem;
+  color: #315c50;
+  font-size: 0.58rem !important;
+  font-weight: 800;
+  line-height: 1.2 !important;
+  white-space: nowrap;
+}
+
+.map-place-popup__badge--deportation {
+  border-color: #c48a78;
+  background: #f7e7e0;
+  color: #8d432c;
+}
+
+.map-place-popup__badge--evacuation {
+  border-color: #c6a16d;
+  background: #f7efdf;
+  color: #7b5b29;
+}
+
+.map-place-popup__badge--return {
+  border-color: #8ab1a1;
+  background: #e6f1eb;
+  color: #1c604c;
+}
+
+.map-place-popup__badge--death {
+  border-color: #b9a9b9;
+  background: #eee8ee;
+  color: #6d506d;
+}
+
+.map-place-popup__badge--birth {
+  border-color: #cbb88c;
+  background: #f5efdf;
+  color: #79612d;
+}
+
+.map-place-popup__badge--camp {
+  border-color: #9fb0bb;
+  background: #e9eff2;
+  color: #496575;
+}
+
+.map-place-popup__badge--forced {
+  border-color: #a8a3cf;
+  background: #eeedfa;
+  color: #554e91;
+}
+
+.map-place-popup__badge--route {
+  border-color: #94aebe;
+  background: #e9f1f5;
+  color: #3c6572;
+}
+
+.map-place-popup__badge--unresolved,
+.map-place-popup__badge--more {
+  border-color: #b8c0c0;
+  background: #eef1f0;
+  color: #5d6a68;
 }
 
 .map-place-popup__person-button:hover,

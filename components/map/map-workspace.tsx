@@ -955,6 +955,47 @@ function popupTextElement<K extends keyof HTMLElementTagNameMap>(
   return element;
 }
 
+type PlacePersonPopupBadge = {
+  key: "deportation" | "evacuation" | "return" | "death" | "birth" | "camp" | "forced" | "route" | "unresolved" | "other";
+  label: string;
+};
+
+type PlacePersonPopupRow = {
+  id: string;
+  label: string;
+  badges: PlacePersonPopupBadge[];
+};
+
+function placePersonPopupBadge(contextLabel: string, language: "en" | "ro"): PlacePersonPopupBadge {
+  const value = contextLabel.toLocaleLowerCase("ro");
+  if (/deport/.test(value)) return { key: "deportation", label: language === "ro" ? "deportat" : "deported" };
+  if (/evac/.test(value)) return { key: "evacuation", label: language === "ro" ? "evacuat" : "evacuated" };
+  if (/intoarc|întoarc|return|repatri/.test(value)) return { key: "return", label: language === "ro" ? "întors" : "returned" };
+  if (/deces|death|mort|loss/.test(value)) return { key: "death", label: language === "ro" ? "decedat aici" : "died here" };
+  if (/lagar|lagăr|ghetou|ghetto|camp|intern/.test(value)) return { key: "camp", label: language === "ro" ? "lagăr / ghetou" : "camp / ghetto" };
+  if (/munca|muncă|forced|work/.test(value)) return { key: "forced", label: language === "ro" ? "muncă forțată" : "forced labour" };
+  if (/nastere|naștere|birth|origin|residence|locuire/.test(value)) return { key: "birth", label: language === "ro" ? "născut / origine" : "born / origin" };
+  if (/route|movement/.test(value)) return { key: "route", label: language === "ro" ? "traseu" : "route" };
+  if (/nerezolvat|unresolved/.test(value)) return { key: "unresolved", label: language === "ro" ? "nerezolvat" : "unresolved" };
+  return { key: "other", label: contextLabel };
+}
+
+function placePersonPopupRows(
+  peopleGroups: Array<{ label: string; people: Array<{ id: string; label: string }> }>,
+  language: "en" | "ro",
+): PlacePersonPopupRow[] {
+  const rows = new Map<string, PlacePersonPopupRow>();
+  for (const group of peopleGroups) {
+    const badge = placePersonPopupBadge(group.label, language);
+    for (const person of group.people) {
+      const row = rows.get(person.id) ?? { id: person.id, label: person.label, badges: [] };
+      if (!row.badges.some((candidate) => candidate.key === badge.key)) row.badges.push(badge);
+      rows.set(person.id, row);
+    }
+  }
+  return [...rows.values()].sort((left, right) => left.label.localeCompare(right.label, language));
+}
+
 function personPlacePopupContent(
   place: MapPlaceDatum,
   language: "en" | "ro",
@@ -1000,31 +1041,93 @@ function personPlacePopupContent(
         : "Documented place in the current collection",
       "map-place-popup__muted",
     ));
-    const peopleCount = peopleGroups.reduce((total, group) => total + group.people.length, 0);
+    const peopleRows = placePersonPopupRows(peopleGroups, language);
+    const peopleCount = peopleRows.length;
     if (peopleCount) {
       root.append(popupTextElement(
         "p",
-        `${peopleCount} ${peopleCount === 1 ? "person" : "people"} connected to this place`,
+        place.id === "PL-CORE-DOROHOI"
+          ? (language === "ro" ? `Dorohoi — punct de plecare și întoarcere · ${peopleCount} persoane` : `Dorohoi — departure and return point · ${peopleCount} people`)
+          : language === "ro"
+            ? `${peopleCount} ${peopleCount === 1 ? "persoană" : "persoane"} legate de acest loc`
+            : `${peopleCount} ${peopleCount === 1 ? "person" : "people"} connected to this place`,
         "map-place-popup__people-count",
       ));
-      const people = document.createElement("div");
-      people.className = "map-place-popup__people";
-      for (const group of peopleGroups) {
-        const groupLabel = popupTextElement("p", group.label, "map-place-popup__people-group");
-        people.append(groupLabel);
-        for (const person of group.people) {
+
+      const counters = new Map<PlacePersonPopupBadge["key"], number>();
+      for (const person of peopleRows) {
+        for (const badge of person.badges) counters.set(badge.key, (counters.get(badge.key) ?? 0) + 1);
+      }
+      const summaryLabels: Array<[PlacePersonPopupBadge["key"], string, string]> = [
+        ["deportation", "deported", "deportați"],
+        ["evacuation", "evacuated", "evacuați"],
+        ["return", "returned", "întorși"],
+        ["death", "died here", "decedați aici"],
+        ["birth", "born here", "născuți aici"],
+        ["camp", "camp / ghetto", "lagăr / ghetou"],
+        ["forced", "forced labour", "muncă forțată"],
+        ["route", "route endpoint", "punct de traseu"],
+        ["unresolved", "unresolved", "nerezolvați"],
+      ];
+      const summary = summaryLabels
+        .map(([key, english, romanian]) => {
+          const count = counters.get(key) ?? 0;
+          return count ? `${count} ${language === "ro" ? romanian : english}` : null;
+        })
+        .filter((value): value is string => Boolean(value));
+      if (summary.length) root.append(popupTextElement("p", summary.join(" · "), "map-place-popup__summary"));
+
+      const searchable = peopleCount > 8 || place.id === "PL-CORE-DOROHOI";
+      const list = document.createElement("div");
+      list.className = "map-place-popup__people";
+      list.setAttribute("role", "list");
+      const renderRows = (query: string) => {
+        const normalizedQuery = query.trim().toLocaleLowerCase("ro");
+        const visibleRows = normalizedQuery
+          ? peopleRows.filter((person) => person.label.toLocaleLowerCase("ro").includes(normalizedQuery))
+          : peopleRows;
+        list.replaceChildren();
+        if (!visibleRows.length) {
+          list.append(popupTextElement("p", language === "ro" ? "Nicio persoană găsită." : "No person found.", "map-place-popup__empty"));
+          return;
+        }
+        for (const person of visibleRows) {
+          const item = document.createElement("div");
+          item.setAttribute("role", "listitem");
           const button = document.createElement("button");
           button.type = "button";
           button.className = "map-place-popup__person-button";
-          button.textContent = person.label;
+          const name = popupTextElement("span", person.label, "map-place-popup__person-name");
+          const badges = document.createElement("span");
+          badges.className = "map-place-popup__person-badges";
+          const visibleBadges = person.badges.slice(0, 3);
+          for (const badge of visibleBadges) {
+            const chip = popupTextElement("span", badge.label, `map-place-popup__badge map-place-popup__badge--${badge.key}`);
+            badges.append(chip);
+          }
+          if (person.badges.length > visibleBadges.length) {
+            badges.append(popupTextElement("span", `+${person.badges.length - visibleBadges.length}`, "map-place-popup__badge map-place-popup__badge--more"));
+          }
+          button.append(name, badges);
           button.addEventListener("click", (event) => {
             event.stopPropagation();
             onPersonSelect(person.id);
           });
-          people.append(button);
+          item.append(button);
+          list.append(item);
         }
+      };
+      if (searchable) {
+        const search = document.createElement("input");
+        search.type = "search";
+        search.className = "map-place-popup__search";
+        search.placeholder = language === "ro" ? "Caută o persoană" : "Search people";
+        search.setAttribute("aria-label", language === "ro" ? "Caută o persoană" : "Search people");
+        search.addEventListener("input", () => renderRows(search.value));
+        root.append(search);
       }
-      root.append(people);
+      renderRows("");
+      root.append(list);
     }
   }
 
@@ -2199,7 +2302,7 @@ export function MapWorkspace({
     const popup = new maplibregl.Popup({
       closeButton: true,
       closeOnClick: false,
-      maxWidth: "290px",
+      maxWidth: "330px",
       offset: 16,
     })
       .setLngLat([selectedPlace.coordinates.longitude, selectedPlace.coordinates.latitude])
