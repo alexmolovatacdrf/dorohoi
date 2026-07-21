@@ -535,7 +535,9 @@ function routeArrow(color: string): ImageData {
   if (!context) throw new Error("Canvas 2D context is unavailable");
   context.beginPath();
   context.moveTo(3, 3);
-  context.lineTo(20, 9);
+  // The geographic point is the arrow tip. The body stays behind it while
+  // the progress line grows towards the same coordinate.
+  context.lineTo(12, 9);
   context.lineTo(3, 15);
   context.closePath();
   context.lineWidth = 3;
@@ -555,8 +557,16 @@ function routeTrainTick(): ImageData {
   context.beginPath();
   context.moveTo(3.5, 0);
   context.lineTo(3.5, 7);
-  context.lineWidth = 2;
-  context.strokeStyle = "#ffffff";
+  // A dark outline plus a light centre keeps the railway convention visible
+  // over both historical fills and the OSM raster.
+  context.lineWidth = 3.4;
+  context.strokeStyle = "#141A22";
+  context.stroke();
+  context.beginPath();
+  context.moveTo(3.5, 0);
+  context.lineTo(3.5, 7);
+  context.lineWidth = 1.5;
+  context.strokeStyle = "#F3F5F7";
   context.stroke();
   return context.getImageData(0, 0, canvas.width, canvas.height);
 }
@@ -719,6 +729,23 @@ function routePointAtProgress(points: Array<[number, number]>, progress: number)
   ];
 }
 
+function progressiveRouteCoordinates(
+  points: Array<[number, number]>,
+  progress: number,
+): Array<[number, number]> {
+  if (points.length < 2) return points;
+  const boundedProgress = Math.max(0, Math.min(1, progress));
+  if (boundedProgress >= 1) return points;
+  const position = boundedProgress * (points.length - 1);
+  const lowerIndex = Math.floor(position);
+  const lower = points[lowerIndex] ?? points[0];
+  const current = routePointAtProgress(points, boundedProgress);
+  const prefix = points.slice(0, lowerIndex + 1);
+  const last = prefix[prefix.length - 1] ?? lower;
+  if (last[0] !== current[0] || last[1] !== current[1]) prefix.push(current);
+  return prefix.length >= 2 ? prefix : [lower, current];
+}
+
 function easeInOutCubic(progress: number): number {
   const boundedProgress = Math.max(0, Math.min(1, progress));
   return boundedProgress < 0.5
@@ -743,7 +770,7 @@ function routeCollection(
         ? curvedRouteCoordinates(route, routeCurveOffset(route, displayCurveRoutes))
         : route.coordinates;
       const visibleCoordinates = route.id === partialRouteId
-        ? coordinates.slice(0, Math.max(2, Math.ceil(easeInOutCubic(partialProgress) * (coordinates.length - 1)) + 1))
+        ? progressiveRouteCoordinates(coordinates, easeInOutCubic(partialProgress))
         : coordinates;
       return {
         type: "Feature",
@@ -1562,6 +1589,9 @@ export function MapWorkspace({
           map.addSource("research-routes", { type: "geojson", data: emptyLineCollection });
           map.addSource("route-progress", { type: "geojson", data: emptyPointCollection });
 
+          // Historical context is translucent and sits above the raster so
+          // roads, rivers and labels remain visible beneath it. Routes and
+          // DOM markers are registered afterwards and remain on top.
           map.addLayer({
             id: HISTORICAL_FILL_LAYER_ID,
             type: "fill",
@@ -1571,7 +1601,7 @@ export function MapWorkspace({
               "fill-color": historicalFillColorExpression(mode),
               "fill-opacity": 0.48,
             },
-          }, BASEMAP_LAYER_ID);
+          });
           map.addLayer({
             id: HISTORICAL_LINE_LAYER_ID,
             type: "line",
@@ -1585,7 +1615,7 @@ export function MapWorkspace({
                 ? { "line-dasharray": ["match", ["get", "Name"], "Transnistria", ["literal", [...wjcDesignTokens.historical.transnistriaDashArray]], ["literal", [1, 0]]] as ExpressionSpecification }
                 : {}),
             },
-          }, BASEMAP_LAYER_ID);
+          });
           const routePaint = isPresentation
             ? {
                 "line-color": presentationRouteColorExpression(),
@@ -1870,21 +1900,19 @@ export function MapWorkspace({
   useEffect(() => {
     const map = mapRef.current;
     if (!mapReady || !map || !map.getLayer(BASEMAP_LAYER_ID)) return;
-    const historicalUnderlay = layers.historicalAdministration;
     const paint = basemapVariant === "standard"
-      ? { opacity: historicalUnderlay ? (isPresentation ? 0.34 : 0.4) : (isPresentation ? 0.98 : 0.88), saturation: isPresentation ? -0.02 : -0.28, contrast: isPresentation ? 0.02 : -0.06, brightnessMin: 0.1, brightnessMax: isPresentation ? 1 : 0.96 }
+      ? { opacity: isPresentation ? 0.98 : 0.88, saturation: isPresentation ? -0.02 : -0.28, contrast: isPresentation ? 0.04 : -0.02, brightnessMin: 0.08, brightnessMax: isPresentation ? 1 : 0.98 }
       : basemapVariant === "light"
-        ? { opacity: historicalUnderlay ? 0.28 : 0.82, saturation: -0.72, contrast: -0.08, brightnessMin: 0.24, brightnessMax: 1 }
-        : { opacity: historicalUnderlay ? 0.24 : 0.68, saturation: -1, contrast: -0.18, brightnessMin: 0.36, brightnessMax: 0.98 };
-    // The historical polygons sit below the raster basemap so labels, roads
-    // and rivers remain visually on top. Reduced raster opacity lets the
-    // historical colour remain visible without covering that context.
+        ? { opacity: 0.9, saturation: -0.42, contrast: 0.04, brightnessMin: 0.08, brightnessMax: 1 }
+        : { opacity: 0.84, saturation: -0.68, contrast: 0.02, brightnessMin: 0.12, brightnessMax: 1 };
+    // Historical polygons carry their own opacity above a readable basemap.
+    // Do not fade the raster when the historical layer is enabled.
     map.setPaintProperty(BASEMAP_LAYER_ID, "raster-opacity", paint.opacity);
     map.setPaintProperty(BASEMAP_LAYER_ID, "raster-saturation", paint.saturation);
     map.setPaintProperty(BASEMAP_LAYER_ID, "raster-contrast", paint.contrast);
     map.setPaintProperty(BASEMAP_LAYER_ID, "raster-brightness-min", paint.brightnessMin);
     map.setPaintProperty(BASEMAP_LAYER_ID, "raster-brightness-max", paint.brightnessMax);
-  }, [basemapVariant, isPresentation, layers.historicalAdministration, mapReady]);
+  }, [basemapVariant, isPresentation, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
