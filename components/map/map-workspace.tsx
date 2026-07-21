@@ -548,6 +548,31 @@ function routeArrow(color: string): ImageData {
   return context.getImageData(0, 0, canvas.width, canvas.height);
 }
 
+function routeProgressArrow(color: string): ImageData {
+  const canvas = document.createElement("canvas");
+  canvas.width = 28;
+  canvas.height = 18;
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("Canvas 2D context is unavailable");
+  // Unlike the repeated route markers, the moving indicator has a narrow
+  // shaft and an elongated point. Its tip is at the centre coordinate.
+  context.beginPath();
+  context.moveTo(1, 7.5);
+  context.lineTo(6, 7.5);
+  context.lineTo(6, 5);
+  context.lineTo(14, 9);
+  context.lineTo(6, 13);
+  context.lineTo(6, 10.5);
+  context.lineTo(1, 10.5);
+  context.closePath();
+  context.lineWidth = 2.6;
+  context.strokeStyle = "#fffdf8";
+  context.stroke();
+  context.fillStyle = color;
+  context.fill();
+  return context.getImageData(0, 0, canvas.width, canvas.height);
+}
+
 function routeTrainTick(): ImageData {
   const canvas = document.createElement("canvas");
   canvas.width = 7;
@@ -1651,18 +1676,18 @@ export function MapWorkspace({
           map.addImage("route-arrow-explicit", routeArrow("#236353"));
           map.addImage("route-arrow-partial", routeArrow("#236353"));
           map.addImage("route-arrow-inferred", routeArrow("#236353"));
-          map.addImage("route-progress-arrow-explicit", routeArrow("#236353"));
-          map.addImage("route-progress-arrow-partial", routeArrow("#236353"));
-          map.addImage("route-progress-arrow-inferred", routeArrow("#236353"));
+          map.addImage("route-progress-arrow-explicit", routeProgressArrow("#236353"));
+          map.addImage("route-progress-arrow-partial", routeProgressArrow("#236353"));
+          map.addImage("route-progress-arrow-inferred", routeProgressArrow("#236353"));
           if (isPresentation) {
             map.addImage("route-arrow-train", routeArrow(wjcDesignTokens.semantic.deportation));
             map.addImage("route-arrow-walking", routeArrow(wjcDesignTokens.semantic.deportation));
             map.addImage("route-arrow-unknown", routeArrow(wjcDesignTokens.semantic.unresolved));
             map.addImage("route-arrow-return", routeArrow(wjcDesignTokens.semantic.origin));
-            map.addImage("route-progress-arrow-train", routeArrow(wjcDesignTokens.semantic.deportation));
-            map.addImage("route-progress-arrow-walking", routeArrow(wjcDesignTokens.semantic.deportation));
-            map.addImage("route-progress-arrow-unknown", routeArrow(wjcDesignTokens.semantic.unresolved));
-            map.addImage("route-progress-arrow-return", routeArrow(wjcDesignTokens.semantic.origin));
+            map.addImage("route-progress-arrow-train", routeProgressArrow(wjcDesignTokens.semantic.deportation));
+            map.addImage("route-progress-arrow-walking", routeProgressArrow(wjcDesignTokens.semantic.deportation));
+            map.addImage("route-progress-arrow-unknown", routeProgressArrow(wjcDesignTokens.semantic.unresolved));
+            map.addImage("route-progress-arrow-return", routeProgressArrow(wjcDesignTokens.semantic.origin));
             map.addImage("route-train-tick", routeTrainTick());
           }
 
