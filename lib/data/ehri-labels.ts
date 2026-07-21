@@ -20,7 +20,7 @@ const EHRI_PUBLIC_LABEL_OVERRIDES: Record<string, string> = {
   // Curated names already present in the project or in the record's raw
   // dossier field. These keep EHRI and route labels consistent.
   "PL-EHRI-0233": "Rădăuți-Prut",
-  "PL-EHRI-0382": "Mohyliv-Podilskyi",
+  "PL-EHRI-0382": "Moghilev",
   "PL-EHRI-0383": "Cernăuți",
   "PL-EHRI-0384": "Sharhorod",
 };

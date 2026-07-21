@@ -44,7 +44,7 @@ describe("verified Eugenia Presentation Map dataset", () => {
       .filter((route) => route.personName === "Bacalu Avram Moise" && route.eventTypes.includes("deportation"))
       .sort((left, right) => left.sequence - right.sequence);
     expect(bacaluRoutes.map((route) => route.destinationName)).toEqual([
-      "Mohyliv-Podilskyi",
+      "Moghilev",
       "Scazineț",
       "Pecioara",
       "Tulcin",
@@ -80,7 +80,7 @@ describe("verified Eugenia Presentation Map dataset", () => {
   it("bridges unresolved intermediary stops between known route endpoints and returns to Dorohoi", () => {
     const ciobotaru = data.routes.filter((route) => route.personName === "Ciobotaru Marcu");
     expect(ciobotaru.map((route) => route.destinationName)).toEqual([
-      "Mohyliv-Podilskyi",
+      "Moghilev",
       "Dorohoi",
     ]);
     expect(ciobotaru[0]?.routeStatus).toBe("partial");
@@ -98,8 +98,8 @@ describe("verified Eugenia Presentation Map dataset", () => {
 
     expect(routes.map((route) => [route.originName, route.destinationName])).toEqual([
       ["Darabani", "Târgu Jiu"],
-      ["Târgu Jiu", "Mohyliv-Podilskyi"],
-      ["Mohyliv-Podilskyi", "Dorohoi"],
+      ["Târgu Jiu", "Moghilev"],
+      ["Moghilev", "Dorohoi"],
     ]);
     expect(routes[0]?.dateRaw).toBe("01/06/1941");
     expect(routes[1]?.dateRaw).toBe("01/10/1941");
@@ -131,7 +131,7 @@ describe("verified Eugenia Presentation Map dataset", () => {
     expect(ehri.every((place) => isReadableEhriMapLabel(place.label))).toBe(true);
     expect(data.places.find((place) => place.id === "PL-EHRI-0233")?.label).toBe("Rădăuți-Prut");
     expect(data.places.find((place) => place.id === "PL-EHRI-0383")?.label).toBe("Cernăuți");
-    expect(data.places.find((place) => place.id === "PL-EHRI-0382")?.label).toBe("Mohyliv-Podilskyi");
+    expect(data.places.find((place) => place.id === "PL-EHRI-0382")?.label).toBe("Moghilev");
     expect(ehri.every((place) => !/\b(?:ghetto|getto|ghetou|camp|lagar|lagăr)\b/i.test(place.label))).toBe(true);
   });
 
@@ -164,7 +164,7 @@ describe("verified Eugenia Presentation Map dataset", () => {
     const monthOnlyRoute = data.routes.find((route) => route.personName === "Alterovici Reiza" && route.destinationName === "Transnistria");
     expect(monthOnlyRoute?.datePrecision).toBe("month");
     expect(monthOnlyRoute?.dateRaw).toBe("11/1941");
-    const exactDateRoute = data.routes.find((route) => route.personName === "Cohn Eti" && route.destinationName === "Mohyliv-Podilskyi");
+    const exactDateRoute = data.routes.find((route) => route.personName === "Cohn Eti" && route.destinationName === "Moghilev");
     expect(exactDateRoute?.datePrecision).toBe("day");
     expect(exactDateRoute?.dateRaw).toBe("01/10/1941");
   });

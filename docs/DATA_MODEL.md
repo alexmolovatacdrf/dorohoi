@@ -180,9 +180,11 @@ coordinates or similar names do not trigger automatic merging.
 Special cases:
 
 - `Ataki` resolves to the Otaci identity and both names remain variants;
-- `Moghilev` resolves to Mohyliv-Podilskyi, while the EHRI Moghilev ghetto record
-  remains a separately provenance-bearing overlay feature linked as a possible
-  catalog representation rather than silently replacing the settlement;
+- `Moghilev` resolves to the current Mohyliv-Podilskyi identity, but the public
+  historical map label remains `Moghilev`; the modern name is retained in
+  `normalizedName` and search variants. The EHRI Moghilev ghetto record remains
+  a separately provenance-bearing overlay feature linked as a possible catalog
+  representation rather than silently replacing the settlement;
 - `Tropov[...]` has no coordinates and resolution status `unresolved`;
 - `Jijia` is resolved only to the river concept; the work-site/bridge position
   remains unknown;

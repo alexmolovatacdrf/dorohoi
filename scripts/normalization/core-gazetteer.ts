@@ -128,7 +128,10 @@ const coreDefinitions: Array<{
     dossierId: "DOROHOI-2590",
     originalName: "Moghilev",
     normalizedName: "Mohyliv-Podilskyi",
-    displayNames: { en: "Mohyliv-Podilskyi (Moghilev)", ro: "Moghilev / Mohyliv-Podilskyi" },
+    // Keep the historical/documentary Romanian form on the public map. The
+    // modern Ukrainian name remains the normalized identity and a search
+    // variant, so the two naming layers are not conflated.
+    displayNames: { en: "Moghilev", ro: "Moghilev" },
     variants: ["Moghilev", "Mogilev-Podolsk", "Moghilău", "Mohyliv-Podilskyi"],
     placeType: "settlement",
     coordinates: { latitude: 48.44278, longitude: 27.79975 },
