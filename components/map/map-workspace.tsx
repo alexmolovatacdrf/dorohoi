@@ -1270,7 +1270,7 @@ export function MapWorkspace({
     death: true,
     return: true,
     unresolved: !isPresentation,
-    localEhri: false,
+    localEhri: isPresentation,
     inferred: isPresentation,
   }));
   const [timelineStep, setTimelineStep] = useState<number | null>(null);
