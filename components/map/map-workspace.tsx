@@ -9,7 +9,8 @@ import type {
   Polygon,
 } from "geojson";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { ReactNode } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import maplibregl, {
   type ExpressionSpecification,
   type GeoJSONSource,
@@ -264,6 +265,46 @@ function LayerToggle({
   );
 }
 
+function PresentationDisclosure({
+  label,
+  children,
+  defaultOpen = false,
+  className = "presentation-group",
+  contentClassName = "presentation-group__content",
+  labelSupplement,
+  testId,
+}: {
+  label: string;
+  children: ReactNode;
+  defaultOpen?: boolean;
+  className?: string;
+  contentClassName?: string;
+  labelSupplement?: ReactNode;
+  testId?: string;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  const contentId = useId();
+
+  return (
+    <section className={className} data-open={open ? "true" : "false"} data-testid={testId}>
+      <button
+        type="button"
+        className="presentation-disclosure__button"
+        aria-expanded={open}
+        aria-controls={contentId}
+        onClick={() => setOpen((current) => !current)}
+      >
+        <span className="presentation-disclosure__chevron" aria-hidden="true">{open ? "▾" : "▸"}</span>
+        <span>{label}</span>
+        {labelSupplement ? <span className="presentation-disclosure__supplement">{labelSupplement}</span> : null}
+      </button>
+      <div id={contentId} className={contentClassName} hidden={!open}>
+        {children}
+      </div>
+    </section>
+  );
+}
+
 function yearFromDate(value: string | null): number | null {
   return value ? Number.parseInt(value.slice(0, 4), 10) : null;
 }
@@ -305,10 +346,22 @@ function historicalPopupContent(
     if (!hasHistoricalSourceValue(value)) continue;
     root.append(popupTextElement(
       "p",
-      `${historicalDetailLabel(field)}: ${value}`,
+      `${historicalDetailLabel(field)} [${field}]: ${value}`,
       "historical-map-popup__detail",
     ));
   }
+  const sourceDetails = document.createElement("details");
+  sourceDetails.className = "historical-map-popup__source";
+  const sourceSummary = document.createElement("summary");
+  sourceSummary.textContent = "Source and method";
+  const sourceMethod = popupTextElement(
+    "p",
+    manifest?.methodologicalWarning
+      ?? "Monthly analytical boundary snapshot; raw source wording is preserved.",
+    "historical-map-popup__method",
+  );
+  sourceDetails.append(sourceSummary, sourceMethod);
+  root.append(sourceDetails);
   return root;
 }
 
@@ -1235,8 +1288,11 @@ export function MapWorkspace({
   const [presentationPanelOpen, setPresentationPanelOpen] = useState(false);
   const [presentationPeoplePanelOpen, setPresentationPeoplePanelOpen] = useState(true);
   const [presentationTimelineOpen, setPresentationTimelineOpen] = useState(true);
+  const [presentationMobile, setPresentationMobile] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const presentationPanelOpenRef = useRef(presentationPanelOpen);
   const presentationPeoplePanelOpenRef = useRef(presentationPeoplePanelOpen);
+  const presentationMobileRef = useRef<boolean | null>(null);
   const [presentationOpenFamilyId, setPresentationOpenFamilyId] = useState<string | null>(null);
   const [presentationViewport, setPresentationViewport] = useState<"europe" | "project" | "story">(
     initialPerson ? "story" : "project",
@@ -1310,9 +1366,34 @@ export function MapWorkspace({
   }, [isPresentation]);
 
   useEffect(() => {
-    if (!isPresentation || typeof window === "undefined" || window.innerWidth >= 720) return;
-    const frame = window.requestAnimationFrame(() => setPresentationPeoplePanelOpen(false));
-    return () => window.cancelAnimationFrame(frame);
+    if (!isPresentation || typeof window === "undefined") return;
+    const syncPresentationViewport = () => {
+      const mobile = window.innerWidth < 720;
+      if (presentationMobileRef.current === mobile) return;
+      const previous = presentationMobileRef.current;
+      presentationMobileRef.current = mobile;
+      setPresentationMobile(mobile);
+      if (mobile) {
+        setPresentationPanelOpen(false);
+        setPresentationPeoplePanelOpen(false);
+        setPresentationTimelineOpen(false);
+      } else if (previous !== null) {
+        setPresentationPanelOpen(false);
+        setPresentationPeoplePanelOpen(true);
+      }
+    };
+    syncPresentationViewport();
+    window.addEventListener("resize", syncPresentationViewport);
+    return () => window.removeEventListener("resize", syncPresentationViewport);
+  }, [isPresentation]);
+
+  useEffect(() => {
+    if (!isPresentation || typeof window === "undefined") return;
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const syncMotionPreference = () => setPrefersReducedMotion(media.matches);
+    syncMotionPreference();
+    media.addEventListener("change", syncMotionPreference);
+    return () => media.removeEventListener("change", syncMotionPreference);
   }, [isPresentation]);
 
   useEffect(() => {
@@ -1534,6 +1615,9 @@ export function MapWorkspace({
     window.queueMicrotask(() => {
       if (cancelled) return;
       setHistoricalYearMonth((current) => current === targetYearMonth ? current : targetYearMonth);
+      setSelection((current) => current?.kind === "historical" ? null : current);
+      historicalPopupRef.current?.remove();
+      historicalPopupRef.current = null;
     });
     return () => {
       cancelled = true;
@@ -1830,6 +1914,16 @@ export function MapWorkspace({
             event.originalEvent.preventDefault();
             openHistoricalPopup(event);
           });
+          map.on("click", (event) => {
+            const selectableLayers = [...projectInteractiveLayers, HISTORICAL_FILL_LAYER_ID]
+              .filter((layerId) => Boolean(map.getLayer(layerId)));
+            if (map.queryRenderedFeatures(event.point, { layers: selectableLayers }).length) return;
+            setSelection(null);
+            historicalPopupRef.current?.remove();
+            historicalPopupRef.current = null;
+            placePopupRef.current?.remove();
+            placePopupRef.current = null;
+          });
           if (styleTimer !== undefined) window.clearTimeout(styleTimer);
           setMapReady(true);
           setMapLifecycle("ready");
@@ -1970,9 +2064,6 @@ export function MapWorkspace({
 
     if (!historicalManifest || !selectedHistoricalSnapshot) return;
     const controller = new AbortController();
-    source.setData(emptyHistoricalCollection);
-    historicalLabelMarkersRef.current.forEach((marker) => marker.remove());
-    historicalLabelMarkersRef.current = [];
     map.setLayoutProperty(HISTORICAL_FILL_LAYER_ID, "visibility", "visible");
     map.setLayoutProperty(HISTORICAL_LINE_LAYER_ID, "visibility", "visible");
     window.queueMicrotask(() => {
@@ -2007,7 +2098,7 @@ export function MapWorkspace({
           );
         }
         source.setData(parsed as HistoricalFeatureCollection);
-        historicalLabelMarkersRef.current = parsed.features.flatMap((feature) => {
+        const nextLabelMarkers = parsed.features.flatMap((feature) => {
           const coordinates = historicalFeatureLabelCoordinate(feature);
           if (!coordinates) return [];
           const element = document.createElement("span");
@@ -2016,6 +2107,8 @@ export function MapWorkspace({
           element.setAttribute("aria-label", historicalMapLabel(feature.properties));
           return [new maplibregl.Marker({ element, anchor: "center" }).setLngLat(coordinates).addTo(map)];
         });
+        historicalLabelMarkersRef.current.forEach((marker) => marker.remove());
+        historicalLabelMarkersRef.current = nextLabelMarkers;
         setHistoricalFeatureCount(parsed.features.length);
         setHistoricalLayerStatus("ready");
       } catch (error) {
@@ -2035,8 +2128,6 @@ export function MapWorkspace({
     return () => {
       disposed = true;
       controller.abort();
-      historicalLabelMarkersRef.current.forEach((marker) => marker.remove());
-      historicalLabelMarkersRef.current = [];
     };
   }, [
     historicalManifest,
@@ -2248,6 +2339,9 @@ export function MapWorkspace({
     window.queueMicrotask(() => {
       if (cancelled) return;
       setHistoricalYearMonth((current) => current === targetYearMonth ? current : targetYearMonth);
+      setSelection((current) => current?.kind === "historical" ? null : current);
+      historicalPopupRef.current?.remove();
+      historicalPopupRef.current = null;
     });
     return () => {
       cancelled = true;
@@ -2379,6 +2473,22 @@ export function MapWorkspace({
   const updateLayer = <K extends keyof Layers>(key: K, value: Layers[K]) =>
     setLayers((current) => ({ ...current, [key]: value }));
 
+  const openPresentationControls = () => {
+    setPresentationPanelOpen(true);
+    if (presentationMobile) {
+      setPresentationPeoplePanelOpen(false);
+      setPresentationTimelineOpen(false);
+    }
+  };
+
+  const openPresentationPeople = () => {
+    setPresentationPeoplePanelOpen(true);
+    if (presentationMobile) {
+      setPresentationPanelOpen(false);
+      setPresentationTimelineOpen(false);
+    }
+  };
+
   const selectPresentationPerson = (personId: string) => {
     setPresentationViewport("story");
     updateFilter("person", personId);
@@ -2434,6 +2544,12 @@ export function MapWorkspace({
 
   const startRoutePlayback = () => {
     if (!filters.person || !selectedPersonRoutes.length) return;
+    if (prefersReducedMotion) {
+      setTimelineStep(selectedPersonRoutes.length);
+      setTimelineProgress(1);
+      setIsPlaying(false);
+      return;
+    }
     if (timelineStep === null || timelineStep >= selectedPersonRoutes.length) {
       setTimelineStep(0);
       setTimelineProgress(0);
@@ -2471,6 +2587,27 @@ export function MapWorkspace({
     setPresentationViewport("project");
     fitMapToBbox(PRESENTATION_DEFAULT_BBOX, 8);
   };
+
+  const routePlaybackComplete = Boolean(
+    filters.person
+    && selectedPersonRoutes.length
+    && timelineStep !== null
+    && timelineStep >= selectedPersonRoutes.length,
+  );
+  const timelinePlaybackLabel = prefersReducedMotion
+    ? "Show full route"
+    : routePlaybackComplete
+      ? "Replay"
+      : "Play once";
+  const detailPlaybackLabel = isPlaying
+    ? "Playing route…"
+    : prefersReducedMotion
+      ? "Show full route"
+      : routePlaybackComplete
+        ? "Replay route"
+        : selectedPersonRoutes.length
+          ? "Play route"
+          : "No documented route";
 
   const presentationLegend = (historicalManifest?.presentationVocabulary?.legend ?? []).map((entry) => ({
     ...entry,
@@ -2547,16 +2684,20 @@ export function MapWorkspace({
           <p className="presentation-label">People documented here</p>
           <p className="presentation-card__meta">People with a documented connection</p>
           {selectedPlacePeople.map((group) => (
-            <details key={group.label} className="presentation-place-people__group" open={selectedPlacePeople.length === 1}>
-              <summary><span>{group.label}</span><span>{group.people.length}</span></summary>
-              <div className="presentation-place-people__items">
+            <PresentationDisclosure
+              key={group.label}
+              label={group.label}
+              labelSupplement={group.people.length}
+              defaultOpen={selectedPlacePeople.length === 1}
+              className="presentation-place-people__group"
+              contentClassName="presentation-place-people__items"
+            >
                 {group.people.map((person) => (
                   <button key={person.id} type="button" className="presentation-place-person" onClick={() => selectPresentationPerson(person.id)}>
                     {person.label}
                   </button>
                 ))}
-              </div>
-            </details>
+            </PresentationDisclosure>
           ))}
         </div>
       ) : null}
@@ -2579,10 +2720,17 @@ export function MapWorkspace({
         Snapshot: {formatYearMonth(selectedHistorical.yearMonth, language)} · supplied {formatIsoDate(selectedHistorical.snapshotDate, language)}
       </p>
       <dl className="presentation-card__details">
-        {hasHistoricalSourceValue(selectedHistorical.Foreign_Po) ? <div><dt>{historicalDetailLabel("Foreign_Po")}</dt><dd>{selectedHistorical.Foreign_Po}</dd></div> : null}
-        {hasHistoricalSourceValue(selectedHistorical.Head_of_St) ? <div><dt>{historicalDetailLabel("Head_of_St")}</dt><dd>{selectedHistorical.Head_of_St}</dd></div> : null}
-        {hasHistoricalSourceValue(selectedHistorical.Govt_in_Ex) ? <div><dt>{historicalDetailLabel("Govt_in_Ex")}</dt><dd>{selectedHistorical.Govt_in_Ex}</dd></div> : null}
+        {hasHistoricalSourceValue(selectedHistorical.Foreign_Po) ? <div><dt>{historicalDetailLabel("Foreign_Po")} <code>Foreign_Po</code></dt><dd>{selectedHistorical.Foreign_Po}</dd></div> : null}
+        {hasHistoricalSourceValue(selectedHistorical.Head_of_St) ? <div><dt>{historicalDetailLabel("Head_of_St")} <code>Head_of_St</code></dt><dd>{selectedHistorical.Head_of_St}</dd></div> : null}
+        {hasHistoricalSourceValue(selectedHistorical.Govt_in_Ex) ? <div><dt>{historicalDetailLabel("Govt_in_Ex")} <code>Govt_in_Ex</code></dt><dd>{selectedHistorical.Govt_in_Ex}</dd></div> : null}
       </dl>
+      <PresentationDisclosure
+        label="Source and method"
+        className="presentation-inline-disclosure"
+        contentClassName="presentation-inline-disclosure__content"
+      >
+        <p>{historicalManifest?.methodologicalWarning ?? "Monthly analytical boundary snapshot; raw source wording is preserved."}</p>
+      </PresentationDisclosure>
     </>
   ) : selectedPerson ? (
     <>
@@ -2590,17 +2738,19 @@ export function MapWorkspace({
       <h2 className="presentation-card__title">{selectedPerson.label}</h2>
       <p className="presentation-card__body">{selectedPersonRoutes.length ? `${selectedPersonRoutes.length} documented movement segments in the current research collection.` : "No documented route segments in the current research collection."}</p>
       {selectedPersonDossierMembers.length ? (
-        <details className="presentation-card__family-context presentation-place-people__group">
-          <summary><span>Other people in this dossier</span><span>{selectedPersonDossierMembers.length}</span></summary>
-          <div className="presentation-place-people__items">
+        <PresentationDisclosure
+          label="Other people in this dossier"
+          labelSupplement={selectedPersonDossierMembers.length}
+          className="presentation-card__family-context presentation-place-people__group"
+          contentClassName="presentation-place-people__items"
+        >
             {selectedPersonDossierMembers.map((person) => (
               <button key={person.id} type="button" className="presentation-place-person" onClick={() => selectPresentationPerson(person.id)}>
                 {person.label}
               </button>
             ))}
             {selectedPersonDossier ? <p className="presentation-family-card__meta">{selectedPersonDossier.label}</p> : null}
-          </div>
-        </details>
+        </PresentationDisclosure>
       ) : null}
       <button type="button" className="presentation-secondary-button mt-3 w-full" onClick={() => openPersonStory(selectedPerson.id)}>Open person story</button>
     </>
@@ -2728,9 +2878,13 @@ export function MapWorkspace({
   );
 
   const peopleDirectory = (
-    <details className="presentation-group presentation-people-directory" open data-testid="people-directory">
-      <summary>Families and people</summary>
-      <div className="presentation-group__content presentation-people-list">
+    <PresentationDisclosure
+      label="Families and people"
+      defaultOpen
+      className="presentation-group presentation-people-directory"
+      contentClassName="presentation-group__content presentation-people-list"
+      testId="people-directory"
+    >
         <label className="presentation-person-search">
           <span className="presentation-label">Find a person</span>
           <input
@@ -2761,45 +2915,41 @@ export function MapWorkspace({
           else selectPresentationGroup(group.id);
         };
         const familyHeadLabel = head?.label ?? group.label.replace(/\s+·\s+dosar\s+.*$/i, "");
+        const familyOpen = presentationOpenFamilyId === group.id;
+        const familyDetailsId = `presentation-family-${group.id}-details`;
         const familyHeadButton = (
-          <span
+          <button
+            type="button"
             className="presentation-family-card__head"
-            role="button"
-            tabIndex={0}
             aria-pressed={head ? filters.person === head.id : filters.group === group.id}
-            onClick={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              selectFamilyHead();
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                event.stopPropagation();
-                selectFamilyHead();
-              }
-            }}
+            onClick={selectFamilyHead}
           >
             <strong>{familyHeadLabel}</strong>
             <small className="presentation-family-card__hint">{head ? "documented head / declarant" : "family or dossier group"}</small>
-          </span>
+          </button>
         );
         return (
           hasFamilyDetails ? (
-            <details
+            <section
               key={group.id}
               className={`presentation-family-card presentation-family-card--disclosure${head && filters.person === head.id ? " presentation-family-card--selected" : ""}`}
-              open={presentationOpenFamilyId === group.id}
-              onToggle={(event) => {
-                if (event.currentTarget.open) setPresentationOpenFamilyId(group.id);
-                else if (presentationOpenFamilyId === group.id) setPresentationOpenFamilyId(null);
-              }}
+              data-open={familyOpen ? "true" : "false"}
             >
-              <summary className="presentation-family-card__summary" aria-label={`Show ${familyCountLabel} and dossier record for ${familyHeadLabel}`}>
+              <div className="presentation-family-card__summary">
                 {familyHeadButton}
                 <span className="presentation-family-card__count">{familyCountLabel}</span>
-              </summary>
-              <div className="presentation-family-card__items">
+                <button
+                  type="button"
+                  className="presentation-family-card__toggle"
+                  aria-expanded={familyOpen}
+                  aria-controls={familyDetailsId}
+                  aria-label={`${familyOpen ? "Hide" : "Show"} ${familyCountLabel} and dossier record for ${familyHeadLabel}`}
+                  onClick={() => setPresentationOpenFamilyId(familyOpen ? null : group.id)}
+                >
+                  <span aria-hidden="true">{familyOpen ? "▾" : "▸"}</span>
+                </button>
+              </div>
+              <div id={familyDetailsId} className="presentation-family-card__items" hidden={!familyOpen}>
                 {mentionedPeople.map((person) => (
                   <button key={person.id} type="button" className={`presentation-person-option${filters.person === person.id ? " presentation-person-option--selected" : ""}`} onClick={() => selectPresentationPerson(person.id)} aria-pressed={filters.person === person.id}>
                     <span>{person.label}</span><span className="presentation-person-option__role">{person.roles[0] ?? "mentioned person"}</span>
@@ -2807,7 +2957,7 @@ export function MapWorkspace({
                 ))}
                 {dossier ? <p className="presentation-family-card__meta">{dossier.label}</p> : null}
               </div>
-            </details>
+            </section>
           ) : (
               <div key={group.id} className={`presentation-family-card${head && filters.person === head.id ? " presentation-family-card--selected" : ""}`}>
               <div className="presentation-family-card__summary presentation-family-card__summary--static">
@@ -2820,8 +2970,7 @@ export function MapWorkspace({
         })}
         {filteredUngroupedPresentationPeople.length ? <div className="presentation-family-card"><p className="presentation-label">Other individual records</p>{filteredUngroupedPresentationPeople.map((person) => <button key={person.id} type="button" className={`presentation-person-option${filters.person === person.id ? " presentation-person-option--selected" : ""}`} onClick={() => selectPresentationPerson(person.id)} aria-pressed={filters.person === person.id}><span>{person.label}</span><span className="presentation-person-option__role">{person.roles[0] ?? "mentioned person"}</span></button>)}</div> : null}
         {!presentationGroups.length && !filteredUngroupedPresentationPeople.length ? <p className="presentation-card__meta">No matching people or families.</p> : null}
-      </div>
-    </details>
+    </PresentationDisclosure>
   );
 
   const presentationPanel = presentationPanelOpen ? (
@@ -2831,7 +2980,10 @@ export function MapWorkspace({
           <p className="presentation-card__eyebrow">Map settings</p>
           <h2 className="font-editorial mt-1 text-xl font-bold text-[#173f36]">Display</h2>
         </div>
-        <button type="button" className="presentation-icon-button" onClick={() => setPresentationPanelOpen(false)} aria-label="Collapse presentation controls">−</button>
+        <div className="presentation-panel__actions">
+          {presentationMobile ? <button type="button" className="presentation-secondary-button" onClick={openPresentationPeople}>People</button> : null}
+          <button type="button" className="presentation-icon-button" onClick={() => setPresentationPanelOpen(false)} aria-label="Collapse presentation controls">−</button>
+        </div>
       </div>
 
       <div className="mt-2 grid grid-cols-2 gap-1.5">
@@ -2839,8 +2991,7 @@ export function MapWorkspace({
         {presentationMapConfig.projectRegionView ? <button type="button" className={`presentation-secondary-button presentation-view-button${presentationViewport === "project" ? " presentation-view-button--active" : ""}`} onClick={() => { setPresentationViewport("project"); fitMapToBbox(PRESENTATION_DEFAULT_BBOX, 8); }} aria-pressed={presentationViewport === "project"}>Project region</button> : null}
       </div>
 
-      <details className="presentation-group" open={presentationMapConfig.historicalAdministration}>
-        <summary>Historical context</summary>
+      <PresentationDisclosure label="Historical context" defaultOpen={presentationMapConfig.historicalAdministration} contentClassName="presentation-disclosure__content">
         {presentationMapConfig.historicalAdministration ? (
           <div className="presentation-group__content">
             <LayerToggle label="Historical administration" marker="historical" checked={layers.historicalAdministration} onChange={(value) => updateLayer("historicalAdministration", value)} />
@@ -2886,27 +3037,27 @@ export function MapWorkspace({
                     Next
                   </button>
                 </div>
+                {historicalLayerStatus === "loading_snapshot" ? <p role="status" className="presentation-method">Updating the selected month while the previous snapshot remains visible…</p> : null}
               </div>
             ) : historicalLayerStatus === "loading_manifest" || historicalLayerStatus === "loading_snapshot" ? <p role="status" className="presentation-method">Loading the selected month only…</p> : historicalLayerStatus === "failed" ? <div role="alert" className="presentation-warning">{historicalDiagnostic}<button type="button" className="presentation-secondary-button mt-2" onClick={() => historicalManifest ? setHistoricalSnapshotReloadToken((value) => value + 1) : setHistoricalReloadToken((value) => value + 1)}>Retry historical layer</button></div> : null}
           </div>
         ) : null}
-      </details>
+      </PresentationDisclosure>
 
-      <details className="presentation-group" open>
-        <summary>People and movement</summary>
+      <PresentationDisclosure label="Places and routes" defaultOpen contentClassName="presentation-disclosure__content">
         <div className="presentation-group__content">
+          <p className="presentation-method">Choose a person in the People drawer; these controls show or hide map geometry.</p>
           {presentationMapConfig.projectPlaces ? <LayerToggle label="Important places" marker="places" checked={layers.locations} onChange={(value) => updateLayer("locations", value)} /> : null}
           {presentationMapConfig.routes ? <LayerToggle label="Routes" marker="routes" checked={layers.individualRoutes} onChange={(value) => updateLayer("individualRoutes", value)} /> : null}
         </div>
-      </details>
+      </PresentationDisclosure>
 
-      <details className="presentation-group">
-        <summary>More layers</summary>
+      <PresentationDisclosure label="More layers" contentClassName="presentation-disclosure__content">
         <div className="presentation-group__content">
           {presentationMapConfig.ehri ? <LayerToggle label="EHRI camps and ghettos" marker="ehri" checked={layers.localEhri} onChange={(value) => updateLayer("localEhri", value)} /> : null}
           {presentationMapConfig.unresolvedPlaces ? <LayerToggle label="Unresolved places" marker="unresolved" checked={layers.unresolved} onChange={(value) => updateLayer("unresolved", value)} /> : null}
         </div>
-      </details>
+      </PresentationDisclosure>
 
       <div className="mt-4 flex flex-wrap gap-2 border-t border-[#d6d0c4] pt-3">
         <button type="button" className="presentation-secondary-button" onClick={resetView}>Reset view</button>
@@ -2923,15 +3074,36 @@ export function MapWorkspace({
           <p className="presentation-card__eyebrow">People</p>
           <h2 className="font-editorial mt-1 text-xl font-bold text-[#173f36]">Select a person</h2>
         </div>
-        <button type="button" className="presentation-icon-button" onClick={() => setPresentationPeoplePanelOpen(false)} aria-label="Collapse people and families">−</button>
+        <div className="presentation-panel__actions">
+          {presentationMobile ? <button type="button" className="presentation-secondary-button" onClick={openPresentationControls}>Settings</button> : null}
+          <button type="button" className="presentation-icon-button" onClick={() => setPresentationPeoplePanelOpen(false)} aria-label="Collapse people and families">−</button>
+        </div>
       </div>
       <button type="button" className={`presentation-person-option presentation-person-option--all${!filters.person && !filters.group ? " presentation-person-option--selected" : ""}`} onClick={() => clearPresentationSelection()} aria-pressed={!filters.person && !filters.group}>
         <span>All people</span><span className="presentation-person-option__role">Romania view</span>
       </button>
+      <p className="presentation-method">Choose a person to focus their documented route. Map features can be inspected separately without assigning that place to the person.</p>
+      {(presentationDetails || presentationGroupDetails) ? (
+        <div className="presentation-people-detail" data-testid="presentation-story-card">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <p className="presentation-label">{selection ? "Selected map detail" : selectedPerson ? "Selected person" : "Selected family"}</p>
+            <button
+              type="button"
+              className="presentation-icon-button"
+              onClick={() => selection ? setSelection(null) : clearPresentationSelection()}
+              aria-label={selection ? "Clear selected map detail" : "Clear selected person or family"}
+            >×</button>
+          </div>
+          {presentationDetails ?? presentationGroupDetails}
+          {selectedPerson ? <button type="button" disabled={!selectedPersonRoutes.length || isPlaying} className="presentation-primary-button mt-3" onClick={startRoutePlayback}>{detailPlaybackLabel}</button> : null}
+          {selectedPlace ? <Link className="presentation-link-button" href={`/places/${selectedPlace.id}`}>Open place record</Link> : null}
+          {selectedRoute && dataSource?.supportsResearchRecords !== false ? <Link className="presentation-link-button" href={`/persons/${selectedRoute.personId}`}>Open person dossier</Link> : null}
+          {selectedPerson && !selection && dataSource?.supportsResearchRecords !== false ? <Link className="presentation-link-button" href={`/persons/${selectedPerson.id}`}>Open person dossier</Link> : null}
+        </div>
+      ) : null}
       {peopleDirectory}
       {presentationMapConfig.legend ? (
-        <details className="presentation-group presentation-right-legend">
-          <summary>Map legend</summary>
+        <PresentationDisclosure label="Map legend" className="presentation-group presentation-right-legend" contentClassName="presentation-disclosure__content">
           <div className="presentation-group__content">
             <p className="presentation-label">Historical administration</p>
             {publicMapLegend.filter((entry) => entry.group === "historical").map((entry) => <div key={entry.value} className="presentation-right-legend__item"><span className="presentation-right-legend__swatch" style={{ backgroundColor: entry.color }} aria-hidden="true" />{entry.label}</div>)}
@@ -2940,18 +3112,7 @@ export function MapWorkspace({
             <p className="presentation-label presentation-right-legend__subheading">Route lines</p>
             {publicMapLegend.filter((entry) => entry.group === "routes").map((entry) => <div key={entry.value} className="presentation-right-legend__item"><span className={`presentation-right-legend__swatch presentation-right-legend__swatch--line presentation-right-legend__swatch--${entry.pattern ?? "solid"}`} style={{ backgroundColor: entry.color, color: entry.color }} aria-hidden="true" />{entry.label}</div>)}
           </div>
-        </details>
-      ) : null}
-
-      {(presentationDetails || presentationGroupDetails) ? (
-        <div className="presentation-people-detail" data-testid="presentation-story-card">
-          <div className="mb-3 flex items-center justify-between gap-2"><p className="presentation-label">Selected detail</p><button type="button" className="presentation-icon-button" onClick={() => clearPresentationSelection()} aria-label="Clear selected person or family">×</button></div>
-          {presentationDetails ?? presentationGroupDetails}
-          {selectedPerson ? <button type="button" disabled={!selectedPersonRoutes.length || isPlaying} className="presentation-primary-button mt-3" onClick={startRoutePlayback}>{isPlaying ? "Playing route…" : selectedPersonRoutes.length ? "Play route" : "No documented route"}</button> : null}
-          {selectedPlace ? <Link className="presentation-link-button" href={`/places/${selectedPlace.id}`}>Open place record</Link> : null}
-          {selectedRoute && dataSource?.supportsResearchRecords !== false ? <Link className="presentation-link-button" href={`/persons/${selectedRoute.personId}`}>Open person dossier</Link> : null}
-          {selectedPerson && !selection && dataSource?.supportsResearchRecords !== false ? <Link className="presentation-link-button" href={`/persons/${selectedPerson.id}`}>Open person dossier</Link> : null}
-        </div>
+        </PresentationDisclosure>
       ) : null}
     </aside>
   ) : null;
@@ -2959,9 +3120,11 @@ export function MapWorkspace({
   const presentationTimeline = presentationMapConfig.timeline ? (
     <section className={`presentation-map__timeline absolute right-2 bottom-2 left-2 z-20 border border-[#bdb7aa] bg-[#fffdf8]/95 p-1 shadow-[0_10px_24px_rgba(22,42,35,0.16)] backdrop-blur-md sm:right-3 sm:bottom-3 sm:left-3${presentationTimelineOpen ? "" : " presentation-map__timeline--collapsed"}`} data-testid="presentation-timeline">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <div className="flex min-w-32 items-center gap-1.5"><button type="button" className="presentation-icon-button presentation-timeline__toggle" onClick={() => setPresentationTimelineOpen((open) => !open)} aria-expanded={presentationTimelineOpen} aria-label={presentationTimelineOpen ? "Collapse route timeline" : "Expand route timeline"}>{presentationTimelineOpen ? "−" : "+"}</button><div><p className="presentation-card__eyebrow">Route</p><p className="font-editorial text-base font-bold text-[#173f36]">{selectedPerson?.label ?? "Select a person"}</p></div></div>
-        <div className="presentation-timeline__track flex min-w-0 grow items-center gap-1.5 overflow-x-auto py-0.5">{selectedPersonRoutes.length ? selectedPersonRoutes.map((route, index) => <div key={route.id} className="presentation-timeline__stop flex min-w-fit items-center gap-1.5"><span className={`grid size-6 place-items-center rounded-full border text-xs font-bold ${timelineStep !== null && index < timelineStep ? "border-[#173f36] bg-[#173f36] text-white" : "border-[#9fa69f] bg-white text-[#56645e]"}`}>{route.sequence}</span><span className="presentation-timeline__place"><strong>{route.destinationName}</strong><small>{mapRouteDateLabel(route, "en")}</small></span>{index < selectedPersonRoutes.length - 1 ? <span className="presentation-timeline__line h-px w-6 bg-[#b9b3a7]" /> : null}</div>) : <p className="text-xs text-[#747f79]">No documented route selected.</p>}</div>
-        <div className="flex min-w-fit gap-2"><button type="button" disabled={!filters.person || !selectedPersonRoutes.length || isPlaying} onClick={startRoutePlayback} className="presentation-primary-button">Play once</button><button type="button" disabled={!isPlaying} onClick={() => setIsPlaying(false)} className="presentation-secondary-button">Pause</button><button type="button" onClick={resetView} className="presentation-secondary-button">Reset</button></div>
+        <div className="flex min-w-32 items-center gap-1.5"><button type="button" className="presentation-icon-button presentation-timeline__toggle" onClick={() => { const nextOpen = !presentationTimelineOpen; setPresentationTimelineOpen(nextOpen); if (nextOpen && presentationMobile) { setPresentationPanelOpen(false); setPresentationPeoplePanelOpen(false); } }} aria-expanded={presentationTimelineOpen} aria-controls="presentation-route-timeline-content" aria-label={presentationTimelineOpen ? "Collapse route timeline" : "Expand route timeline"}>{presentationTimelineOpen ? "−" : "+"}</button><div><p className="presentation-card__eyebrow">Route</p><p className="font-editorial text-base font-bold text-[#173f36]">{selectedPerson?.label ?? "Select a person"}</p></div></div>
+        <div id="presentation-route-timeline-content" className="presentation-timeline__content" hidden={!presentationTimelineOpen}>
+          <div className="presentation-timeline__track flex min-w-0 grow items-center gap-1.5 overflow-x-auto py-0.5">{selectedPersonRoutes.length ? selectedPersonRoutes.map((route, index) => <div key={route.id} className="presentation-timeline__stop flex min-w-fit items-center gap-1.5"><span className={`grid size-6 place-items-center rounded-full border text-xs font-bold ${timelineStep !== null && index < timelineStep ? "border-[#173f36] bg-[#173f36] text-white" : "border-[#9fa69f] bg-white text-[#56645e]"}`}>{route.sequence}</span><span className="presentation-timeline__place"><strong>{route.destinationName}</strong><small>{mapRouteDateLabel(route, "en")}</small></span>{index < selectedPersonRoutes.length - 1 ? <span className="presentation-timeline__line h-px w-6 bg-[#b9b3a7]" /> : null}</div>) : <p className="text-xs text-[#747f79]">No documented route selected.</p>}</div>
+          <div className="flex min-w-fit gap-2"><button type="button" disabled={!filters.person || !selectedPersonRoutes.length || isPlaying} onClick={startRoutePlayback} className="presentation-primary-button">{timelinePlaybackLabel}</button><button type="button" disabled={!isPlaying || prefersReducedMotion} onClick={() => setIsPlaying(false)} className="presentation-secondary-button">Pause</button><button type="button" onClick={resetView} className="presentation-secondary-button">Reset</button></div>
+        </div>
       </div>
       {presentationTimelineOpen && activePlaybackWaypoint ? <div className="presentation-waypoint"><span className="presentation-label">Current documented place</span><strong>{language === "ro" ? activePlaybackWaypoint.labelRo : activePlaybackWaypoint.label}</strong>{activePlaybackRoute?.dateStart || activePlaybackRoute?.dateRaw ? <span>{mapRouteDateLabel(activePlaybackRoute, "en")}</span> : null}{activePlaybackRoute?.notes ? <span>{activePlaybackRoute.notes}</span> : null}</div> : null}
     </section>
@@ -2974,14 +3137,15 @@ export function MapWorkspace({
         data-interface-hidden={interfaceHidden ? "true" : "false"}
         data-people-panel-open={presentationPeoplePanelOpen ? "true" : "false"}
         data-controls-open={presentationPanelOpen ? "true" : "false"}
+        data-timeline-open={presentationTimelineOpen ? "true" : "false"}
         data-presentation-viewport={presentationViewport}
         className="map-workspace presentation-map-workspace relative isolate min-h-[560px] h-[calc(100vh-12rem)] overflow-hidden border-y border-[#bdb7aa] bg-[#d7d3ca]"
       >
         {renderMapCanvas()}
         {!interfaceHidden ? presentationPanel : null}
-        {!interfaceHidden && !presentationPanelOpen ? <button type="button" className="presentation-map__reopen absolute top-2 left-2 z-30" onClick={() => setPresentationPanelOpen(true)}>Map settings</button> : null}
+        {!interfaceHidden && !presentationPanelOpen && (!presentationMobile || !presentationPeoplePanelOpen) ? <button type="button" className="presentation-map__reopen absolute top-2 left-2 z-30" onClick={openPresentationControls}>Map settings</button> : null}
         {presentationPeoplePanel}
-        {!interfaceHidden && !presentationPeoplePanelOpen && presentationMapConfig.personSelector ? <button type="button" className="presentation-map__reopen presentation-map__reopen--right absolute top-2 right-2 z-30" onClick={() => setPresentationPeoplePanelOpen(true)}>People</button> : null}
+        {!interfaceHidden && !presentationPeoplePanelOpen && (!presentationMobile || !presentationPanelOpen) && presentationMapConfig.personSelector ? <button type="button" className="presentation-map__reopen presentation-map__reopen--right absolute top-2 right-2 z-30" onClick={openPresentationPeople}>People</button> : null}
         {presentationTimeline}
         {interfaceHidden ? <div className="presentation-map__hidden-tools absolute top-3 left-3 z-30 flex items-center gap-2"><button type="button" className="presentation-secondary-button shadow-lg" onClick={() => setInterfaceHidden(false)}>Show interface</button>{presentationMapConfig.legend && presentationLegend.length ? <div className="presentation-compact-legend">{presentationLegend.map((entry) => <span key={entry.value} title={entry.label} style={{ backgroundColor: entry.color }} />)}</div> : null}</div> : null}
         {personStoryModal}

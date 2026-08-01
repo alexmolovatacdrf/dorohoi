@@ -454,7 +454,7 @@ The production deployment is Ready at:
 `https://dosare-dorohoi-platform-chatgpt.vercel.app/presentation/map`
 
 The latest deployment URL is
-`https://dosare-dorohoi-platform-chatgpt-kgqz0dtse.vercel.app`.
+`https://dosare-dorohoi-platform-chatgpt-i8yvno0ku.vercel.app`.
 
 Verification after the change: 56 tests passed, typecheck passed, lint passed
 and production build passed. The only existing uncommitted worktree content
@@ -463,3 +463,42 @@ committed. On continuation, first inspect `git status`, then continue from
 this checkpoint. If the next request concerns EHRI coverage, distinguish
 between enabling the layer (already done) and changing the existing
 route-linked visibility filter (a separate data/UX decision).
+
+## Production-audit remediation continuation — 21 July 2026
+
+The uncommitted continuation after `2b85c7e` addresses the remaining public-map
+interaction findings from `artifacts/production-review/presentation-map/`.
+It does not change `data/source/`, normalized research data, routes, names,
+coordinates or relationships.
+
+Implemented in the working tree:
+
+- mobile Presentation Map starts with settings, people and timeline collapsed;
+  settings and people are mutually exclusive drawers with an in-header switch,
+  no horizontal overflow and no MapLibre control interception;
+- selected-person detail precedes the family directory on desktop and mobile;
+- family selection and dossier expansion are separate semantic buttons; all
+  public disclosures expose `aria-expanded` and `aria-controls`, with no nested
+  interactive controls in the verified DOM;
+- map-feature clearing is distinct from clearing a pinned person/family;
+- historical popups/details expose raw field names and the manifest method
+  warning, and a snapshot change keeps the previous complete polygons painted
+  until the replacement has loaded;
+- route completion is labelled Replay, while reduced-motion mode reveals the
+  full route immediately without entering playback;
+- the public header explicitly identifies the English-only pilot.
+
+Local production-browser verification covered 1920×1080 and 390×844. The map
+reached `ready`, mobile panel transitions had zero horizontal overflow, the DOM
+query found zero nested interactive descendants, normal playback ended in
+Replay, and reduced-motion playback left Pause disabled. Final screenshots are
+under `output/playwright/presentation-audit-continuation/`.
+
+These working-tree changes were deployed to production on 22 July 2026 as
+Vercel deployment `dpl_CwCc7ELbD8rmEotvh4CBEsQkBpzW`. The deployment reached
+`READY`, the stable public Presentation Map returned HTTP 200, and the unique
+deployment URL remains protected by Vercel Authentication as described above.
+
+Final local gate after the remediation: 56 tests passed, strict typecheck
+passed, lint passed with zero warnings, and the production build passed for all
+routes including `/presentation/map` and `/map`.

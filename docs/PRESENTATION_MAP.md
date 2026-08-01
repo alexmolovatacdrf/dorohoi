@@ -13,7 +13,8 @@ The Project and Claude demo datasets remain available in the advanced Research
 Map and are not shown as Presentation tabs. Legacy `?dataset=project` and
 `?dataset=claude-demo` URLs resolve to the Eugenia pilot as well.
 
-The pilot is English-only at the interface level. Names, places and raw
+The pilot is English-only at the interface level and the public header marks
+that scope explicitly as `English pilot`. Names, places and raw
 documentary wording remain source-bound; they are not silently overwritten by
 machine translation. Structured labels and dates are presented in English,
 while a reviewed translation layer can be added when the corrected Eugenia
@@ -23,7 +24,7 @@ The ordinary OpenStreetMap raster layer remains the map base:
 `https://tile.openstreetmap.org/{z}/{x}/{y}.png`. The map offers Standard OSM,
 Light OSM and Muted OSM appearances so natural areas can be visually reduced
 while roads, rivers and settlement labels remain available. Presentation mode
-starts with historical polygon opacity at 18%.
+starts with historical polygon opacity at 38%.
 
 ## Research/demo fixtures
 
@@ -141,18 +142,31 @@ The visible controls are intentionally limited to:
 - collapsed-by-default EHRI and unresolved-place layers;
 - reset, full screen and hide-interface controls.
 
-The left settings panel is closed on first load. The right people panel and
-the bottom route timeline are compact overlays so the map remains the dominant
-surface. The timeline shows the event date beside each documented destination;
+The left settings panel is closed on first load. On desktop the right people
+panel opens with the selected-person detail before the directory. On mobile,
+both drawers and the route timeline start collapsed so the map remains the
+dominant surface. Map settings and People are mutually exclusive mobile
+drawers; their switch action lives in the open drawer header, and MapLibre
+zoom controls are hidden while a drawer is open to prevent pointer conflicts.
+The timeline shows the event date beside each documented destination;
 dates use the English format and preserve month/year precision when a day is
 not supplied.
+
+All public collapsible sections use named buttons with `aria-expanded` and
+`aria-controls`. A family row uses one button to select the documented person
+and a separate disclosure button to show dossier members, avoiding nested
+interactive controls. Selecting a map feature remains distinct from pinning a
+person; the public copy and clear action identify which selection is active.
 
 The public map does not expose dossiers, event type or confidence filters. The
 research map retains those capabilities under its collapsed Advanced filters
 group. Public labels avoid source IDs, schema names and confidence codes while
 selected historical polygons still expose the raw documentary fields in the
-details card: `Name`, `Foreign_Po`, `Head_of_St`, `Govt_in_Ex`, snapshot month,
-public category and attribution.
+details card and popup: `Name`, `Foreign_Po`, `Head_of_St`, `Govt_in_Ex`,
+snapshot month, public category and attribution. A Source and method disclosure
+keeps the manifest's methodological warning available at the point of
+selection. While another month is loading, the previous complete snapshot
+remains painted instead of exposing an empty intermediate canvas.
 
 ## Camera, timeline and interface
 
@@ -169,14 +183,17 @@ documented head/declarant separately.
 The selected-person card also lists other people in the same dossier when the
 normalized data supports that relationship.
 
-The bottom timeline uses a slow, one-shot progression of 4.6 seconds per
+The bottom timeline uses a slow, one-shot progression of 5.6 seconds per
 documented route segment. In both Presentation Map
 and Research Map, each route is rendered as a smooth visual curve between its
 documented endpoints, with directional arrow symbols and a moving progress
 marker. Reverse or repeated movements between the same two places are assigned
 separate visual lanes so they do not sit on top of one another. The curve is
 explicitly a presentation aid, not a claim about the exact historical road.
-Playback never starts automatically and never loops. During playback the
+Playback never starts automatically and never loops. After completion the
+action is labelled Replay. When `prefers-reduced-motion: reduce` is active,
+the action becomes Show full route and reveals the complete route immediately
+without entering an animated or pausable state. During ordinary playback the
 current documented place and the route note are shown in the timeline card.
 
 The left panel collapses, the right people panel can also collapse, and the

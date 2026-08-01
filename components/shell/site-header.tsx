@@ -25,6 +25,7 @@ export function SiteHeader({ presentationOnly = false }: { presentationOnly?: bo
         <div className="presentation-site-header__inner">
           <span className="presentation-site-header__kicker">Public Historical Atlas</span>
           <span className="presentation-site-header__title">Jews Repatriated to Dorohoi</span>
+          <span className="presentation-site-header__language">English pilot</span>
         </div>
       </header>
     );

@@ -671,8 +671,12 @@ summary {
   display: block;
   min-width: 0;
   flex: 1;
+  border: 0;
+  background: transparent;
+  padding: 0;
   cursor: pointer;
   outline-offset: 3px;
+  text-align: left;
 }
 
 .presentation-family-card__head strong {
@@ -686,6 +690,19 @@ summary {
   font-size: 0.75rem !important;
   font-weight: 800;
   white-space: nowrap;
+}
+
+.presentation-family-card__toggle {
+  display: grid;
+  flex: 0 0 2rem;
+  width: 2rem;
+  min-height: 2rem;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: #315c50;
+  cursor: pointer;
+  font-size: 1.1rem;
 }
 
 .presentation-family-card__items {
@@ -722,6 +739,14 @@ summary {
 }
 
 .presentation-place-people__group summary {
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.55rem 0.65rem;
+  color: #315c50;
+  font-weight: 800;
+}
+
+.presentation-place-people__group > .presentation-disclosure__button {
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.55rem 0.65rem;
@@ -1076,6 +1101,56 @@ summary {
   font-size: 1.125rem !important;
   font-weight: 700;
   list-style-position: inside;
+}
+
+.presentation-disclosure__button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.5rem;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.presentation-group > .presentation-disclosure__button {
+  color: #173f36;
+  font-family: var(--font-ui);
+  font-size: 1.125rem !important;
+  font-weight: 700;
+}
+
+.presentation-disclosure__chevron {
+  flex: 0 0 1rem;
+  color: #315c50;
+  font-family: var(--font-ui);
+  font-size: 1.1rem;
+  line-height: 1;
+  text-align: center;
+}
+
+.presentation-disclosure__supplement {
+  margin-left: auto;
+}
+
+.presentation-disclosure__content[hidden],
+.presentation-family-card__items[hidden] {
+  display: none !important;
+}
+
+.presentation-inline-disclosure {
+  margin-top: 0.8rem;
+  border-top: 1px solid #ded8cc;
+  padding-top: 0.6rem;
+}
+
+.presentation-inline-disclosure__content {
+  padding-top: 0.45rem;
+  color: #65716b;
+  font-size: 0.8rem;
+  line-height: 1.5;
 }
 
 /* Keep every collapsible map section visibly actionable, including the shared
@@ -1727,6 +1802,26 @@ body:has(.map-workspace) .site-footer {
   color: #747c78;
 }
 
+.historical-map-popup__source {
+  margin-top: 0.55rem;
+  border-top: 1px solid #ded8cc;
+  padding-top: 0.4rem;
+}
+
+.historical-map-popup__source summary {
+  cursor: pointer;
+  color: #315c50;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.historical-map-popup__method {
+  margin: 0.35rem 0 0;
+  color: #65716b;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
 /* Presentation pilot: preserve the map as the primary visual surface. */
 .presentation-site-header {
   min-height: 2.9rem;
@@ -1756,10 +1851,26 @@ body:has(.map-workspace) .site-footer {
 }
 
 .presentation-site-header__title {
+  min-width: 0;
+  overflow: hidden;
   font-family: var(--font-ui);
   font-size: clamp(1rem, 2vw, 1.28rem);
   font-weight: 700;
   line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.presentation-site-header__language {
+  flex: 0 0 auto;
+  margin-left: auto;
+  border: 1px solid rgb(255 255 255 / 45%);
+  padding: 0.18rem 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .presentation-page {
@@ -1796,6 +1907,13 @@ body:has(.map-workspace) .site-footer {
   padding: 0.55rem;
 }
 
+.presentation-panel__actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.35rem;
+}
+
 .presentation-map-workspace button,
 .presentation-map-workspace input,
 .presentation-map-workspace select,
@@ -1828,8 +1946,10 @@ body:has(.map-workspace) .site-footer {
 }
 
 .presentation-map-workspace .presentation-group > summary,
+.presentation-map-workspace .presentation-group > .presentation-disclosure__button,
 .presentation-map-workspace .presentation-family-card--disclosure > summary,
-.presentation-map-workspace .presentation-place-people__group > summary {
+.presentation-map-workspace .presentation-place-people__group > summary,
+.presentation-map-workspace .presentation-place-people__group > .presentation-disclosure__button {
   min-height: 1.85rem !important;
   padding-block: 0.18rem;
 }
@@ -1952,6 +2072,14 @@ body:has(.map-workspace) .site-footer {
   flex: 0 0 auto;
 }
 
+.presentation-timeline__content {
+  display: contents;
+}
+
+.presentation-timeline__content[hidden] {
+  display: none !important;
+}
+
 .presentation-timeline__track {
   scrollbar-width: thin;
 }
@@ -2014,8 +2142,10 @@ body:has(.map-workspace) .site-footer {
 }
 
 .presentation-map-workspace .presentation-map__reopen {
+  z-index: 40;
   min-height: 1.85rem;
   padding: 0.3rem 0.5rem;
+  pointer-events: auto;
   font-size: 0.7rem !important;
 }
 
@@ -2049,35 +2179,48 @@ body:has(.map-workspace) .site-footer {
   }
 
   .presentation-site-header__kicker {
-    font-size: 0.52rem;
+    display: none;
   }
 
   .presentation-site-header__title {
     font-size: 0.96rem;
   }
 
+  .presentation-site-header__language {
+    font-size: 0.68rem;
+  }
+
   .presentation-map-workspace {
     height: calc(100vh - 2.7rem) !important;
   }
 
-  .presentation-map-workspace .presentation-map__panel {
-    top: 0.35rem;
-    left: 0.35rem;
-    max-height: min(24rem, calc(100% - 3rem));
-  }
-
+  .presentation-map-workspace .presentation-map__panel,
   .presentation-map-workspace .presentation-map__people {
     top: 0.35rem;
     right: 0.35rem;
-    width: min(17rem, calc(100% - 0.7rem));
-    max-height: min(24rem, calc(100% - 3rem));
+    left: 0.35rem;
+    width: auto;
+    max-height: calc(100% - 3.7rem);
+  }
+
+  .presentation-map-workspace .presentation-map__people {
+    width: auto;
   }
 
   .presentation-map-workspace .maplibregl-ctrl-top-right,
   .presentation-map-workspace[data-people-panel-open="true"] .maplibregl-ctrl-top-right {
     top: auto;
     right: 0.35rem;
+    bottom: 3.8rem;
+  }
+
+  .presentation-map-workspace[data-timeline-open="true"] .maplibregl-ctrl-top-right {
     bottom: 6.9rem;
+  }
+
+  .presentation-map-workspace[data-people-panel-open="true"] .maplibregl-ctrl-top-right,
+  .presentation-map-workspace[data-controls-open="true"] .maplibregl-ctrl-top-right {
+    display: none;
   }
 
   .presentation-map-workspace .presentation-map__timeline {
@@ -2087,8 +2230,12 @@ body:has(.map-workspace) .site-footer {
   }
 
   .presentation-map__attribution {
-    bottom: 5.6rem;
+    bottom: 3.25rem;
     left: 0.45rem;
+  }
+
+  .presentation-map-workspace[data-timeline-open="true"] .presentation-map__attribution {
+    bottom: 5.6rem;
   }
 
   .presentation-map-workspace .presentation-map__timeline > div {
@@ -2163,7 +2310,7 @@ body:has(.map-workspace) .site-footer {
 .presentation-page .presentation-site-header__kicker {
   color: var(--wjc-paper-card);
   font-family: var(--wjc-font-mono);
-  font-size: 12px;
+  font-size: 14px;
   letter-spacing: 0.08em;
 }
 
@@ -2174,6 +2321,13 @@ body:has(.map-workspace) .site-footer {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.presentation-page .presentation-site-header__language {
+  border-color: rgb(243 245 247 / 55%);
+  color: var(--wjc-paper-card);
+  font-family: var(--wjc-font-mono);
+  font-size: 14px;
 }
 
 .presentation-page .presentation-map-workspace {
@@ -2208,10 +2362,11 @@ body:has(.map-workspace) .site-footer {
 
 .presentation-page .presentation-map-workspace .presentation-card__eyebrow,
 .presentation-page .presentation-map-workspace .presentation-label,
-.presentation-page .presentation-map-workspace .presentation-group > summary {
+.presentation-page .presentation-map-workspace .presentation-group > summary,
+.presentation-page .presentation-map-workspace .presentation-group > .presentation-disclosure__button {
   color: var(--wjc-ink-muted);
   font-family: var(--wjc-font-mono);
-  font-size: 12px !important;
+  font-size: 14px !important;
   letter-spacing: 0.08em;
   line-height: 1.3 !important;
   text-transform: uppercase;
@@ -2255,6 +2410,8 @@ body:has(.map-workspace) .site-footer {
 }
 
 .presentation-page .presentation-map-workspace .presentation-family-card__summary,
+.presentation-page .presentation-map-workspace .presentation-family-card__head,
+.presentation-page .presentation-map-workspace .presentation-family-card__toggle,
 .presentation-page .presentation-map-workspace .presentation-person-option,
 .presentation-page .presentation-map-workspace .presentation-group-option,
 .presentation-page .presentation-map-workspace .presentation-right-legend__item,
@@ -2287,6 +2444,12 @@ body:has(.map-workspace) .site-footer {
   font-size: 16px !important;
 }
 
+.presentation-page .presentation-map-workspace .presentation-family-card__head,
+.presentation-page .presentation-map-workspace .presentation-family-card__toggle,
+.presentation-page .presentation-map-workspace .presentation-disclosure__chevron {
+  color: var(--wjc-ink);
+}
+
 .presentation-page .presentation-map-workspace .presentation-timeline__place strong,
 .presentation-page .presentation-map-workspace .presentation-waypoint strong {
   color: var(--wjc-ink);
@@ -2298,7 +2461,14 @@ body:has(.map-workspace) .site-footer {
 .presentation-page .presentation-map-workspace .research-map-marker__date {
   color: var(--wjc-ink-muted);
   font-family: var(--wjc-font-mono);
-  font-size: 12px !important;
+  font-size: 14px !important;
+}
+
+.presentation-page .historical-map-popup__date,
+.presentation-page .historical-map-popup__detail,
+.presentation-page .historical-map-popup__source summary,
+.presentation-page .historical-map-popup__method {
+  font-size: 14px;
 }
 
 .presentation-page .presentation-map-workspace .presentation-map__attribution,
